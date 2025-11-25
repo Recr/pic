@@ -149,7 +149,7 @@ function SuggestionForm() {
                     </div>
 
                     {/* suggestion_area */}
-                    <div id="suggestion_area" className='flex gap-1.5 justify-center items-center w-90'>
+                    <div id="suggestion_area" className='flex flex-col gap-1.5 justify-center items-center w-90'>
                         <label>Local:</label>
                         <select
                             name="area"
