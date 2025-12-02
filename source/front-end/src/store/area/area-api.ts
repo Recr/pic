@@ -1,14 +1,14 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 // Define the base URL for your API
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/';
+const BASE_URL = import.meta.env.VITE_API_URL
 
 interface Area {
     id: number,
     name: string,
 }
 
-export const areaApi = createApi({
+export const areaAPI = createApi({
     reducerPath: 'areaApi',
     baseQuery: fetchBaseQuery({ 
         baseUrl: BASE_URL,
@@ -29,7 +29,3 @@ export const areaApi = createApi({
         }),
     }),
 });
-
-export const { useGetAreasQuery } = areaApi;
-
-export default areaApi;

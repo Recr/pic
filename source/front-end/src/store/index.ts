@@ -1,22 +1,19 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { improvementApi } from './improvement-api';
-import { employeeApi } from './employee-api';
-import areaApi from './area-api';
+import { improvementAPI } from './improvement/improvement-api';
+import { employeeAPI } from './employee/employee-api';
+import { areaAPI } from './area/area-api';
 
 export const store = configureStore({
     reducer: {
-        [improvementApi.reducerPath]: improvementApi.reducer,
-        [employeeApi.reducerPath]: employeeApi.reducer,
-        [areaApi.reducerPath]: areaApi.reducer,
+      [improvementAPI.reducerPath]: improvementAPI.reducer,
+      [employeeAPI.reducerPath]: employeeAPI.reducer,
+      [areaAPI.reducerPath]: areaAPI.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(
-            improvementApi.middleware,
-            employeeApi.middleware,
-            areaApi.middleware
-        ),
+      getDefaultMiddleware()
+        .concat(improvementAPI.middleware)
+        .concat(employeeAPI.middleware)
+        .concat(areaAPI.middleware)
 });
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
 

@@ -1,16 +1,10 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import type { Employee } from './types';
 
 // Define the base URL for your API
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/';
+const BASE_URL = import.meta.env.VITE_API_URL
 
-// Define types for employee data
-export interface Employee {
-    re: string;
-    name: string;
-    shift?: string;
-}
-
-export const employeeApi = createApi({
+export const employeeAPI = createApi({
     reducerPath: 'employeeApi',
     baseQuery: fetchBaseQuery({ 
         baseUrl: BASE_URL,
@@ -30,8 +24,4 @@ export const employeeApi = createApi({
             providesTags: ['Employee'],
         }),
     }),
-});
-
-export const { useGetEmployeesQuery } = employeeApi;
-
-export default employeeApi;
+})

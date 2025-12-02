@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useGetEmployeesQuery } from '../../store/employee-api';
-import { useGetAreasQuery } from '../../store/area-api';
+import { employeeAPI } from '../../store/employee/employee-api';
+import { areaAPI } from '../../store/area/area-api';
 // import { useGetCategoriesQuery } from '../../store/category-api'; // Uncomment when available
 // import { useGetImprovementsWithDetailsQuery, useUpdateImprovementMutation } from '../../store/improvement-api'; // Uncomment when available
 
@@ -28,8 +28,8 @@ function DefineManager() {
     const [improvements, setImprovements] = useState<Improvement[]>([]);
     
     // API Queries - uncomment when ready
-    const { data: employees } = useGetEmployeesQuery();
-    const { data: areas } = useGetAreasQuery();
+    const { data: employees } = employeeAPI.useGetEmployeesQuery();
+    const { data: areas } = areaAPI.useGetAreasQuery();
     // const { data: categories } = useGetCategoriesQuery();
     // const { data: improvementsData } = useGetImprovementsWithDetailsQuery();
     // const [updateImprovement] = useUpdateImprovementMutation();
