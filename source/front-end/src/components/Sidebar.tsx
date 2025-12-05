@@ -1,9 +1,11 @@
 function Sidebar () {
-    return (
-        <div className="sidebar">
-            <h2>Sidebar</h2>
-        </div>
-    )
+  return (
+    <div className="fixed">
+      <div>
+
+      </div>
+    </div>
+ )
 }
 
 export default Sidebar;

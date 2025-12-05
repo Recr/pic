@@ -32,6 +32,7 @@ function Employee () {
       </select>
       <label>Senha:</label>
       <input type="text" {...register('password')} />
+      <input type="submit" />
     </form>
   )
 }
