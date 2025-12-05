@@ -1,11 +1,11 @@
 export interface Employee {
-    re: string;
+    re: number;
     name: string;
     shift: string;
 }
 
 export interface Improvement {
-    id?: string;
+    id?: number;
     employees: Employee[];
     area: string;
     suggestion: string;
@@ -16,8 +16,9 @@ export interface Improvement {
 
 export interface CreateImprovementRequest {
     employees: Employee[];
-    area: string;
-    suggestion: string;
+    areaId: number;
+    description: string;
+    date: string;
 }
 
 export interface UpdateImprovementRequest {

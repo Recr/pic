@@ -7,11 +7,25 @@ import { areaAPI } from '../../store/area/area-api'
 
 function SuggestionForm() {
     const [employeeCount, setEmployeeCount] = useState(1);
+    const [selectedEmployees, setSelectedEmployees] = useState<Record<number, { name: string; shift: string }>>({});
     const [createImprovement, { isLoading, isSuccess, isError }] = improvementAPI.useCreateImprovementMutation();
     
     // These queries can be used for autocomplete - pass search terms as needed
     const { data: employees } = employeeAPI.useGetEmployeesQuery();
     const { data: areas } = areaAPI.useGetAreasQuery();
+
+    const handleEmployeeSelect = (num: number, re: string) => {
+        const selectedEmployee = employees?.find(emp => emp.re === re || emp.re === Number(re) || String(emp.re) === re);
+        if (selectedEmployee) {
+            setSelectedEmployees(prev => ({
+                ...prev,
+                [num]: {
+                    name: selectedEmployee.name,
+                    shift: selectedEmployee.shift || ''
+                }
+            }));
+        }
+    };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -21,7 +35,7 @@ function SuggestionForm() {
         const employeesList = [];
         for (let i = 1; i <= employeeCount; i++) {
             employeesList.push({
-                re: formData.get(`re-${i}`) as string,
+                re: Number(formData.get(`re-${i}`)),
                 name: formData.get(`name-${i}`) as string,
                 shift: formData.get(`shift-${i}`) as string,
             });
@@ -30,8 +44,9 @@ function SuggestionForm() {
         try {
             await createImprovement({
                 employees: employeesList,
-                area: formData.get('area') as string,
-                suggestion: formData.get('suggestion') as string,
+                areaId: Number(formData.get('area')),
+                description: formData.get('description') as string,
+                date: formData.get('date') as string,
             }).unwrap();
             
             // Reset form on success
@@ -109,6 +124,8 @@ function SuggestionForm() {
                                     list={`employees-list-${num}`}
                                     required
                                     className='w-4/5 p-2.5 my-1.5 rounded-[5px] border border-[#ccc]'
+                                    onChange={(e) => handleEmployeeSelect(num, e.target.value)}
+                                    onBlur={(e) => handleEmployeeSelect(num, e.target.value)}
                                 />
                                 <datalist id={`employees-list-${num}`}>
                                     {employees?.map((emp) => (
@@ -117,28 +134,40 @@ function SuggestionForm() {
                                         </option>
                                     ))}
                                 </datalist>
-
+                                {/* TODO: Allow to manually fill name and shift if not found in datalist*/}
                                 <label>Nome:</label>
                                 <input
                                     type="text"
                                     name={`name-${num}`}
+                                    value={selectedEmployees[num]?.name || ''}
+                                    onChange={(e) => setSelectedEmployees(prev => ({
+                                        ...prev,
+                                        [num]: { ...prev[num], name: e.target.value }
+                                    }))}
                                     required
                                     className='w-4/5 p-2.5 my-1.5 rounded-[5px] border border-[#ccc]'
+                                    readOnly
                                 />
 
                                 <label>Turno:</label>
                                 <input
                                     type="text"
                                     name={`shift-${num}`}
+                                    value={selectedEmployees[num]?.shift || ''}
+                                    onChange={(e) => setSelectedEmployees(prev => ({
+                                        ...prev,
+                                        [num]: { ...prev[num], shift: e.target.value }
+                                    }))}
                                     required
                                     className='employee_shift cursor-pointer w-4/5 p-2.5 my-1.5 rounded-[5px] border border-[#ccc]'
+                                    readOnly
                                 />
                             </div>
                         ))}
                     </div>
 
                     {/* suggestion_area */}
-                    <div id="suggestion_area" className='flex gap-1.5 justify-center items-center w-90'>
+                    <div id="suggestion_area" className='flex flex-col gap-1.5 justify-center items-center w-90'>
                         <label>Local:</label>
                         <input
                             type="text"
