@@ -1,7 +1,7 @@
 export type Role = "OPERATOR" | "LEADER" | "ADMIN"
 
 export interface Employee {
-    re: string;
+    re: number;
     name: string;
     role: Role;
     shift?: string;

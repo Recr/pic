@@ -11,11 +11,16 @@ function SuggestionForm() {
     const [createImprovement, { isLoading, isSuccess, isError }] = improvementAPI.useCreateImprovementMutation();
     
     // These queries can be used for autocomplete - pass search terms as needed
-    const { data: employees } = employeeAPI.useGetEmployeesQuery();
+    const { data: employees, isLoading: employeesLoading, error: employeesError } = employeeAPI.useGetEmployeesQuery();
     const { data: areas } = areaAPI.useGetAreasQuery();
+    
+    console.log('Employees:', employees);
+    console.log('Employees Error:', employeesError);
+    console.log('Areas:', areas);
 
     const handleEmployeeSelect = (num: number, re: string) => {
-        const selectedEmployee = employees?.find(emp => emp.re === re || emp.re === Number(re) || String(emp.re) === re);
+        const reNumber = Number(re);
+        const selectedEmployee = employees?.find(emp => emp.re === reNumber);
         if (selectedEmployee) {
             setSelectedEmployees(prev => ({
                 ...prev,
@@ -46,7 +51,7 @@ function SuggestionForm() {
                 employees: employeesList,
                 areaId: Number(formData.get('area')),
                 description: formData.get('description') as string,
-                date: formData.get('date') as string,
+                date: new Date(),
             }).unwrap();
             
             // Reset form on success
@@ -167,7 +172,7 @@ function SuggestionForm() {
                     </div>
 
                     {/* suggestion_area */}
-                    <div id="suggestion_area" className='flex flex-col gap-1.5 justify-center items-center w-90'>
+                    {/* <div id="suggestion_area" className='flex flex-col gap-1.5 justify-center items-center w-90'>
                         <label>Local:</label>
                         <input
                             type="text"
@@ -184,12 +189,12 @@ function SuggestionForm() {
                                 </option>
                             ))}
                         </datalist>
-                    </div>
+                    </div> */}
 
                     <label>Sugestão:</label>
                     <textarea
-                        id="suggestion"
-                        name="suggestion"
+                        id="description"
+                        name="description"
                         required
                         className='resize-none no-underline w-4/5 p-2.5 my-1.5 rounded-[5px] border border-[#ccc]'
                     ></textarea>

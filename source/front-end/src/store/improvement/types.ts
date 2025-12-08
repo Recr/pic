@@ -7,18 +7,17 @@ export interface Employee {
 export interface Improvement {
     id?: number;
     employees: Employee[];
-    area: string;
-    suggestion: string;
-    status?: 'pending' | 'approved' | 'rejected' | 'implemented';
-    createdAt?: string;
-    updatedAt?: string;
+    areaId: string;
+    description: string;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface CreateImprovementRequest {
+    description: string;
     employees: Employee[];
     areaId: number;
-    description: string;
-    date: string;
+    date: Date;
 }
 
 export interface UpdateImprovementRequest {
