@@ -8,15 +8,12 @@ import { areaAPI } from '../../store/area/area-api'
 function SuggestionForm() {
     const [employeeCount, setEmployeeCount] = useState(1);
     const [selectedEmployees, setSelectedEmployees] = useState<Record<number, { name: string; shift: string }>>({});
+    const [selectedAreaId, setSelectedAreaId] = useState<number | null>(null);
     const [createImprovement, { isLoading, isSuccess, isError }] = improvementAPI.useCreateImprovementMutation();
     
     // These queries can be used for autocomplete - pass search terms as needed
-    const { data: employees, isLoading: employeesLoading, error: employeesError } = employeeAPI.useGetEmployeesQuery();
+    const { data: employees } = employeeAPI.useGetEmployeesQuery();
     const { data: areas } = areaAPI.useGetAreasQuery();
-    
-    console.log('Employees:', employees);
-    console.log('Employees Error:', employeesError);
-    console.log('Areas:', areas);
 
     const handleEmployeeSelect = (num: number, re: string) => {
         const reNumber = Number(re);
@@ -29,6 +26,13 @@ function SuggestionForm() {
                     shift: selectedEmployee.shift || ''
                 }
             }));
+        }
+    };
+
+    const handleAreaSelect = (areaName: string) => {
+        const selectedArea = areas?.find(area => area.name === areaName);
+        if (selectedArea) {
+            setSelectedAreaId(selectedArea.id);
         }
     };
 
@@ -46,20 +50,26 @@ function SuggestionForm() {
             });
         }
 
+        if (!selectedAreaId) {
+            alert('Por favor, selecione uma área válida da lista.');
+            return;
+        }
+
         try {
             await createImprovement({
                 employees: employeesList,
-                areaId: Number(formData.get('area')),
+                areaId: selectedAreaId,
                 description: formData.get('description') as string,
                 date: new Date(),
             }).unwrap();
             
             // Reset form on success
             e.currentTarget.reset();
+            setSelectedAreaId(null);
+            setSelectedEmployees({});
             alert('Sugestão enviada com sucesso!');
         } catch (error) {
-            console.error('Erro ao enviar sugestão:', error);
-            alert('Erro ao enviar sugestão. Tente novamente.');
+            console.log('Erro ao enviar sugestão:', error);
         }
     };
 
@@ -172,13 +182,14 @@ function SuggestionForm() {
                     </div>
 
                     {/* suggestion_area */}
-                    {/* <div id="suggestion_area" className='flex flex-col gap-1.5 justify-center items-center w-90'>
+                    <div id="suggestion_area" className='flex flex-col gap-1.5 justify-center items-center w-90'>
                         <label>Local:</label>
                         <input
                             type="text"
                             name="area"
                             placeholder="Pesquisar área"
                             list="areas-list"
+                            onChange={(e) => handleAreaSelect(e.target.value)}
                             required
                             className='w-4/5 p-2.5 my-1.5 rounded-[5px] border border-[#ccc]'
                         />
@@ -189,7 +200,7 @@ function SuggestionForm() {
                                 </option>
                             ))}
                         </datalist>
-                    </div> */}
+                    </div>
 
                     <label>Sugestão:</label>
                     <textarea

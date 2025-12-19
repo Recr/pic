@@ -1,7 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import type { Employee } from './types';
+import type { Employee, CreateEmployee } from './types';
 
-// Define the base URL for your API
 const BASE_URL = import.meta.env.VITE_API_URL
 
 export const employeeAPI = createApi({
@@ -9,7 +8,6 @@ export const employeeAPI = createApi({
     baseQuery: fetchBaseQuery({ 
         baseUrl: BASE_URL,
         prepareHeaders: (headers) => {
-            // Add any auth tokens or custom headers here
             const token = localStorage.getItem('authToken');
             if (token) {
                 headers.set('authorization', `Bearer ${token}`);
@@ -22,6 +20,14 @@ export const employeeAPI = createApi({
         getEmployees: builder.query<Employee[], void>({
             query: () => '/employees',
             providesTags: ['Employee'],
+        }),
+        createEmployee: builder.mutation<Employee, CreateEmployee>({
+            query: (body) => ({
+                url: '/employees',
+                method: 'POST',
+                body,
+            }),
+            invalidatesTags: ['Employee'],
         }),
     }),
 })

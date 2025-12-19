@@ -6,3 +6,7 @@ export interface Employee {
     role: Role;
     shift?: string;
 }
+
+export interface CreateEmployee extends Employee {
+    password: string;
+}
