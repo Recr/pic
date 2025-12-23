@@ -26,5 +26,12 @@ export const improvementAPI = createApi({
             }),
             invalidatesTags: ['Improvement'],
         }),
+        getImprovements: builder.query<Improvement[], void>({
+            query: () => ({
+                url: '/improvements',
+                method: 'GET',
+            }),
+            providesTags: ['Improvement'],
+        }),
     }),
 })

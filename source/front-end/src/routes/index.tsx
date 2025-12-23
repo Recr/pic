@@ -5,10 +5,12 @@ import DefineManager from '../pages/define-manager'
 import DefineChampion from '../pages/define-champion'
 import Employee from '../pages/employee'
 import Areas from '../pages/areas'
+import Sidebar from '../components/Sidebar'
 
 function SuggestionSystemRouter() {
     return (
         <Router>
+            <Sidebar />
             <Routes>
                 <Route path="/" element={<SuggestionForm />} />
                 <Route path="/suggestion-list" element={<SuggestionList />} />
