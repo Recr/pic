@@ -7,76 +7,85 @@ datasource db {
   provider = "sqlserver"
 }
 
-model AREA {
-  id   Int    @id(map: "PK__AREA__3213E83F99DC33F0") @default(autoincrement())
-  name String @db.VarChar(50)
+model Area {
+  id   Int    @id @default(autoincrement())
+  name String @db.NVarChar(50)
+
+  improvements Improvement[]
+
+  @@map("area")
 }
 
-model CATEGORY {
-  id              Int           @id(map: "PK__CATEGORY__3213E83F35CCE15C") @default(autoincrement())
-  name            String        @db.VarChar(50)
-  category_reward Decimal       @db.Decimal(10, 2)
-  IMPROVEMENT     IMPROVEMENT[]
+model Category {
+  id             Int      @id @default(autoincrement())
+  name           String   @db.NVarChar(50)
+  categoryReward Decimal? @map("category_reward") @db.Decimal(10, 2)
+
+  improvements Improvement[]
+
+  @@map("category")
 }
 
-model EMPLOYEE {
-  id                                            Int           @id(map: "PK__EMPLOYEE__3213E83F230DFE0E") @default(autoincrement())
-  name                                          String        @db.VarChar(100)
-  role                                          String        @default("OPERATOR", map: "DF__EMPLOYEE__role__6B24EA82") @db.VarChar(20)
-  re                                            Int?          @unique(map: "UQ__EMPLOYEE__321433120B386ECD")
-  shift                                         String?       @db.VarChar(20)
-  password_hash                                 String        @db.VarChar(100)
-  IMPROVEMENT_IMPROVEMENT_champion_idToEMPLOYEE IMPROVEMENT[] @relation("IMPROVEMENT_champion_idToEMPLOYEE")
-  IMPROVEMENT_IMPROVEMENT_manager_idToEMPLOYEE  IMPROVEMENT[] @relation("IMPROVEMENT_manager_idToEMPLOYEE")
-  SUGGESTION                                    SUGGESTION[]
+model Employee {
+  id           Int     @id @default(autoincrement())
+  name         String  @db.NVarChar(100)
+  role         String  @default("OPERATOR")
+  re           Int?    @unique(map: "UQ__EMPLOYEE__321433120B386ECD")
+  shift        String? @db.NVarChar(20)
+  passwordHash String  @map("password_hash") @db.NVarChar(100)
+
+  improvementsChampion Improvement[] @relation("ChampionReviewImprovement")
+  improvementsManager  Improvement[] @relation("ManagerReviewImprovement")
+  suggestions          Suggestion[]
+
+  @@map("employee")
 }
 
-model IMPROVEMENT {
-  id                                         Int          @id(map: "PK__IMPROVEM__3213E83FFEE3890E") @default(autoincrement())
-  description                                String       @db.VarChar(1000)
-  status                                     String       @default("DEFINE_MANAGER", map: "DF__IMPROVEME__statu__06CD04F7") @db.VarChar(20)
-  category_id                                Int?
-  area_id                                    Int
-  created_at                                 DateTime     @db.Date
-  admin_reviewed_at                          DateTime?    @db.Date
-  manager_reviewed_at                        DateTime?    @db.Date
-  champion_reviewed_at                       DateTime?    @db.Date
-  implementation_started_at                  DateTime?    @db.Date
-  completed_at                               DateTime?    @db.Date
-  manager_id                                 Int?
-  champion_id                                Int?
-  notes                                      String?      @db.VarChar(1000)
-  rejection_note                             String?      @db.VarChar(1000)
-  CATEGORY                                   CATEGORY?    @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_IMPROVEMENT_CATEGORY")
-  EMPLOYEE_IMPROVEMENT_champion_idToEMPLOYEE EMPLOYEE?    @relation("IMPROVEMENT_champion_idToEMPLOYEE", fields: [champion_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_IMPROVEMENT_CHAMPION")
-  EMPLOYEE_IMPROVEMENT_manager_idToEMPLOYEE  EMPLOYEE?    @relation("IMPROVEMENT_manager_idToEMPLOYEE", fields: [manager_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_IMPROVEMENT_MANAGER")
-  SUGGESTION                                 SUGGESTION[]
+model Improvement {
+  id                      Int       @id(map: "PK__IMPROVEM__3213E83FFEE3890E") @default(autoincrement())
+  description             String    @db.NVarChar(1000)
+  status                  String    @default("DEFINE_MANAGER")
+  categoryId              Int?      @map("category_id")
+  areaId                  Int       @map("area_id")
+  createdAt               DateTime  @map("created_at") @db.DateTime2
+  adminReviewedAt         DateTime? @map("admin_reviewed_at") @db.DateTime2
+  managerReviewedAt       DateTime? @map("manager_reviewed_at") @db.DateTime2
+  championReviewedAt      DateTime? @map("champion_reviewed_at") @db.DateTime2
+  implementationStartedAt DateTime? @map("implementation_started_at") @db.DateTime2
+  completedAt             DateTime? @map("completed_at") @db.DateTime2
+  managerId               Int?      @map("manager_id")
+  championId              Int?      @map("champion_id")
+  notes                   String?   @db.NVarChar(1000)
+  rejectionNote           String?   @db.NVarChar(1000)
 
-  @@index([area_id], map: "IX_IMPROVEMENT_AREA")
-  @@index([category_id], map: "IX_IMPROVEMENT_CATEGORY")
-  @@index([champion_id], map: "IX_IMPROVEMENT_CHAMPION")
-  @@index([manager_id], map: "IX_IMPROVEMENT_MANAGER")
+  area        Area         @relation(fields: [areaId], references: [id])
+  category    Category?    @relation(fields: [categoryId], references: [id])
+  champion    Employee?    @relation("ChampionReviewImprovement", fields: [championId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  manager     Employee?    @relation("ManagerReviewImprovement", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  suggestions Suggestion[]
 }
 
-model PAYOUT {
-  id            Int        @id(map: "PK__PAYOUT__3213E83F9679BBED") @default(autoincrement())
-  suggestion_id Int
-  value         Decimal?   @db.Decimal(10, 2)
-  status        String     @default("PENDING", map: "DF__PAYOUT__status__114A936A") @db.VarChar(20)
-  payed_at      DateTime?  @db.Date
-  SUGGESTION    SUGGESTION @relation(fields: [suggestion_id], references: [id], onUpdate: NoAction, map: "FK_PAYOUT_SUGGESTION")
+model Payout {
+  id           Int       @id @default(autoincrement())
+  suggestionId Int       @map("suggestion_id")
+  value        Decimal?  @db.Decimal(10, 2)
+  status       String    @default("PENDING")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.DateTime2
+  payedAt      DateTime? @map("payed_at") @db.DateTime2
 
-  @@index([suggestion_id], map: "IX_PAYOUT_SUGGESTION")
+  suggestion Suggestion @relation(fields: [suggestionId], references: [id])
+
+  @@map("payout")
 }
 
-model SUGGESTION {
-  id             Int         @id(map: "PK__SUGGESTI__3213E83FCC0C559C") @default(autoincrement())
-  employee_id    Int
-  improvement_id Int
-  PAYOUT         PAYOUT[]
-  EMPLOYEE       EMPLOYEE    @relation(fields: [employee_id], references: [id], onUpdate: NoAction, map: "FK_SUGGESTION_EMPLOYEE")
-  IMPROVEMENT    IMPROVEMENT @relation(fields: [improvement_id], references: [id], onUpdate: NoAction, map: "FK_SUGGESTION_IMPROVEMENT")
+model Suggestion {
+  id            Int @id @default(autoincrement())
+  employeeId    Int @map("employee_id")
+  improvementId Int @map("improvement_id")
 
-  @@index([employee_id], map: "IX_SUGGESTION_EMPLOYEE")
-  @@index([improvement_id], map: "IX_SUGGESTION_IMPROVEMENT")
+  payout      Payout[]
+  employee    Employee    @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  improvement Improvement @relation(fields: [improvementId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("suggestion")
 }
