@@ -1,14 +1,15 @@
 import { NextFunction, Request, Response } from "express";
+import { AreasUseCase } from "../services/areas.use-case";
+import { PrismaAreaRepository } from "../repositories/area.repository";
 
-class AreasController {
-  public static async handleFindAll (req: Request, res: Response, next: NextFunction) {
+export const AreasController = {
+  async handleFindAll (req: Request, res: Response, next: NextFunction) {
     try {
-      const areas = await areaService.findAll()
+      const areasUseCase = new AreasUseCase(new PrismaAreaRepository())
+      const areas = await areasUseCase.executeFindAll()
       res.send(areas)
     } catch (error) {
       next(error)
     }
   }
 }
-
-export { AreasController }

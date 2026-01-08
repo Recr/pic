@@ -30,7 +30,7 @@ model Employee {
   id           Int     @id @default(autoincrement())
   name         String  @db.NVarChar(100)
   role         String  @default("OPERATOR")
-  re           Int?    @unique(map: "UQ__EMPLOYEE__321433120B386ECD")
+  re           Int?    @unique
   shift        String? @db.NVarChar(20)
   passwordHash String  @map("password_hash") @db.NVarChar(100)
 
@@ -42,12 +42,13 @@ model Employee {
 }
 
 model Improvement {
-  id                      Int       @id(map: "PK__IMPROVEM__3213E83FFEE3890E") @default(autoincrement())
+  id                      Int       @id @default(autoincrement())
   description             String    @db.NVarChar(1000)
   status                  String    @default("DEFINE_MANAGER")
   categoryId              Int?      @map("category_id")
+  rewardAmount            Decimal?  @map("reward_amount") @db.Decimal(10, 2)
   areaId                  Int       @map("area_id")
-  createdAt               DateTime  @map("created_at") @db.DateTime2
+  createdAt               DateTime  @map("created_at") @db.DateTime2 @default(now())
   adminReviewedAt         DateTime? @map("admin_reviewed_at") @db.DateTime2
   managerReviewedAt       DateTime? @map("manager_reviewed_at") @db.DateTime2
   championReviewedAt      DateTime? @map("champion_reviewed_at") @db.DateTime2
@@ -56,13 +57,15 @@ model Improvement {
   managerId               Int?      @map("manager_id")
   championId              Int?      @map("champion_id")
   notes                   String?   @db.NVarChar(1000)
-  rejectionNote           String?   @db.NVarChar(1000)
+  rejectionNote           String?   @map("rejection_note") @db.NVarChar(1000)
 
   area        Area         @relation(fields: [areaId], references: [id])
   category    Category?    @relation(fields: [categoryId], references: [id])
   champion    Employee?    @relation("ChampionReviewImprovement", fields: [championId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   manager     Employee?    @relation("ManagerReviewImprovement", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   suggestions Suggestion[]
+
+  @@map("improvement")
 }
 
 model Payout {
