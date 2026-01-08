@@ -9,6 +9,8 @@ class AreasUseCase {
     const areas = await this.areaRepository.findAll()
     return areas
   }
+
+  public async executeCreate(newArea: { name: string }) {
 }
 
 export { AreasUseCase }

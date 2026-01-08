@@ -23,6 +23,17 @@ class PrismaAreaRepository {
     })
     return area
   }
+
+  public async update (areaId: number, updatedArea: Prisma.AreaUpdateInput) {
+    const area = await prisma.area.update({
+      where: {
+        id: areaId
+      },
+      data: { ...updatedArea}
+    })
+    return area
+  }
+
 }
 
 export { PrismaAreaRepository }

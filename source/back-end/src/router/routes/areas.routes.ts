@@ -6,4 +6,5 @@ const areaRoutes = Router()
 areaRoutes.get('/', AreasController.handleFindAll)
 
 
+
 export { areaRoutes }
