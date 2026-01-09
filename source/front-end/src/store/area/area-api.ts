@@ -9,23 +9,46 @@ interface Area {
 }
 
 export const areaAPI = createApi({
-    reducerPath: 'areaApi',
-    baseQuery: fetchBaseQuery({ 
-        baseUrl: BASE_URL,
-        prepareHeaders: (headers) => {
-            // Add any auth tokens or custom headers here
-            const token = localStorage.getItem('authToken');
-            if (token) {
-                headers.set('authorization', `Bearer ${token}`);
-            }
-            return headers;
-        },
+  reducerPath: 'areaApi',
+  baseQuery: fetchBaseQuery({ 
+    baseUrl: BASE_URL,
+    prepareHeaders: (headers) => {
+      // Add any auth tokens or custom headers here
+      const token = localStorage.getItem('authToken');
+      if (token) {
+          headers.set('authorization', `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
+  tagTypes: ['Area'],
+  endpoints: (builder) => ({
+    getAreas: builder.query<Area[], undefined>({
+        query: () => '/areas',
+        providesTags: ['Area'],
     }),
-    tagTypes: ['Area'],
-    endpoints: (builder) => ({
-        getAreas: builder.query<Area[], void>({
-            query: () => '/areas',
-            providesTags: ['Area'],
-        }),
+    createArea: builder.mutation<Area, {name: string}>({
+      query: (body) => ({
+        url: `areas`,
+        method: 'POST',
+        body 
+      }),
+      invalidatesTags: ["Area"]
     }),
+    deleteArea: builder.mutation<undefined, number>({
+      query: (areaId) => ({
+        url: `/areas/${areaId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Area"]
+    }),
+    updateArea: builder.mutation<Area, {id: number, name: string}>({
+      query: ({id, name}) => ({
+        url: `/areas/${id}`,
+        method: "PUT",
+        body: { name }
+      }),
+      invalidatesTags: ["Area"]
+    })
+  }),
 });

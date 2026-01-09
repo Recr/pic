@@ -3,9 +3,17 @@ import { prisma } from "../lib/prisma"
 
 class PrismaAreaRepository {
   public async findAll() {
-    const areas = await prisma.area.findMany()
-    
+    const areas = await prisma.area.findMany() 
     return areas
+  }
+
+  public async findById(areaId: number) {
+    const area = await prisma.area.findUnique({
+      where: {
+        id: areaId
+      }
+    })
+    return area
   }
 
   public async create(newArea: Prisma.AreaCreateInput) {
