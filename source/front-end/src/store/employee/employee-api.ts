@@ -17,7 +17,7 @@ export const employeeAPI = createApi({
     }),
     tagTypes: ['Employee'],
     endpoints: (builder) => ({
-        getEmployees: builder.query<Employee[], void>({
+        getEmployees: builder.query<Employee[], undefined>({
             query: () => '/employees',
             providesTags: ['Employee'],
         }),
