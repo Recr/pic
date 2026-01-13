@@ -17,6 +17,7 @@ class EmployeesUseCase {
   }
 
   public async executeCreate(newEmployee: Prisma.EmployeeCreateInput) {
+    
     const employee = await this.employeeRepository.create(newEmployee)
     return employee
   }

@@ -73,21 +73,23 @@ function Areas () {
         ))}
       </div>
       <div>
-        <form className="flex flex-col w-1/3 mx-auto mt-10" onSubmit={handleSubmit(onCreateFormSubmit)}>
-          <label htmlFor="areaName">Adicionar Área</label>
-          <div className="relative">
-            {areaNameValue && (
-              <Check 
-                onClick={handleSubmit(onCreateFormSubmit)} 
-                className="absolute right-2 top-1/2 -translate-y-1/2 hover:cursor-pointer hover:text-green-700 hover:bg-green-200 transition-colors rounded-xs animated-pulse" 
+        <form className="flex flex-col w-1/3 mx-auto mt-10 items-center" onSubmit={handleSubmit(onCreateFormSubmit)}>
+          <div className="">
+            <label htmlFor="areaName">Adicionar Área</label>
+            <div className="relative">
+              {areaNameValue && (
+                <Check 
+                  onClick={handleSubmit(onCreateFormSubmit)} 
+                  className="absolute left-43 top-1/2 -translate-y-1/2 hover:cursor-pointer hover:text-green-700 hover:bg-green-200 transition-colors rounded-xs animated-pulse" 
+                />
+              )}
+              <input 
+                {...register("areaName", { required: true })}
+                type="text"
+                placeholder="Nome da nova área" 
+                className="border-2 border-gray-300 rounded-lg p-2" 
               />
-            )}
-            <input 
-              {...register("areaName", { required: true })}
-              type="text"
-              placeholder="Nome da nova área" 
-              className="border-2 border-gray-300 rounded-lg p-2" 
-            />
+            </div>
           </div>
         </form>
       </div>
