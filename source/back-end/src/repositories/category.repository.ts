@@ -3,12 +3,12 @@ import { prisma } from "../lib/prisma"
 
 class PrismaCategoryRepository {
   public async findAll() {
-    const categories = prisma.category.findMany()
+    const categories = await prisma.category.findMany()
     return categories
   }
 
   public async findById(categoryId: number) {
-    const category = prisma.category.findUnique({
+    const category = await prisma.category.findUnique({
       where: {
         id: categoryId
       }
@@ -17,14 +17,14 @@ class PrismaCategoryRepository {
   }
 
   public async create (newCategory: Prisma.CategoryCreateInput) {
-    const category = prisma.category.create({
+    const category = await prisma.category.create({
       data: newCategory
     })
     return category
   }
 
   public async update (categoryId: number, updatedCategory: Prisma.CategoryUpdateInput) {
-    const category = prisma.category.update({
+    const category = await prisma.category.update({
       where: {
         id: categoryId
       },
@@ -34,7 +34,7 @@ class PrismaCategoryRepository {
   }
 
   public async delete (categoryId: number) {
-    const category = prisma.category.delete({
+    const category = await prisma.category.delete({
       where: {
         id: categoryId
       }

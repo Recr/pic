@@ -3,12 +3,12 @@ import { prisma } from "../lib/prisma";
 
 class PrismaEmployeeRepository {
   public async findAll() {
-    const employees = prisma.employee.findMany()
+    const employees = await prisma.employee.findMany()
     return employees
   }
   
   public async findById(employeeId: number) {
-    const employee = prisma.employee.findUnique({
+    const employee = await prisma.employee.findUnique({
       where: {
         id: employeeId
       },
@@ -17,7 +17,7 @@ class PrismaEmployeeRepository {
   }
 
   public async findByRe(employeeRe: number) {
-    const employee = prisma.employee.findUnique({
+    const employee = await prisma.employee.findUnique({
       where: {
         re: employeeRe
       }
@@ -26,14 +26,14 @@ class PrismaEmployeeRepository {
   }
 
   public async create(newEmployee: Prisma.EmployeeCreateInput) {
-    const employee = prisma.employee.create({
+    const employee = await prisma.employee.create({
       data: newEmployee
     })
     return employee
   }
 
   public async delete(employeeId: number) {
-    const employee = prisma.employee.delete({
+    const employee = await prisma.employee.delete({
       where: {
         id: employeeId
       }
@@ -42,7 +42,7 @@ class PrismaEmployeeRepository {
   }
 
   public async update(employeeId: number, updatedEmployee: Prisma.EmployeeUpdateInput) {
-    const employee = prisma.employee.update({
+    const employee = await prisma.employee.update({
       where: {
         id: employeeId
       },
