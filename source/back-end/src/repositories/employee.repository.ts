@@ -4,7 +4,6 @@ import { prisma } from "../lib/prisma";
 class PrismaEmployeeRepository {
   public async findAll() {
     const employees = prisma.employee.findMany()
-
     return employees
   }
   
@@ -12,7 +11,7 @@ class PrismaEmployeeRepository {
     const employee = prisma.employee.findUnique({
       where: {
         id: employeeId
-      }
+      },
     })
     return employee
   }

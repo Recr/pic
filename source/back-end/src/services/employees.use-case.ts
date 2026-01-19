@@ -19,18 +19,20 @@ class EmployeesUseCase {
 
   public async executeFindById(employeeId: number) {
     const employee = await this.employeeRepository.findById(employeeId)
+    if (!employee) throw new AppError("Employee not found.", StatusCodes.NOT_FOUND)
     return employee
   }
 
   public async executeFindByRe(employeeRe: number) {
     const employee = await this.employeeRepository.findByRe(employeeRe)
+    if (!employee) throw new AppError("Employee not found.", StatusCodes.NOT_FOUND) 
     return employee
   }
 
   public async executeCreate({ password, ...data }: CreateEmployeeInput) {
     const inDbEmployee = await this.employeeRepository.findByRe(data.re)
     if (inDbEmployee) throw new AppError("Employee already exists.", StatusCodes.CONFLICT)
-      
+
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS)
     const newEmployee = {
       ...data,
@@ -41,13 +43,18 @@ class EmployeesUseCase {
   }
 
   public async executeDelete(employeeId: number) {
-    const employee = await this.employeeRepository.delete(employeeId)
+    const employee = await this.employeeRepository.findById(employeeId)
+    if (!employee) throw new AppError("Employee not found.", StatusCodes.NOT_FOUND)
+    
+    await this.employeeRepository.delete(employeeId)
     return employee
   }
 
-  public async executeUpdate(employeeId: number, updatedEmployee: Prisma.EmployeeUpdateInput) {
-    const employee = await this.employeeRepository.update(employeeId, updatedEmployee)
-    return employee
+  public async executeUpdate(employeeId: number, updatedEmployeeData: Prisma.EmployeeUpdateInput) {
+    const employee = await this.employeeRepository.findById(employeeId)
+    if (!employee) throw new AppError("Employee not found.", StatusCodes.NOT_FOUND)
+    const updatedEmployee = await this.employeeRepository.update(employeeId, updatedEmployeeData)
+    return updatedEmployee
   }
 }
 
