@@ -2,12 +2,13 @@ import { NextFunction, Request, Response } from "express";
 import { EmployeesUseCase } from "../services/employees.use-case";
 import { PrismaEmployeeRepository } from "../repositories/employee.repository";
 import { Prisma } from "../../prisma/client/client";
+import { CreateEmployeeInput } from "../utils/types/employees.types";
 
 export const EmployeesController = {
   async handleFindAll(req: Request, res: Response, next: NextFunction) {
     try  {
       const employeeUseCase = new EmployeesUseCase(new PrismaEmployeeRepository())
-      const employees = employeeUseCase.executeFindAll()
+      const employees = await employeeUseCase.executeFindAll()
       res.send(employees)
     } catch (error) {
       next(error)
@@ -18,7 +19,7 @@ export const EmployeesController = {
     try {
       const employeeId = Number(req.params.id)
       const employeeUseCase = new EmployeesUseCase(new PrismaEmployeeRepository())
-      const employee = employeeUseCase.executeFindById(employeeId)
+      const employee = await employeeUseCase.executeFindById(employeeId)
       res.send(employee)
     } catch (error) {
       next(error)
@@ -27,9 +28,9 @@ export const EmployeesController = {
 
   async handleCreate(req: Request, res: Response, next: NextFunction) {
     try {
-      const data: Prisma.EmployeeCreateInput = req.body
+      const data: CreateEmployeeInput = req.body
       const employeeUseCase = new EmployeesUseCase( new PrismaEmployeeRepository())
-      const employee = employeeUseCase.executeCreate(data)
+      const employee = await employeeUseCase.executeCreate(data)
       res.send(employee)
     } catch (error) {
       next(error)
@@ -40,7 +41,7 @@ export const EmployeesController = {
     try {
       const employeeId = Number(req.params.id)
       const employeeUseCase = new EmployeesUseCase( new PrismaEmployeeRepository())
-      const employee = employeeUseCase.executeDelete(employeeId)
+      const employee = await employeeUseCase.executeDelete(employeeId)
       res.send(employee)
     } catch(error) {
       next(error)
@@ -52,7 +53,7 @@ export const EmployeesController = {
       const employeeId = Number(req.params.id)
       const data: Prisma.EmployeeUpdateInput = req.body
       const employeeUseCase = new EmployeesUseCase( new PrismaEmployeeRepository())
-      const employee = employeeUseCase.executeUpdate(employeeId, data)
+      const employee = await employeeUseCase.executeUpdate(employeeId, data)
       res.send(employee)
     } catch(error) {
       next(error)
