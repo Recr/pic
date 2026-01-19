@@ -1,4 +1,6 @@
+import { StatusCodes } from "http-status-codes"
 import { Prisma } from "../../prisma/client/client"
+import { AppError } from "../errors/AppError"
 import { PrismaAreaRepository } from "../repositories/area.repository"
 
 class AreasUseCase {
@@ -13,6 +15,7 @@ class AreasUseCase {
 
   public async executeFindById(areaId: number) {
     const area = await this.areaRepository.findById(areaId)
+    if (!area) throw new AppError("Area not found.", StatusCodes.NOT_FOUND)
     return area
   }
 
@@ -22,11 +25,15 @@ class AreasUseCase {
   }
 
   public async executeUpdate (areaId: number, updatedArea: Prisma.AreaUpdateInput) {
+    const existingArea = await this.areaRepository.findById(areaId)
+    if (!existingArea) throw new AppError("Area not found.", StatusCodes.NOT_FOUND)
     const area = await this.areaRepository.update(areaId, updatedArea)
     return area
   }
 
   public async executeDelete (areaId: number) {
+    const existingArea = await this.areaRepository.findById(areaId)
+    if (!existingArea) throw new AppError("Area not found.", StatusCodes.NOT_FOUND)
     const area = await this.areaRepository.delete(areaId)
     return area
   }

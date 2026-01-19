@@ -18,7 +18,7 @@ export const AreasController = {
   async handleFindById (req: Request, res: Response, next: NextFunction) {
     try {
       const areasUseCase = new AreasUseCase(new PrismaAreaRepository())
-      const areaId: number = req.body
+      const areaId = Number(req.body)
 
       const area = await areasUseCase.executeFindById(areaId)
       res.send(area)

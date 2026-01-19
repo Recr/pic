@@ -30,8 +30,8 @@ class EmployeesUseCase {
   }
 
   public async executeCreate({ password, ...data }: CreateEmployeeInput) {
-    const inDbEmployee = await this.employeeRepository.findByRe(data.re)
-    if (inDbEmployee) throw new AppError("Employee already exists.", StatusCodes.CONFLICT)
+    const existingEmployee = await this.employeeRepository.findByRe(data.re)
+    if (existingEmployee) throw new AppError("Employee with this RE already exists.", StatusCodes.CONFLICT)
 
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS)
     const newEmployee = {
