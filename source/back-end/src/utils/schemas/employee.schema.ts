@@ -16,6 +16,12 @@ export const getEmployeeByIdSchema = z.object({
   })
 })
 
+export const getEmployeeByReSchema = z.object({
+  params: z.object({
+    re: z.coerce.number()
+  })
+})
+
 export const updateEmployeeSchema = z.object({
   params: z.object({
     id: z.coerce.number()

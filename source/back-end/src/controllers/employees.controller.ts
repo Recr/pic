@@ -26,6 +26,17 @@ export const EmployeesController = {
     }
   },
 
+  async handleFindByRe(req: Request, res: Response, next: NextFunction) {
+    try {
+      const employeeRe = Number(req.params.re)
+      const employeeUseCase = new EmployeesUseCase(new PrismaEmployeeRepository())
+      const employee = await employeeUseCase.executeFindByRe(employeeRe)
+      res.send(employee)
+    } catch (error) {
+      next(error)
+    }
+  },
+
   async handleCreate(req: Request, res: Response, next: NextFunction) {
     try {
       const data: CreateEmployeeInput = req.body

@@ -2,6 +2,8 @@ import bcrypt from "bcrypt";
 import { Prisma } from "../../prisma/client/client";
 import { PrismaEmployeeRepository } from "../repositories/employee.repository";
 import { CreateEmployeeInput } from "../utils/types/employees.types";
+import { AppError } from "../errors/AppError";
+import { StatusCodes } from "http-status-codes";
 
 const SALT_ROUNDS = 12
 
@@ -20,8 +22,15 @@ class EmployeesUseCase {
     return employee
   }
 
+  public async executeFindByRe(employeeRe: number) {
+    const employee = await this.employeeRepository.findByRe(employeeRe)
+    return employee
+  }
+
   public async executeCreate({ password, ...data }: CreateEmployeeInput) {
-    // TODO: verify "re" existence and throw error
+    const inDbEmployee = await this.employeeRepository.findByRe(data.re)
+    if (inDbEmployee) throw new AppError("Employee already exists.", StatusCodes.CONFLICT)
+      
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS)
     const newEmployee = {
       ...data,

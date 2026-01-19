@@ -17,6 +17,15 @@ class PrismaEmployeeRepository {
     return employee
   }
 
+  public async findByRe(employeeRe: number) {
+    const employee = prisma.employee.findUnique({
+      where: {
+        re: employeeRe
+      }
+    })
+    return employee
+  }
+
   public async create(newEmployee: Prisma.EmployeeCreateInput) {
     const employee = prisma.employee.create({
       data: newEmployee
