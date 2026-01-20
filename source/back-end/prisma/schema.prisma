@@ -11,7 +11,7 @@ model Area {
   id   Int    @id @default(autoincrement())
   name String @db.NVarChar(50)
 
-  improvements Improvement[]
+  proposals Proposal[]
 
   @@map("area")
 }
@@ -21,7 +21,7 @@ model Category {
   name           String   @db.NVarChar(50)
   categoryReward Decimal? @map("category_reward") @db.Decimal(10, 2)
 
-  improvements Improvement[]
+  proposals Proposal[]
 
   @@map("category")
 }
@@ -34,21 +34,21 @@ model Employee {
   shift        String? @db.NVarChar(20)
   passwordHash String  @map("password_hash") @db.NVarChar(100)
 
-  improvementsChampion Improvement[] @relation("ChampionReviewImprovement")
-  improvementsManager  Improvement[] @relation("ManagerReviewImprovement")
-  suggestions          Suggestion[]
+  proposalsChampion Proposal[]   @relation("ChampionReviewProposal")
+  proposalsManager  Proposal[]   @relation("ManagerReviewProposal")
+  suggestions       Suggestion[]
 
   @@map("employee")
 }
 
-model Improvement {
+model Proposal {
   id                      Int       @id @default(autoincrement())
   description             String    @db.NVarChar(1000)
   status                  String    @default("DEFINE_MANAGER")
   categoryId              Int?      @map("category_id")
   rewardAmount            Decimal?  @map("reward_amount") @db.Decimal(10, 2)
   areaId                  Int       @map("area_id")
-  createdAt               DateTime  @map("created_at") @db.DateTime2 @default(now())
+  createdAt               DateTime  @default(now()) @map("created_at") @db.DateTime2
   adminReviewedAt         DateTime? @map("admin_reviewed_at") @db.DateTime2
   managerReviewedAt       DateTime? @map("manager_reviewed_at") @db.DateTime2
   championReviewedAt      DateTime? @map("champion_reviewed_at") @db.DateTime2
@@ -61,11 +61,11 @@ model Improvement {
 
   area        Area         @relation(fields: [areaId], references: [id])
   category    Category?    @relation(fields: [categoryId], references: [id])
-  champion    Employee?    @relation("ChampionReviewImprovement", fields: [championId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  manager     Employee?    @relation("ManagerReviewImprovement", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  champion    Employee?    @relation("ChampionReviewProposal", fields: [championId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  manager     Employee?    @relation("ManagerReviewProposal", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   suggestions Suggestion[]
 
-  @@map("improvement")
+  @@map("proposal")
 }
 
 model Payout {
@@ -82,13 +82,14 @@ model Payout {
 }
 
 model Suggestion {
-  id            Int @id @default(autoincrement())
-  employeeId    Int @map("employee_id")
-  improvementId Int @map("improvement_id")
+  id         Int @id @default(autoincrement())
+  employeeId Int @map("employee_id")
+  proposalId Int @map("proposal_id")
 
-  payout      Payout[]
-  employee    Employee    @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  improvement Improvement @relation(fields: [improvementId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payout   Payout[]
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@unique([employeeId, proposalId])
   @@map("suggestion")
 }

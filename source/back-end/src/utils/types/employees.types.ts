@@ -1,4 +1,4 @@
-export interface CreateEmployeeInput{
+export interface CreateEmployeeInput {
   name: string, 
   re: number,
   role: Role,

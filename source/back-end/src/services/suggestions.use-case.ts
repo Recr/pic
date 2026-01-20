@@ -38,3 +38,5 @@ class SuggestionUseCase {
     return suggestion
   }
 }
+
+export { SuggestionUseCase }

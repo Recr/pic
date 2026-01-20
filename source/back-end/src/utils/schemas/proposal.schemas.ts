@@ -1,0 +1,17 @@
+import z from "zod";
+
+export const getProposalByIdSchema = z.object({
+  params: z.object({
+    id: z.coerce.number()
+  })
+})
+
+export const createProposalSchema = z.object({
+  body: z.object({
+    description: z.string(),
+    categoryId: z.number(),
+    areaId: z.number(),
+    createdAt: z.date(),
+    employeeRes: z.number().array().max(3, "The max employees per proposal is 3.")
+  })
+})
