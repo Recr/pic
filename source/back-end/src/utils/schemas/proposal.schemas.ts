@@ -11,7 +11,6 @@ export const createProposalSchema = z.object({
     description: z.string(),
     categoryId: z.number(),
     areaId: z.number(),
-    createdAt: z.date(),
-    employeeRes: z.number().array().max(3, "The max employees per proposal is 3.")
+    employeeRes: z.number().array().max(3, "The max employees per proposal is 3.").nonempty()
   })
 })

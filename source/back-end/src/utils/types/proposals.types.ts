@@ -3,7 +3,6 @@ export interface CreateProposal {
   categoryId: number
   rewardAmount: number
   areaId: number
-  createdAt: Date
 }
 
 export interface CreateProposalInput extends CreateProposal {

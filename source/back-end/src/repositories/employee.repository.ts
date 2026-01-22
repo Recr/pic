@@ -25,6 +25,15 @@ class PrismaEmployeeRepository {
     return employee
   }
 
+  public async findManyByRe(employeeRes: number[]) {
+    const employees = await prisma.employee.findMany({
+      where: {
+        re: { in: employeeRes}
+      }
+    })
+    return employees
+  }
+
   public async create(newEmployee: Prisma.EmployeeCreateInput) {
     const employee = await prisma.employee.create({
       data: newEmployee

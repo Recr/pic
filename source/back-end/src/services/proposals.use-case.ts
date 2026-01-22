@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { AppError } from "../errors/AppError";
 import { PrismaProposalRepository } from "../repositories/proposal.repository";
-import { CreateProposalInput } from "../utils/types/proposals.types";
+import { CreateProposalInput, CreateProposalWithSuggestions } from "../utils/types/proposals.types";
 import { PrismaEmployeeRepository } from "../repositories/employee.repository";
 
 class ProposalsUseCase {
@@ -11,18 +11,21 @@ class ProposalsUseCase {
   ){}
 
   public async executeFindAll() {
-    const proposals = this.proposalRepository.findAll()
+    const proposals = await this.proposalRepository.findAll()
     return proposals
   }
 
   public async executeFindById(proposalId: number) {
-    const proposal = this.proposalRepository.findById(proposalId)
+    const proposal = await this.proposalRepository.findById(proposalId)
     if (!proposal) throw new AppError("Proposal not found", StatusCodes.NOT_FOUND)
     return proposal
   }
 
-  public async executeCreate(newProposal: CreateProposalInput) {
-    const proposal = this.proposalRepository.createWithSuggestions(newProposal)
+  public async executeCreate({employeeRes, ...newProposal}: CreateProposalInput) {
+    const employeeIds: number[] = (await this.employeeRepository.findManyByRe(employeeRes)).map(employee => employee.id)
+    if (employeeIds.length !== employeeRes.length) throw new AppError("Employees not found", StatusCodes.NOT_FOUND)
+    const newProposalWithIds: CreateProposalWithSuggestions = {...newProposal, employeeIds}
+    const proposal = await this.proposalRepository.createWithSuggestions(newProposalWithIds)
     return proposal
   }
 }
