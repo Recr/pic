@@ -9,8 +9,7 @@ export const getProposalByIdSchema = z.object({
 export const createProposalSchema = z.object({
   body: z.object({
     description: z.string(),
-    categoryId: z.number(),
     areaId: z.number(),
     employeeRes: z.number().array().max(3, "The max employees per proposal is 3.").nonempty()
-  })
+  }).strict()
 })

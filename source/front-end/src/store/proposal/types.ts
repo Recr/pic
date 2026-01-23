@@ -4,7 +4,7 @@ export interface Employee {
     shift: string;
 }
 
-export interface Improvement {
+export interface Proposal {
     id?: number;
     employees: Employee[];
     areaId: string;
@@ -13,14 +13,13 @@ export interface Improvement {
     updatedAt?: Date;
 }
 
-export interface CreateImprovementRequest {
+export interface CreateProposalRequest {
     description: string;
-    employees: Employee[];
+    employeeRes: number[];
     areaId: number;
-    date: Date;
 }
 
-export interface UpdateImprovementRequest {
+export interface UpdateProposalRequest {
     id: string;
     status?: 'pending' | 'approved' | 'rejected' | 'implemented';
     employees?: Employee[];

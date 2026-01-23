@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import logo from '../../assets/logo.png'
-import { improvementAPI } from '../../store/improvement/improvement-api'
+import { proposalAPI } from '../../store/proposal/proposal-api'
 import { employeeAPI } from '../../store/employee/employee-api'
 import { areaAPI } from '../../store/area/area-api'
 
@@ -9,7 +9,7 @@ function SuggestionForm() {
     const [employeeCount, setEmployeeCount] = useState(1);
     const [selectedEmployees, setSelectedEmployees] = useState<Record<number, { name: string; shift: string }>>({});
     const [selectedAreaId, setSelectedAreaId] = useState<number | null>(null);
-    const [createImprovement, { isLoading, isSuccess, isError }] = improvementAPI.useCreateImprovementMutation();
+    const [createProposal, { isLoading, isSuccess, isError }] = proposalAPI.useCreateProposalMutation();
     
     // These queries can be used for autocomplete - pass search terms as needed
     const { data: employees } = employeeAPI.useGetEmployeesQuery();
@@ -41,13 +41,11 @@ function SuggestionForm() {
         const formData = new FormData(e.currentTarget);
         
         // Collect employee data
-        const employeesList = [];
+        const employeeRes = [];
         for (let i = 1; i <= employeeCount; i++) {
-            employeesList.push({
-                re: Number(formData.get(`re-${i}`)),
-                name: formData.get(`name-${i}`) as string,
-                shift: formData.get(`shift-${i}`) as string,
-            });
+          employeeRes.push(
+            Number(formData.get(`re-${i}`)),
+          );
         }
 
         if (!selectedAreaId) {
@@ -56,11 +54,10 @@ function SuggestionForm() {
         }
 
         try {
-            await createImprovement({
-                employees: employeesList,
+            await createProposal({
+                employeeRes,
                 areaId: selectedAreaId,
                 description: formData.get('description') as string,
-                date: new Date(),
             }).unwrap();
             
             // Reset form on success
@@ -74,7 +71,7 @@ function SuggestionForm() {
     };
 
     return (
-        <div>
+        <div className='bg-gray-100'>
           <div className='flex justify-center flex-col mt-4'>
             <div className='flex flex-col items-center'>
             <img
@@ -84,7 +81,7 @@ function SuggestionForm() {
                 className='object-contain w-90 max-w-[400px] mb-5 border-[5px] border-[#ccc] rounded-[20px]'
             />
             </div>
-            <form onSubmit={handleSubmit} className='flex flex-col items-center w-90 sm:w-auto shadow-custom py-5 px-[30px] mx-auto mb-[30px] rounded-[20px]'>
+            <form onSubmit={handleSubmit} className='bg-white flex flex-col items-center w-90 sm:w-auto shadow-custom py-5 px-[30px] mx-auto mb-[30px] rounded-[20px]'>
                   {/* employee_amount_radio */}
                   <div id="employee_amount_radio" className='my-8 mx-auto flex flex-col items-center'>
                       <label>Quantidade de Funcionários:</label>
@@ -205,7 +202,7 @@ function SuggestionForm() {
                   <button
                       type="submit"
                       disabled={isLoading}
-                      className='w-4/5 p-2.5 my-5 rounded-[5px] text-lg border-none bg-[#b90f0f] text-white cursor-pointer transition-all duration-500 hover:bg-[#610707] disabled:opacity-50 disabled:cursor-not-allowed'
+                      className='w-4/5 p-2.5 my-5 rounded-[5px] text-lg border-none bg-blue-600 text-white cursor-pointer transition-all duration-500 hover:bg-blue-950 disabled:opacity-50 disabled:cursor-not-allowed'
                   >
                       {isLoading ? 'Enviando...' : 'Enviar Sugestão'}
                   </button>

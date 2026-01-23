@@ -1,17 +1,17 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { improvementAPI } from './improvement/improvement-api';
+import { proposalAPI } from './proposal/proposal-api';
 import { employeeAPI } from './employee/employee-api';
 import { areaAPI } from './area/area-api';
 
 export const store = configureStore({
     reducer: {
-      [improvementAPI.reducerPath]: improvementAPI.reducer,
+      [proposalAPI.reducerPath]: proposalAPI.reducer,
       [employeeAPI.reducerPath]: employeeAPI.reducer,
       [areaAPI.reducerPath]: areaAPI.reducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware()
-        .concat(improvementAPI.middleware)
+        .concat(proposalAPI.middleware)
         .concat(employeeAPI.middleware)
         .concat(areaAPI.middleware)
 });

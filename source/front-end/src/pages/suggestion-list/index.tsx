@@ -1,14 +1,14 @@
-import { improvementAPI } from "../../store/improvement/improvement-api";
+import { proposalAPI } from "../../store/proposal/proposal-api";
 
 function SuggestionList() {
-    const { data: improvementsData } = improvementAPI.useGetImprovementsQuery();
-    console.log(improvementsData);
+    const { data: proposalsData } = proposalAPI.useGetProposalsQuery();
+    console.log(proposalsData);
     return (
       <>
-        {improvementsData?.map((improvement) => (
+        {proposalsData?.map((proposal) => (
           <div >
-            <p>{improvement.id}</p>
-            <p>{improvement.description}</p>
+            <p>{proposal.id}</p>
+            <p>{proposal.description}</p>
           </div>
         ))}
       </>

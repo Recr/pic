@@ -1,6 +1,5 @@
 export interface CreateProposal {
   description: string
-  categoryId: number
   rewardAmount: number
   areaId: number
 }

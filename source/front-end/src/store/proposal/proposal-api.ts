@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { CreateImprovementRequest, Improvement } from './types';
+import type { CreateProposalRequest, Proposal } from './types';
 
 const BASE_URL = import.meta.env.VITE_API_URL
 
-export const improvementAPI = createApi({
-    reducerPath: 'improvement-api',
+export const proposalAPI = createApi({
+    reducerPath: 'proposal-api',
     baseQuery: fetchBaseQuery({ 
         baseUrl: BASE_URL,
         prepareHeaders: (headers) => {
@@ -16,22 +16,22 @@ export const improvementAPI = createApi({
             return headers;
         },
     }),
-    tagTypes: ['Improvement'],
+    tagTypes: ['Proposal'],
     endpoints: (builder) => ({
-        createImprovement: builder.mutation<Improvement, CreateImprovementRequest>({
+        createProposal: builder.mutation<Proposal, CreateProposalRequest>({
             query: (body) => ({
-                url: '/improvements',
+                url: '/proposals',
                 method: 'POST',
                 body,
             }),
-            invalidatesTags: ['Improvement'],
+            invalidatesTags: ['Proposal'],
         }),
-        getImprovements: builder.query<Improvement[], void>({
+        getProposals: builder.query<Proposal[], void>({
             query: () => ({
-                url: '/improvements',
+                url: '/proposals',
                 method: 'GET',
             }),
-            providesTags: ['Improvement'],
+            providesTags: ['Proposal'],
         }),
     }),
 })
