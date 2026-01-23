@@ -72,6 +72,45 @@ ALTER TABLE [dbo].[proposal] ADD CONSTRAINT [proposal_manager_id_fkey] FOREIGN K
 -- AddForeignKey
 ALTER TABLE [dbo].[suggestion] ADD CONSTRAINT [suggestion_proposal_id_fkey] FOREIGN KEY ([proposal_id]) REFERENCES [dbo].[proposal]([id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
+ALTER TABLE [dbo].[proposal]
+ADD CONSTRAINT CK_Proposal_Status
+CHECK (
+  status IN (
+    'DEFINE_CHAMPION',
+    'UNDER_VALIDATION',
+    'TO_IMPLEMENT',
+    'IMPLEMENTATION',
+    'REJECTED',
+    'NOT_VIABLE',
+    'IMPLEMENTED'
+  )
+);
+
+ALTER TABLE [dbo].[employee]
+ADD CONSTRAINT CK_Employee_Role
+CHECK (
+  role IN (
+    'OPERATOR',
+    'TEAM_LEADER',
+    'SUPERVISOR',
+    'MANAGER',
+    'GENERAL_MANAGER',
+    'ADMIN',
+    'HUMAN_RESOURCES',
+    'TECHNICAL_SUPPORT'
+  )
+);
+
+ALTER TABLE [dbo].[payout]
+ADD CONSTRAINT CK_Payout_Status
+CHECK (
+  status IN (
+    'PENDING',
+    'PAID',
+    'CANCELLED'
+  )
+);
+
 COMMIT TRAN;
 
 END TRY

@@ -44,13 +44,12 @@ model Employee {
 model Proposal {
   id                      Int       @id @default(autoincrement())
   description             String    @db.NVarChar(1000)
-  status                  String    @default("DEFINE_MANAGER")
+  status                  String    @default("DEFINE_CHAMPION")
   categoryId              Int?      @map("category_id")
   rewardAmount            Decimal?  @map("reward_amount") @db.Decimal(10, 2)
   areaId                  Int       @map("area_id")
   createdAt               DateTime  @default(now()) @map("created_at") @db.DateTime2
   adminReviewedAt         DateTime? @map("admin_reviewed_at") @db.DateTime2
-  managerReviewedAt       DateTime? @map("manager_reviewed_at") @db.DateTime2
   championReviewedAt      DateTime? @map("champion_reviewed_at") @db.DateTime2
   implementationStartedAt DateTime? @map("implementation_started_at") @db.DateTime2
   completedAt             DateTime? @map("completed_at") @db.DateTime2
