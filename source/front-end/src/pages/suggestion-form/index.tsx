@@ -78,7 +78,7 @@ function SuggestionForm() {
   return (
     <div className="bg-gray-100">
       <ToastContainer />
-      <div className="flex justify-center flex-col mt-4">
+      <div className="flex justify-center flex-col pt-4">
         <div className="flex flex-col items-center">
           <img
             id="logo"

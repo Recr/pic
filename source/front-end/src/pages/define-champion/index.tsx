@@ -5,16 +5,16 @@ import { proposalAPI } from "../../store/proposal/proposal-api";
 // import { useGetCategoriesQuery } from '../../store/category-api'; // Uncomment when available
 // import { useGetImprovementsWithDetailsQuery, useUpdateImprovementMutation } from '../../store/improvement-api'; // Uncomment when available
 
-interface Proposal {
-  id: number;
-  status: string;
-  description: string;
-  employeeRes: string;
-  employeeNames: string;
-  employeeShifts: string;
-  areaName?: string;
-  categoryName?: string;
-  championName?: string;
+interface ProposalWithEmployees {
+  id: number
+  description: string
+  status: string
+  employeeRes: string
+  employeeNames: string
+  employeeShifts: string
+  areaName?: string
+  categoryName?: string
+  championName?: string
 }
 
 interface UpdateData {
