@@ -15,6 +15,16 @@ export const ProposalsController = {
     }
   },
 
+  async handleFindAllWithEmployees(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalUseCase = new ProposalsUseCase(new PrismaProposalRepository, new PrismaEmployeeRepository)
+      const proposals = await proposalUseCase.executeFindAllWithEmployees()
+      res.send(proposals)
+    } catch (error) {
+      next(error)
+    }
+  },
+
   async handleFindById(req: Request, res: Response, next: NextFunction) {
     try {
       const proposalId = Number(req.params.id)

@@ -35,7 +35,6 @@ model Employee {
   passwordHash String  @map("password_hash") @db.NVarChar(100)
 
   proposalsChampion Proposal[]   @relation("ChampionReviewProposal")
-  proposalsManager  Proposal[]   @relation("ManagerReviewProposal")
   suggestions       Suggestion[]
 
   @@map("employee")
@@ -53,7 +52,6 @@ model Proposal {
   championReviewedAt      DateTime? @map("champion_reviewed_at") @db.DateTime2
   implementationStartedAt DateTime? @map("implementation_started_at") @db.DateTime2
   completedAt             DateTime? @map("completed_at") @db.DateTime2
-  managerId               Int?      @map("manager_id")
   championId              Int?      @map("champion_id")
   notes                   String?   @db.NVarChar(1000)
   rejectionNote           String?   @map("rejection_note") @db.NVarChar(1000)
@@ -61,7 +59,6 @@ model Proposal {
   area        Area         @relation(fields: [areaId], references: [id])
   category    Category?    @relation(fields: [categoryId], references: [id])
   champion    Employee?    @relation("ChampionReviewProposal", fields: [championId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  manager     Employee?    @relation("ManagerReviewProposal", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   suggestions Suggestion[]
 
   @@map("proposal")

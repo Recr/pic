@@ -7,6 +7,24 @@ class PrismaProposalRepository {
     return proposals 
   }
 
+  public async findAllWithEmployees() {
+    const proposals = await prisma.proposal.findMany({
+      include: {
+        suggestions: {
+          omit: {
+            id: true,
+            employeeId: true,
+            proposalId: true,
+          },
+          include: {
+            employee: true
+          }
+        }
+      }
+    })
+    return proposals
+  }
+
   public async findById(proposalId: number) {
     const proposal = await prisma.proposal.findUnique({
       where: {

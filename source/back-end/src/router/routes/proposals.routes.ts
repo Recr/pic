@@ -6,6 +6,7 @@ import { createProposalSchema, getProposalByIdSchema } from "../../utils/schemas
 const proposalsRoutes = Router()
 
 proposalsRoutes.get("/", ProposalsController.handleFindAll)
+proposalsRoutes.get("/with-employees", ProposalsController.handleFindAllWithEmployees)
 proposalsRoutes.get("/:id", validate(getProposalByIdSchema), ProposalsController.handleFindById)
 proposalsRoutes.post("/", validate(createProposalSchema), ProposalsController.handleCreate)
 

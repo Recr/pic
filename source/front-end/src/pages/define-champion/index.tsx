@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { employeeAPI } from "../../store/employee/employee-api";
 import { areaAPI } from "../../store/area/area-api";
+import { proposalAPI } from "../../store/proposal/proposal-api";
 // import { useGetCategoriesQuery } from '../../store/category-api'; // Uncomment when available
 // import { useGetImprovementsWithDetailsQuery, useUpdateImprovementMutation } from '../../store/improvement-api'; // Uncomment when available
 
-interface Improvement {
+interface Proposal {
   id: number;
   status: string;
   description: string;
@@ -13,11 +14,11 @@ interface Improvement {
   employeeShifts: string;
   areaName?: string;
   categoryName?: string;
-  managerName?: string;
+  championName?: string;
 }
 
 interface UpdateData {
-  managerRe: string;
+  championRe: string;
   status: string;
   adminReviewedAt: string;
   areaId?: number;
@@ -25,14 +26,9 @@ interface UpdateData {
 }
 
 function DefineChampion() {
-  const [improvements, setImprovements] = useState<Improvement[]>([]);
-
-  // API Queries - uncomment when ready
   const { data: employees } = employeeAPI.useGetEmployeesQuery();
   const { data: areas } = areaAPI.useGetAreasQuery();
-  // const { data: categories } = useGetCategoriesQuery();
-  // const { data: improvementsData } = useGetImprovementsWithDetailsQuery();
-  // const [updateImprovement] = useUpdateImprovementMutation();
+  const { data: proposals } = proposalAPI.useGetProposalsQuery();
 
   // Mock data for development
   const categories = [
@@ -40,40 +36,6 @@ function DefineChampion() {
     { id: 2, name: "Qualidade", category_reward: 150 },
     { id: 3, name: "Produtividade", category_reward: 200 },
   ];
-
-  useEffect(() => {
-    // Use mock data for now
-    const mockData: Improvement[] = [
-      {
-        id: 1,
-        status: "DEFINE_MANAGER",
-        description: "Sugestão de melhoria na linha de produção",
-        employeeRes: "12345, 23456",
-        employeeNames: "João Silva, Maria Santos",
-        employeeShifts: "1, 2",
-        areaName: undefined,
-        categoryName: undefined,
-        managerName: undefined,
-      },
-      {
-        id: 2,
-        status: "DEFINE_MANAGER",
-        description: "Implementar novo processo de qualidade",
-        employeeRes: "34567",
-        employeeNames: "Pedro Oliveira",
-        employeeShifts: "3",
-        areaName: undefined,
-        categoryName: undefined,
-        managerName: undefined,
-      },
-    ];
-    setImprovements(mockData);
-
-    // Uncomment when API is ready:
-    // if (improvementsData?.improvements) {
-    //     setImprovements(improvementsData.improvements.filter((imp: Improvement) => imp.status === 'DEFINE_MANAGER'));
-    // }
-  }, []);
 
   const getStatusClass = (status: string): string => {
     const statusMap: { [key: string]: string } = {
@@ -115,19 +77,19 @@ function DefineChampion() {
     }
   };
 
-  const handleManagerChange = (improvementId: number, value: string) => {
+  const handleChampionChange = (improvementId: number, value: string) => {
     const employee = employees?.find((emp) => emp.name === value);
     if (employee) {
       const input = document.getElementById(
-        `manager-input-${improvementId}`,
+        `champion-input-${improvementId}`,
       ) as HTMLInputElement;
       if (input) input.dataset.selectedRe = employee.re;
     }
   };
 
-  const setManager = async (improvementId: number) => {
-    const managerInput = document.getElementById(
-      `manager-input-${improvementId}`,
+  const setChampion = async (improvementId: number) => {
+    const championInput = document.getElementById(
+      `champion-input-${improvementId}`,
     ) as HTMLInputElement;
     const areaInput = document.getElementById(
       `area-input-${improvementId}`,
@@ -136,18 +98,18 @@ function DefineChampion() {
       `category-input-${improvementId}`,
     ) as HTMLInputElement;
 
-    const managerName = managerInput?.value.trim();
-    const managerRe = managerInput?.dataset.selectedRe;
+    const championName = championInput?.value.trim();
+    const championRe = championInput?.dataset.selectedRe;
 
     const areaId = areaInput?.dataset.selectedId;
     const categoryId = categoryInput?.dataset.selectedId;
 
-    if (!managerName) {
+    if (!championName) {
       alert("Por favor, selecione um gestor da lista.");
       return;
     }
 
-    if (!managerRe) {
+    if (!championRe) {
       alert("Por favor, selecione um gestor válido da lista de sugestões.");
       return;
     }
@@ -164,8 +126,8 @@ function DefineChampion() {
 
     try {
       const updateData: UpdateData = {
-        managerRe: managerRe,
-        status: "DEFINE_CHAMPION",
+        championRe: championRe,
+        status: "UNDER_VALIDATION",
         adminReviewedAt: new Date().toISOString().split("T")[0],
       };
 
@@ -209,35 +171,14 @@ function DefineChampion() {
   return (
     <div className="bg-[#eee] min-h-screen font-sans">
       <div className="flex justify-between items-center py-2.5 px-5 bg-white shadow-md mb-2.5">
-        <h2 className="m-0 text-xl">Lista de Sugestões</h2>
-      </div>
-
-      <div className="px-2.5 mb-2.5">
-        <button
-          onClick={() => (window.location.href = "/add-employee")}
-          className="py-2 px-3 cursor-pointer rounded border border-[#ccc] mr-2"
-        >
-          Adicionar Funcionário
-        </button>
-        <button
-          onClick={() => (window.location.href = "/suggestion-list")}
-          className="py-2 px-3 cursor-pointer rounded border border-[#ccc] mr-2"
-        >
-          Ver Sugestões
-        </button>
-        <button
-          onClick={() => (window.location.href = "/payout-list")}
-          className="py-2 px-3 cursor-pointer rounded border border-[#ccc]"
-        >
-          Ver Pagamentos
-        </button>
+        <h2 className="ml-8 text-xl">Lista de Sugestões</h2>
       </div>
 
       <div className="flex flex-wrap">
-        {improvements.length === 0 ? (
+        {proposals.length === 0 ? (
           <p className="px-2.5">Nenhuma sugestão encontrada.</p>
         ) : (
-          improvements.map((item) => {
+          proposals.map((item) => {
             const employeeRes = item.employeeRes
               .split(",")
               .map((res) => res.trim());
@@ -268,11 +209,6 @@ function DefineChampion() {
                     <strong>Área:</strong> {item.areaName || "Não definida"}
                   </p>
                   <p>
-                    <strong>Categoria:</strong>{" "}
-                    {item.categoryName || "Não definida"}
-                  </p>
-
-                  <p>
                     <strong>Colaboradores:</strong>
                   </p>
                   <ul className="ml-5">
@@ -295,7 +231,7 @@ function DefineChampion() {
                   </p>
                 </div>
 
-                {!item.managerName ? (
+                {!item.championName ? (
                   <div className="flex flex-col gap-2 items-start my-5 pt-2.5 border-t border-[#eee]">
                     <label htmlFor={`area-input-${item.id}`}>
                       <strong>Definir Área:</strong>
@@ -344,17 +280,17 @@ function DefineChampion() {
                       ))}
                     </datalist>
 
-                    <label htmlFor={`manager-input-${item.id}`}>
-                      <strong>Definir Gestor:</strong>
+                    <label htmlFor={`champion-input-${item.id}`}>
+                      <strong>Definir Champion:</strong>
                     </label>
                     <input
                       type="text"
-                      id={`manager-input-${item.id}`}
-                      name="manager"
+                      id={`champion-input-${item.id}`}
+                      name="champion"
                       placeholder="Pesquisar gestor por nome ou RE"
                       list={`employees-list-${item.id}`}
                       onChange={(e) =>
-                        handleManagerChange(item.id, e.target.value)
+                        handleChampionChange(item.id, e.target.value)
                       }
                       autoComplete="off"
                       className="p-1.5 w-full border border-[#ccc] rounded"
@@ -368,7 +304,7 @@ function DefineChampion() {
                     </datalist>
 
                     <button
-                      onClick={() => setManager(item.id)}
+                      onClick={() => setChampion(item.id)}
                       className="py-2 px-3 cursor-pointer rounded border border-[#ccc] bg-white"
                     >
                       Definir dados
@@ -376,7 +312,7 @@ function DefineChampion() {
                   </div>
                 ) : (
                   <p>
-                    <strong>Gestor:</strong> {item.managerName}
+                    <strong>Gestor:</strong> {item.championName}
                   </p>
                 )}
 

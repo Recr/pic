@@ -15,6 +15,15 @@ class ProposalsUseCase {
     return proposals
   }
 
+  public async executeFindAllWithEmployees() {
+    const proposals = await this.proposalRepository.findAllWithEmployees()
+    const formatedProposals = proposals.map(({ suggestions, ...proposal}) => ({
+      ...proposal,
+      employees: suggestions.map(s => s.employee)
+    }))
+    return formatedProposals
+  }
+
   public async executeFindById(proposalId: number) {
     const proposal = await this.proposalRepository.findById(proposalId)
     if (!proposal) throw new AppError("Proposal not found", StatusCodes.NOT_FOUND)
