@@ -15,20 +15,18 @@ class PrismaProposalRepository {
         status: true,
         createdAt: true,
         suggestions: {
-          omit: {
-            id: true,
-            employeeId: true,
-            proposalId: true,
-          },
           select: {
+            id: false,
+            employeeId: false,
+            proposalId: false,
             employee: {
               select: {
                 re: true,
                 name: true,
                 role: true,
-                shift: true
-              }
-            }
+                shift: true,
+              },
+            },
           },
         },
       },
