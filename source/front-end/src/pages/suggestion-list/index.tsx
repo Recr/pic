@@ -1,8 +1,8 @@
-import { proposalAPI } from "../../store/proposal/proposal-api";
+import { proposalAPI } from '../../store/proposal/proposal-api'
 
 function SuggestionList() {
-  const { data: proposalsData } = proposalAPI.useGetProposalsQuery();
-  console.log(proposalsData);
+  const { data: proposalsData } = proposalAPI.useGetProposalsQuery()
+  console.log(proposalsData)
   return (
     <>
       {proposalsData?.map((proposal) => (
@@ -12,7 +12,7 @@ function SuggestionList() {
         </div>
       ))}
     </>
-  );
+  )
 }
 
-export default SuggestionList;
+export default SuggestionList

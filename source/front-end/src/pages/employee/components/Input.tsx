@@ -1,9 +1,9 @@
 interface InputProps {
-  label: string;
-  type: string;
+  label: string
+  type: string
 }
 
-function Input ({ label, type }: InputProps) {
+function Input({ label, type }: InputProps) {
   return (
     <>
       <label>{label}</label>

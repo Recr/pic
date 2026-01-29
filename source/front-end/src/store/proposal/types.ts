@@ -21,8 +21,6 @@ export interface CreateProposalRequest {
 
 export interface UpdateProposalRequest {
   id: string
-  status?: "pending" | "approved" | "rejected" | "implemented"
-  employees?: Employee[]
-  area?: string
-  suggestion?: string
+  area: string
+  categoryId: number
 }

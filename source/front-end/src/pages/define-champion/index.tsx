@@ -1,38 +1,38 @@
 // import { useState, useEffect } from "react";
-import { employeeAPI } from "../../store/employee/employee-api";
-import { areaAPI } from "../../store/area/area-api";
-import { proposalAPI } from "../../store/proposal/proposal-api";
-import { categoryAPI } from "../../store/category/category-api";
-import { translateStatus } from "../../helpers/translateStatus";
+import { employeeAPI } from '../../store/employee/employee-api'
+import { areaAPI } from '../../store/area/area-api'
+import { proposalAPI } from '../../store/proposal/proposal-api'
+import { categoryAPI } from '../../store/category/category-api'
+import { translateStatus } from '../../helpers/translateStatus'
 // import { useGetCategoriesQuery } from '../../store/category-api'; // Uncomment when available
 // import { useGetImprovementsWithDetailsQuery, useUpdateImprovementMutation } from '../../store/improvement-api'; // Uncomment when available
+import { useForm, type SubmitHandler } from 'react-hook-form'
 
 interface ProposalWithEmployees {
-  id: number;
-  description: string;
-  status: string;
-  employeeRes: string;
-  employeeNames: string;
-  employeeShifts: string;
-  areaName?: string;
-  categoryName?: string;
-  championName?: string;
+  id: number
+  description: string
+  status: string
+  employeeRes: string
+  employeeNames: string
+  employeeShifts: string
+  areaName?: string
+  categoryName?: string
+  championName?: string
 }
 
 interface UpdateData {
-  championRe: string;
-  status: string;
-  adminReviewedAt: string;
-  areaId?: number;
-  categoryId?: number;
+  championRe: string
+  status: string
+  adminReviewedAt: string
+  areaId?: number
+  categoryId?: number
 }
 
 function DefineChampion() {
-  const { data: employees } = employeeAPI.useGetEmployeesQuery();
-  const { data: areas } = areaAPI.useGetAreasQuery();
-  const { data: proposalsList } =
-    proposalAPI.useGetProposalsWithEmployeesQuery();
-  const { data: categories } = categoryAPI.useGetCategoriesQuery();
+  const { data: employees } = employeeAPI.useGetEmployeesQuery()
+  const { data: areas } = areaAPI.useGetAreasQuery()
+  const { data: proposalsList } = proposalAPI.useGetProposalsWithEmployeesQuery()
+  const { data: categories } = categoryAPI.useGetCategoriesQuery()
 
   // const getStatusClass = (status: string): string => {
   //   const statusMap: { [key: string]: string } = {
@@ -182,9 +182,7 @@ function DefineChampion() {
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="text-lg m-0">Sugestão #{proposal.id}</h3>
-                    <div
-                      className={`${translateStatus(proposal.status)} flex items-center gap-2`}
-                    >
+                    <div className={`${translateStatus(proposal.status)} flex items-center gap-2`}>
                       <div className="w-2.5 h-2.5 rounded-full bg-current"></div>
                       <span>{translateStatus(proposal.status)}</span>
                     </div>
@@ -198,8 +196,8 @@ function DefineChampion() {
                   </p>
                   <ul className="ml-5">
                     {(() => {
-                      console.log(proposal.employees);
-                      return null;
+                      console.log(proposal.employees)
+                      return null
                     })()}
                     {!proposal.employees ? (
                       <p>Nenhum colaborador encontrado</p>
@@ -207,10 +205,9 @@ function DefineChampion() {
                       employees?.map((employee, i) => {
                         return (
                           <li key={i}>
-                            {employee.name} (RE: {employee.re}) - Turno:{" "}
-                            {employee.shift}
+                            {employee.name} (RE: {employee.re}) - Turno: {employee.shift}
                           </li>
-                        );
+                        )
                       })
                     )}
                   </ul>
@@ -309,12 +306,12 @@ function DefineChampion() {
                   </button>
                 </div>
               </div>
-            );
+            )
           })
         )}
       </div>
     </div>
-  );
+  )
 }
 
-export default DefineChampion;
+export default DefineChampion

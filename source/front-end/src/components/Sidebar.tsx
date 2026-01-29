@@ -1,8 +1,8 @@
-import { TextAlignJustify, X } from "lucide-react";
-import { useState } from "react";
+import { TextAlignJustify, X } from 'lucide-react'
+import { useState } from 'react'
 
 function Sidebar() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   return (
     <div className="fixed top-0 left-0 z-1">
       {isSidebarOpen && (
@@ -12,10 +12,7 @@ function Sidebar() {
               onClick={() => setIsSidebarOpen(false)}
               className="hover:cursor-pointer hover:text-red-500 transition-all hover:size-7"
             />
-            <a
-              href="/"
-              className="hover:cursor-pointer hover:bg-gray-300 p-2 rounded"
-            >
+            <a href="/" className="hover:cursor-pointer hover:bg-gray-300 p-2 rounded">
               Formulário de Sugestões
             </a>
             <a
@@ -30,16 +27,10 @@ function Sidebar() {
             >
               Definir Campeão
             </a>
-            <a
-              href="/employee"
-              className="hover:cursor-pointer hover:bg-gray-300 p-2 rounded"
-            >
+            <a href="/employee" className="hover:cursor-pointer hover:bg-gray-300 p-2 rounded">
               Colaboradores
             </a>
-            <a
-              href="/areas"
-              className="hover:cursor-pointer hover:bg-gray-300 p-2 rounded"
-            >
+            <a href="/areas" className="hover:cursor-pointer hover:bg-gray-300 p-2 rounded">
               Áreas
             </a>
           </div>
@@ -52,7 +43,7 @@ function Sidebar() {
         />
       )}
     </div>
-  );
+  )
 }
 
-export default Sidebar;
+export default Sidebar

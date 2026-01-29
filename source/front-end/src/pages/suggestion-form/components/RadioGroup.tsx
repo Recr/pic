@@ -1,6 +1,6 @@
 interface RadioGroupProps {
-  employeeCount: number;
-  setEmployeeCount: (count: number) => void;
+  employeeCount: number
+  setEmployeeCount: (count: number) => void
 }
 
 function RadioGroup(radioGroupProps: RadioGroupProps) {
@@ -38,7 +38,7 @@ function RadioGroup(radioGroupProps: RadioGroupProps) {
       />
       <label htmlFor="radio3">3</label>
     </div>
-  );
+  )
 }
 
-export default RadioGroup;
+export default RadioGroup
