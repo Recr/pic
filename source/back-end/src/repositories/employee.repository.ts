@@ -1,10 +1,10 @@
-import { Prisma } from "../../prisma/client/client";
-import { prisma } from "../lib/prisma";
+import { Prisma } from '../../prisma/client/client'
+import { prisma } from '../lib/prisma'
 
 class PrismaEmployeeRepository {
   public async findAll() {
-    const employees = await prisma.employee.findMany();
-    return employees;
+    const employees = await prisma.employee.findMany()
+    return employees
   }
 
   public async findById(employeeId: number) {
@@ -12,8 +12,8 @@ class PrismaEmployeeRepository {
       where: {
         id: employeeId,
       },
-    });
-    return employee;
+    })
+    return employee
   }
 
   public async findByRe(employeeRe: number) {
@@ -21,8 +21,8 @@ class PrismaEmployeeRepository {
       where: {
         re: employeeRe,
       },
-    });
-    return employee;
+    })
+    return employee
   }
 
   public async findManyByRe(employeeRes: number[]) {
@@ -30,15 +30,15 @@ class PrismaEmployeeRepository {
       where: {
         re: { in: employeeRes },
       },
-    });
-    return employees;
+    })
+    return employees
   }
 
   public async create(newEmployee: Prisma.EmployeeCreateInput) {
     const employee = await prisma.employee.create({
       data: newEmployee,
-    });
-    return employee;
+    })
+    return employee
   }
 
   public async delete(employeeId: number) {
@@ -46,22 +46,19 @@ class PrismaEmployeeRepository {
       where: {
         id: employeeId,
       },
-    });
-    return employee;
+    })
+    return employee
   }
 
-  public async update(
-    employeeId: number,
-    updatedEmployee: Prisma.EmployeeUpdateInput,
-  ) {
+  public async update(employeeId: number, updatedEmployee: Prisma.EmployeeUpdateInput) {
     const employee = await prisma.employee.update({
       where: {
         id: employeeId,
       },
       data: updatedEmployee,
-    });
-    return employee;
+    })
+    return employee
   }
 }
 
-export { PrismaEmployeeRepository };
+export { PrismaEmployeeRepository }

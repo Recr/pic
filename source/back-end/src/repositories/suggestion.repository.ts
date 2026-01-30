@@ -1,17 +1,17 @@
-import { Prisma } from "../../prisma/client/client";
-import { prisma } from "../lib/prisma";
+import { Prisma } from '../../prisma/client/client'
+import { prisma } from '../lib/prisma'
 
 class PrismaSuggestionRepository {
   public async create(newSuggestion: Prisma.SuggestionCreateInput) {
     const suggestion = await prisma.suggestion.create({
       data: newSuggestion,
-    });
-    return suggestion;
+    })
+    return suggestion
   }
 
   public async findAll() {
-    const suggestions = await prisma.suggestion.findMany();
-    return suggestions;
+    const suggestions = await prisma.suggestion.findMany()
+    return suggestions
   }
 
   public async findById(suggestionId: number) {
@@ -19,8 +19,8 @@ class PrismaSuggestionRepository {
       where: {
         id: suggestionId,
       },
-    });
-    return suggestion;
+    })
+    return suggestion
   }
 
   public async delete(suggestionId: number) {
@@ -28,22 +28,19 @@ class PrismaSuggestionRepository {
       where: {
         id: suggestionId,
       },
-    });
-    return suggestion;
+    })
+    return suggestion
   }
 
-  public async update(
-    suggestionId: number,
-    updatedSuggestion: Prisma.SuggestionUpdateInput,
-  ) {
+  public async update(suggestionId: number, updatedSuggestion: Prisma.SuggestionUpdateInput) {
     const suggestion = await prisma.suggestion.update({
       where: {
         id: suggestionId,
       },
       data: updatedSuggestion,
-    });
-    return suggestion;
+    })
+    return suggestion
   }
 }
 
-export { PrismaSuggestionRepository };
+export { PrismaSuggestionRepository }

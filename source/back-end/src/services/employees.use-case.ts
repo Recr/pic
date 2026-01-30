@@ -1,73 +1,60 @@
-import bcrypt from "bcrypt";
-import { Prisma } from "../../prisma/client/client";
-import { PrismaEmployeeRepository } from "../repositories/employee.repository";
-import { CreateEmployeeInput } from "../utils/types/employees.types";
-import { AppError } from "../errors/AppError";
-import { StatusCodes } from "http-status-codes";
+import bcrypt from 'bcrypt'
+import { Prisma } from '../../prisma/client/client'
+import { PrismaEmployeeRepository } from '../repositories/employee.repository'
+import { CreateEmployeeInput } from '../utils/types/employees.types'
+import { AppError } from '../errors/AppError'
+import { StatusCodes } from 'http-status-codes'
 
-const SALT_ROUNDS = 12;
+const SALT_ROUNDS = 12
 
 class EmployeesUseCase {
   constructor(private employeeRepository: PrismaEmployeeRepository) {}
 
   public async executeFindAll() {
-    const employees = await this.employeeRepository.findAll();
-    return employees;
+    const employees = await this.employeeRepository.findAll()
+    return employees
   }
 
   public async executeFindById(employeeId: number) {
-    const employee = await this.employeeRepository.findById(employeeId);
-    if (!employee)
-      throw new AppError("Employee not found.", StatusCodes.NOT_FOUND);
-    return employee;
+    const employee = await this.employeeRepository.findById(employeeId)
+    if (!employee) throw new AppError('Employee not found.', StatusCodes.NOT_FOUND)
+    return employee
   }
 
   public async executeFindByRe(employeeRe: number) {
-    const employee = await this.employeeRepository.findByRe(employeeRe);
-    if (!employee)
-      throw new AppError("Employee not found.", StatusCodes.NOT_FOUND);
-    return employee;
+    const employee = await this.employeeRepository.findByRe(employeeRe)
+    if (!employee) throw new AppError('Employee not found.', StatusCodes.NOT_FOUND)
+    return employee
   }
 
   public async executeCreate({ password, ...data }: CreateEmployeeInput) {
-    const existingEmployee = await this.employeeRepository.findByRe(data.re);
+    const existingEmployee = await this.employeeRepository.findByRe(data.re)
     if (existingEmployee)
-      throw new AppError(
-        "Employee with this RE already exists.",
-        StatusCodes.CONFLICT,
-      );
+      throw new AppError('Employee with this RE already exists.', StatusCodes.CONFLICT)
 
-    const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+    const passwordHash = await bcrypt.hash(password, SALT_ROUNDS)
     const newEmployee = {
       ...data,
       passwordHash,
-    };
-    const employee = await this.employeeRepository.create(newEmployee);
-    return employee;
+    }
+    const employee = await this.employeeRepository.create(newEmployee)
+    return employee
   }
 
   public async executeDelete(employeeId: number) {
-    const employee = await this.employeeRepository.findById(employeeId);
-    if (!employee)
-      throw new AppError("Employee not found.", StatusCodes.NOT_FOUND);
+    const employee = await this.employeeRepository.findById(employeeId)
+    if (!employee) throw new AppError('Employee not found.', StatusCodes.NOT_FOUND)
 
-    await this.employeeRepository.delete(employeeId);
-    return employee;
+    await this.employeeRepository.delete(employeeId)
+    return employee
   }
 
-  public async executeUpdate(
-    employeeId: number,
-    updatedEmployeeData: Prisma.EmployeeUpdateInput,
-  ) {
-    const employee = await this.employeeRepository.findById(employeeId);
-    if (!employee)
-      throw new AppError("Employee not found.", StatusCodes.NOT_FOUND);
-    const updatedEmployee = await this.employeeRepository.update(
-      employeeId,
-      updatedEmployeeData,
-    );
-    return updatedEmployee;
+  public async executeUpdate(employeeId: number, updatedEmployeeData: Prisma.EmployeeUpdateInput) {
+    const employee = await this.employeeRepository.findById(employeeId)
+    if (!employee) throw new AppError('Employee not found.', StatusCodes.NOT_FOUND)
+    const updatedEmployee = await this.employeeRepository.update(employeeId, updatedEmployeeData)
+    return updatedEmployee
   }
 }
 
-export { EmployeesUseCase };
+export { EmployeesUseCase }

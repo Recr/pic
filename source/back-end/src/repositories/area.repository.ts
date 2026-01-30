@@ -1,10 +1,10 @@
-import { Prisma } from "../../prisma/client/client";
-import { prisma } from "../lib/prisma";
+import { Prisma } from '../../prisma/client/client'
+import { prisma } from '../lib/prisma'
 
 class PrismaAreaRepository {
   public async findAll() {
-    const areas = await prisma.area.findMany();
-    return areas;
+    const areas = await prisma.area.findMany()
+    return areas
   }
 
   public async findById(areaId: number) {
@@ -12,15 +12,15 @@ class PrismaAreaRepository {
       where: {
         id: areaId,
       },
-    });
-    return area;
+    })
+    return area
   }
 
   public async create(newArea: Prisma.AreaCreateInput) {
     const area = await prisma.area.create({
       data: newArea,
-    });
-    return area;
+    })
+    return area
   }
 
   public async delete(areaId: number) {
@@ -28,8 +28,8 @@ class PrismaAreaRepository {
       where: {
         id: areaId,
       },
-    });
-    return area;
+    })
+    return area
   }
 
   public async update(areaId: number, updatedArea: Prisma.AreaUpdateInput) {
@@ -38,9 +38,9 @@ class PrismaAreaRepository {
         id: areaId,
       },
       data: { ...updatedArea },
-    });
-    return area;
+    })
+    return area
   }
 }
 
-export { PrismaAreaRepository };
+export { PrismaAreaRepository }

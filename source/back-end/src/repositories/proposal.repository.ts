@@ -1,10 +1,11 @@
-import { prisma } from "../lib/prisma";
-import { CreateProposalWithSuggestions } from "../utils/types/proposals.types";
+import { Prisma } from '../../prisma/client/client'
+import { prisma } from '../lib/prisma'
+import { CreateProposalWithSuggestions } from '../utils/types/proposals.types'
 
 class PrismaProposalRepository {
   public async findAll() {
-    const proposals = await prisma.proposal.findMany();
-    return proposals;
+    const proposals = await prisma.proposal.findMany()
+    return proposals
   }
 
   public async findAllWithEmployees() {
@@ -30,8 +31,8 @@ class PrismaProposalRepository {
           },
         },
       },
-    });
-    return proposals;
+    })
+    return proposals
   }
 
   public async findById(proposalId: number) {
@@ -39,8 +40,8 @@ class PrismaProposalRepository {
       where: {
         id: proposalId,
       },
-    });
-    return proposal;
+    })
+    return proposal
   }
 
   public async createWithSuggestions({
@@ -58,9 +59,21 @@ class PrismaProposalRepository {
           },
         },
       },
-    });
-    return proposal;
+    })
+    return proposal
+  }
+
+  public async updateProposal(proposalId: number, updatedProposal: Prisma.ProposalUpdateInput) {
+    const proposal = await prisma.proposal.update({
+      where: {
+        id: proposalId,
+      },
+      data: {
+        ...updatedProposal,
+      },
+    })
+    return proposal
   }
 }
 
-export { PrismaProposalRepository };
+export { PrismaProposalRepository }
