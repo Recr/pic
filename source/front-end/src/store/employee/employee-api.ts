@@ -21,7 +21,7 @@ export const employeeAPI = createApi({
       query: () => '/employees',
       providesTags: ['Employee'],
     }),
-    createEmployee: builder.mutation<Employee, CreateEmployee>({
+    createEmployee: builder.mutation<CreateEmployee, Employee>({
       query: (body) => ({
         url: '/employees',
         method: 'POST',

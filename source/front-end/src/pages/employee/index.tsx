@@ -21,7 +21,10 @@ function Employee() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
 
   const onSubmit: SubmitHandler<CreateEmployee> = async (data) => {
-    await createEmployee(data)
+    await createEmployee({
+      ...data,
+      re: Number(data.re),
+    })
       .unwrap()
       .then(() => {
         toast('Colaborador cadastrado com sucesso!', {
