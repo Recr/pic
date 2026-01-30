@@ -1,8 +1,8 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { translateStatus } from '../../../helpers/translateStatus'
 import { proposalAPI } from '../../../store/proposal/proposal-api'
+import StatusBadge from '../../../components/StatusBadge'
 
 const updateProposalSchema = z.object({
   championRe: z.coerce.number(),
@@ -50,10 +50,7 @@ export function ProposalCard({ proposal, employees, areas, categories }: Proposa
       <div>
         <div className="flex justify-between items-center mb-2">
           <h3 className="text-lg m-0">Sugestão #{proposal.id}</h3>
-          <div className={`${translateStatus(proposal.status)} flex items-center gap-2`}>
-            <div className="w-2.5 h-2.5 rounded-full bg-current"></div>
-            <span>{translateStatus(proposal.status)}</span>
-          </div>
+          <StatusBadge status={proposal.status} color={'green'} />
         </div>
         <p>
           <strong>Colaboradores:</strong>
@@ -155,7 +152,7 @@ export function ProposalCard({ proposal, employees, areas, categories }: Proposa
 
         <button
           type="submit"
-          className="py-2 px-3 cursor-pointer rounded border border-[#ccc] bg-white"
+          className="py-2 px-3 cursor-pointer rounded border border-[#ccc] bg-blue-500 text-white w-38"
         >
           Definir dados
         </button>
@@ -164,9 +161,9 @@ export function ProposalCard({ proposal, employees, areas, categories }: Proposa
         <button
           type="button"
           // onClick={() => rejectSuggestion(proposal.id)}
-          className="py-2 px-3 cursor-pointer rounded border border-[#c0392b] bg-[#e74c3c] text-white"
+          className="py-2 px-3 cursor-pointer rounded border border-[#c0392b] bg-[#e74c3c] text-white w-38"
         >
-          Rejeitar sugestão
+          Rejeitar
         </button>
       </div>
     </form>
