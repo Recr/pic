@@ -1,6 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import type { CreateProposalRequest, Proposal } from './types'
-import DefineChampion from '../../pages/define-champion'
+import type { CreateProposalRequest, Proposal, UpdateProposalRequest } from './types'
 
 const BASE_URL = import.meta.env.VITE_API_URL
 
@@ -32,15 +31,27 @@ export const proposalAPI = createApi({
         url: '/proposals/with-employees',
         method: 'GET',
       }),
-      providesTags: ['Proposal'],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ id }) => ({ type: 'Proposal' as const, id })),
+              { type: 'Proposal', id: 'LIST' },
+            ]
+          : [{ type: 'Proposal', id: 'LIST' }],
     }),
-    updateProposalWithChampion: builder.mutation<Proposal, void>({
-      query: (body) => ({
-        url: '/proposals/define-champion',
+    updateProposalWithChampion: builder.mutation<
+      Proposal,
+      { body: UpdateProposalRequest; proposalId: string }
+    >({
+      query: ({ body, proposalId }) => ({
+        url: `/proposals/${proposalId}/define-champion`,
         method: 'PUT',
         body,
       }),
-      invalidatesTags: ['Proposal'],
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
     }),
   }),
 })

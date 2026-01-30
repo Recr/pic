@@ -58,4 +58,19 @@ export const ProposalsController = {
       next(error)
     }
   },
+
+  async handleDefineChampion(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = req.body
+      const proposalId = Number(req.params.id)
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+      )
+      const updatedProposal = await proposalUseCase.executeDefineChampion(proposalId, data)
+      res.send(updatedProposal)
+    } catch (error) {
+      next(error)
+    }
+  },
 }

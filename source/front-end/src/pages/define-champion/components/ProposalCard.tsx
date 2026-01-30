@@ -1,5 +1,14 @@
 import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { translateStatus } from '../../../helpers/translateStatus'
+import { proposalAPI } from '../../../store/proposal/proposal-api'
+
+const updateProposalSchema = z.object({
+  championRe: z.coerce.number(),
+  areaId: z.coerce.number(),
+  categoryId: z.coerce.number(),
+})
 
 interface ProposalWithEmployees {
   id: number
@@ -19,12 +28,18 @@ interface ProposalCardProps {
 }
 
 export function ProposalCard({ proposal, employees, areas, categories }: ProposalCardProps) {
-  const { register, handleSubmit, setValue } = useForm()
-  
+  const { register, handleSubmit, setValue } = useForm({
+    resolver: zodResolver(updateProposalSchema),
+  })
+  const [updateProposal, { isLoading }] = proposalAPI.useUpdateProposalWithChampionMutation()
 
-  const onSubmit = (data: any) => {
-    console.log('Proposal ID:', proposal.id, 'Data:', data)
-    // Here you can call your API with proposal.id and the data
+  const onSubmit = async (data: z.infer<typeof updateProposalSchema>) => {
+    try {
+      await updateProposal({ proposalId: proposal.id.toString(), body: data }).unwrap()
+      console.log('Proposal updated successfully')
+    } catch (error) {
+      console.error('Failed to update proposal:', error)
+    }
   }
 
   return (
@@ -47,7 +62,7 @@ export function ProposalCard({ proposal, employees, areas, categories }: Proposa
           {!proposal.employees ? (
             <p>Nenhum colaborador encontrado</p>
           ) : (
-            employees?.map((employee, i) => {
+            proposal.employees?.map((employee, i) => {
               return (
                 <li key={i}>
                   {employee.name} (RE: {employee.re}) - Turno: {employee.shift}

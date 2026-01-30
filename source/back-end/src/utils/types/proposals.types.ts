@@ -11,3 +11,9 @@ export interface CreateProposalInput extends CreateProposal {
 export interface CreateProposalWithSuggestions extends CreateProposal {
   employeeIds: number[]
 }
+
+export interface UpdateProposalWithChampion {
+  championRe: number
+  areaId: number
+  categoryId: number
+}

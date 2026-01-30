@@ -1,8 +1,12 @@
 export function translateStatus(status: string): string {
   const translations: { [key: string]: string } = {
     DEFINE_CHAMPION: 'Definir Campeão',
-    REJECTED: 'Rejeitada',
-    APPROVED: 'Aprovada',
+    UNDER_VALIDATION: 'Em Validação',
+    TO_IMPLEMENT: 'À Implementar',
+    IMPLEMENTATION: 'Em Implementação',
+    REJECTED: 'Rejeitado',
+    NOT_VIABLE: 'Não Viável',
+    IMPLEMENTED: 'Implementado',
   }
   return translations[status] || status
 }

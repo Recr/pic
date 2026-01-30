@@ -15,3 +15,14 @@ export const createProposalSchema = z.object({
     })
     .strict(),
 })
+
+export const updateProposalWithChampion = z.object({
+  body: z.object({
+    areaId: z.number(),
+    championRe: z.number(),
+    categoryId: z.number(),
+  }),
+  params: z.object({
+    id: z.coerce.number(),
+  }),
+})

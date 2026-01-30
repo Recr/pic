@@ -20,7 +20,7 @@ export interface CreateProposalRequest {
 }
 
 export interface UpdateProposalRequest {
-  id: string
-  area: string
+  championRe: number
+  areaId: number
   categoryId: number
 }

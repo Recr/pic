@@ -1,8 +1,13 @@
 import { StatusCodes } from 'http-status-codes'
 import { AppError } from '../errors/AppError'
 import { PrismaProposalRepository } from '../repositories/proposal.repository'
-import { CreateProposalInput, CreateProposalWithSuggestions } from '../utils/types/proposals.types'
+import {
+  CreateProposalInput,
+  CreateProposalWithSuggestions,
+  UpdateProposalWithChampion,
+} from '../utils/types/proposals.types'
 import { PrismaEmployeeRepository } from '../repositories/employee.repository'
+import { Prisma } from '../../prisma/client/client'
 
 class ProposalsUseCase {
   constructor(
@@ -42,6 +47,21 @@ class ProposalsUseCase {
     }
     const proposal = await this.proposalRepository.createWithSuggestions(newProposalWithIds)
     return proposal
+  }
+
+  public async executeDefineChampion(proposalId: number, data: UpdateProposalWithChampion) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+    const champion = await this.employeeRepository.findByRe(data.championRe)
+    if (!champion) throw new AppError('Champion not found', StatusCodes.NOT_FOUND)
+    const updatedData: Prisma.ProposalUpdateInput = {
+      area: { connect: { id: data.areaId } },
+      category: { connect: { id: data.categoryId } },
+      champion: { connect: { id: champion.id } },
+      status: 'UNDER_VALIDATION',
+    }
+    const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
+    return updatedProposal
   }
 }
 
