@@ -1,13 +1,13 @@
 export interface CreateProposal {
-  description: string
-  rewardAmount: number
-  areaId: number
+  description: string;
+  rewardAmount: number;
+  areaId: number;
 }
 
 export interface CreateProposalInput extends CreateProposal {
-  employeeRes: number[]
+  employeeRes: number[];
 }
 
 export interface CreateProposalWithSuggestions extends CreateProposal {
-  employeeIds: number[]
+  employeeIds: number[];
 }

@@ -5,7 +5,7 @@ export function errorHandler(
   err: Error,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   // Prevent stack traces from being sent
   if (err instanceof AppError) {
