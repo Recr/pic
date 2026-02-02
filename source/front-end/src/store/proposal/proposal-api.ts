@@ -53,5 +53,15 @@ export const proposalAPI = createApi({
         { type: 'Proposal', id: 'LIST' },
       ],
     }),
+    updateProposalWithRejection: builder.mutation<Proposal, { proposalId: string }>({
+      query: ({ proposalId }) => ({
+        url: `/proposals/${proposalId}/reject`,
+        method: 'PUT',
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
   }),
 })

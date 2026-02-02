@@ -37,8 +37,18 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
     resolver: zodResolver(updateProposalSchema),
   })
   const [updateProposal, { isLoading }] = proposalAPI.useUpdateProposalWithChampionMutation()
+  const [rejectProposal] = proposalAPI.useUpdateProposalWithRejectionMutation()
 
-  const onSubmit = async (data: z.infer<typeof updateProposalSchema>) => {
+  const onSubmit = async (
+    data: z.infer<typeof updateProposalSchema>,
+    action: 'define-champion' | 'reject',
+  ) => {
+    if (action === 'reject') {
+      await rejectProposal({ proposalId: proposal.id.toString() }).unwrap()
+      console.log('Proposal rejected:', proposal.id)
+      return
+    }
+
     try {
       await updateProposal({ proposalId: proposal.id.toString(), body: data }).unwrap()
       console.log('Proposal updated successfully')
@@ -47,10 +57,22 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
     }
   }
 
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement
+    const action = submitter?.value as 'define-champion' | 'reject'
+
+    if (action === 'reject') {
+      onSubmit({} as z.infer<typeof updateProposalSchema>, 'reject')
+    } else {
+      handleSubmit((data) => onSubmit(data, 'define-champion'))(e)
+    }
+  }
+
   return (
     <form
       className="border border-[#ccc] rounded-md p-4 m-2.5 w-[350px] bg-white flex flex-col"
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleFormSubmit}
     >
       <div>
         <div className="flex justify-between items-center mb-2">
@@ -157,6 +179,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
 
         <button
           type="submit"
+          value="define-champion"
           className="py-2 px-3 cursor-pointer rounded border border-[#ccc] bg-blue-500 text-white w-38"
         >
           Definir dados
@@ -164,8 +187,8 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
       </div>
       <div className="mt-auto flex gap-2.5">
         <button
-          type="button"
-          // onClick={() => rejectSuggestion(proposal.id)}
+          type="submit"
+          value="reject"
           className="py-2 px-3 cursor-pointer rounded border border-[#c0392b] bg-[#e74c3c] text-white w-38"
         >
           Rejeitar
