@@ -1,6 +1,6 @@
 import z from 'zod'
 
-export const getProposalByIdSchema = z.object({
+export const proposalIdSchema = z.object({
   params: z.object({
     id: z.coerce.number(),
   }),

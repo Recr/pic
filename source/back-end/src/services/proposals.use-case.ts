@@ -63,6 +63,16 @@ class ProposalsUseCase {
     const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
     return updatedProposal
   }
+
+  public async executeRejection(proposalId: number) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+    const updatedStatus: Prisma.ProposalUpdateInput = {
+      status: 'REJECTED',
+    }
+    const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedStatus)
+    return updatedProposal
+  }
 }
 
 export { ProposalsUseCase }

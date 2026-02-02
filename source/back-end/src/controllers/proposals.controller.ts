@@ -73,4 +73,18 @@ export const ProposalsController = {
       next(error)
     }
   },
+
+  async handleRejection(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalId = Number(req.params.id)
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+      )
+      const updatedProposal = await proposalUseCase.executeRejection(proposalId)
+      res.send(updatedProposal)
+    } catch (error) {
+      next(error)
+    }
+  },
 }
