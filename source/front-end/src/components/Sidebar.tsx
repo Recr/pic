@@ -33,6 +33,9 @@ const Sidebar: React.FC = () => {
             <a href="/areas" className="hover:cursor-pointer hover:bg-gray-300 p-2 rounded">
               Áreas
             </a>
+            <a href="/proposals" className="hover:cursor-pointer hover:bg-gray-300 p-2 rounded">
+              Propostas
+            </a>
           </div>
         </div>
       )}
