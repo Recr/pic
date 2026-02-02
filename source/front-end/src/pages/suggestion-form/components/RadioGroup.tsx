@@ -3,7 +3,7 @@ interface RadioGroupProps {
   setEmployeeCount: (count: number) => void
 }
 
-function RadioGroup(radioGroupProps: RadioGroupProps) {
+const RadioGroup: React.FC<RadioGroupProps> = (radioGroupProps) => {
   return (
     <div className="flex justify-center gap-2.5">
       <input

@@ -1,6 +1,6 @@
 import { proposalAPI } from '../../store/proposal/proposal-api'
 
-function SuggestionList() {
+const SuggestionList: React.FC = () => {
   const { data: proposalsData } = proposalAPI.useGetProposalsQuery()
   console.log(proposalsData)
   return (

@@ -4,7 +4,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form'
 import Modal from '../../components/modal/Modal'
 import { useState } from 'react'
 
-function Areas() {
+const Areas: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedAreaId, setSelectedAreaId] = useState<number | null>(null)
   const { register, handleSubmit, watch, reset } = useForm<{ areaName: string }>()

@@ -1,7 +1,7 @@
 import { TextAlignJustify, X } from 'lucide-react'
 import { useState } from 'react'
 
-function Sidebar() {
+const Sidebar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   return (
     <div className="fixed top-0 left-0 z-1">

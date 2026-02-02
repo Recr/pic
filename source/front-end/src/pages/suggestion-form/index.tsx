@@ -6,7 +6,7 @@ import { employeeAPI } from '../../store/employee/employee-api'
 import { areaAPI } from '../../store/area/area-api'
 import { ToastContainer, toast } from 'react-toastify'
 
-function SuggestionForm() {
+const SuggestionForm: React.FC = () => {
   const [employeeCount, setEmployeeCount] = useState(1)
   const [selectedEmployees, setSelectedEmployees] = useState<
     Record<number, { name: string; shift: string }>

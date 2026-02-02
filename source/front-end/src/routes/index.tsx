@@ -6,7 +6,7 @@ import Employee from '../pages/employee'
 import Areas from '../pages/areas'
 import Sidebar from '../components/Sidebar'
 
-function SuggestionSystemRouter() {
+const SuggestionSystemRouter: React.FC = () => {
   return (
     <Router>
       <Sidebar />

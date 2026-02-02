@@ -3,7 +3,7 @@ interface InputProps {
   type: string
 }
 
-function Input({ label, type }: InputProps) {
+const Input: React.FC<InputProps> = ({ label, type }) => {
   return (
     <>
       <label>{label}</label>

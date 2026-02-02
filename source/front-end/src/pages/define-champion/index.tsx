@@ -4,7 +4,7 @@ import { proposalAPI } from '../../store/proposal/proposal-api'
 import { categoryAPI } from '../../store/category/category-api'
 import { ProposalCard } from './components/ProposalCard'
 
-function DefineChampion() {
+const DefineChampion: React.FC = () => {
   const { data: employees } = employeeAPI.useGetEmployeesQuery()
   const { data: areas } = areaAPI.useGetAreasQuery()
   const { data: proposalsList } = proposalAPI.useGetProposalsWithEmployeesQuery()

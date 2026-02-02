@@ -27,7 +27,12 @@ interface ProposalCardProps {
   categories: any[] | undefined
 }
 
-export function ProposalCard({ proposal, employees, areas, categories }: ProposalCardProps) {
+export const ProposalCard: React.FC<ProposalCardProps> = ({
+  proposal,
+  employees,
+  areas,
+  categories,
+}) => {
   const { register, handleSubmit, setValue } = useForm({
     resolver: zodResolver(updateProposalSchema),
   })

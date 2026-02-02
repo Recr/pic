@@ -6,7 +6,7 @@ import Modal from '../../components/modal/Modal'
 import { useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 
-function Employee() {
+const Employee: React.FC = () => {
   const {
     register,
     handleSubmit,
