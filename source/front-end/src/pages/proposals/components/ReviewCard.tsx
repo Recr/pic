@@ -1,4 +1,5 @@
 import StatusBadge from '../../../components/StatusBadge'
+import { getStatusColor } from '../../../helpers/getStatusColor'
 import type { Proposal } from '../../../store/proposal/types'
 
 const ReviewCard: React.FC<Proposal> = (proposal) => {
@@ -6,7 +7,7 @@ const ReviewCard: React.FC<Proposal> = (proposal) => {
     <div className="border border-[#ccc] rounded-md p-4 m-2.5 w-[350px] bg-white flex flex-col justify-between">
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-lg m-0">Sugestão #{proposal.id}</h3>
-        <StatusBadge status={proposal.status} color={'green'} />
+        <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
       </div>
       <p>
         <strong>Colaboradores:</strong>
@@ -30,7 +31,7 @@ const ReviewCard: React.FC<Proposal> = (proposal) => {
         <br />
         <span>{proposal.description}</span>
       </p>
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center pt-4">
         <button className="py-2 px-2 cursor-pointer rounded border border-green-800 bg-green-500 text-white w-1/3 hover:w-1/2 transition-all">
           Aprovar
         </button>

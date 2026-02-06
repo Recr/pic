@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { proposalAPI } from '../../../store/proposal/proposal-api'
 import StatusBadge from '../../../components/StatusBadge'
+import { getStatusColor } from '../../../helpers/getStatusColor'
 
 const updateProposalSchema = z.object({
   championRe: z.coerce.number(),
@@ -77,7 +78,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
       <div>
         <div className="flex justify-between items-center mb-2">
           <h3 className="text-lg m-0">Sugestão #{proposal.id}</h3>
-          <StatusBadge status={proposal.status} color={'green'} />
+          <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
         </div>
         <p>
           <strong>Colaboradores:</strong>

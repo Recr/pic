@@ -59,6 +59,7 @@ class ProposalsUseCase {
       category: { connect: { id: data.categoryId } },
       champion: { connect: { id: champion.id } },
       status: 'UNDER_VALIDATION',
+      adminReviewedAt: new Date(),
     }
     const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
     return updatedProposal
