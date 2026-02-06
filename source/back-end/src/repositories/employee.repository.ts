@@ -25,6 +25,18 @@ class PrismaEmployeeRepository {
     return employee
   }
 
+  public async findByReWithPassword(employeeRe: number) {
+    const employee = await prisma.employee.findUnique({
+      where: {
+        re: employeeRe,
+      },
+      omit: {
+        passwordHash: false,
+      },
+    })
+    return employee
+  }
+
   public async findManyByRe(employeeRes: number[]) {
     const employees = await prisma.employee.findMany({
       where: {

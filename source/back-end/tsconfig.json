@@ -13,6 +13,7 @@
     "target": "es2023",
     "esModuleInterop": true,
     "types": ["node"],
+    "typeRoots": ["./node_modules/@types", "./src/@types"],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
@@ -41,7 +42,7 @@
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
-    "skipLibCheck": true,
+    "skipLibCheck": true
   },
   "include": ["src", "prisma.config.ts"],
   "exclude": ["node_modules"]
