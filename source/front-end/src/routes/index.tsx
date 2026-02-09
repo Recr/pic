@@ -2,10 +2,11 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 import SuggestionForm from '../pages/suggestion-form'
 import SuggestionList from '../pages/suggestion-list'
 import DefineChampion from '../pages/define-champion'
-import Employee from '../pages/employee'
 import Areas from '../pages/areas'
 import Sidebar from '../components/Sidebar'
 import Proposals from '../pages/proposals'
+import LoginForm from '../pages/login/LoginForm'
+import Employee from '../pages/employee'
 
 const SuggestionSystemRouter: React.FC = () => {
   return (
@@ -18,6 +19,7 @@ const SuggestionSystemRouter: React.FC = () => {
         <Route path="/employee" element={<Employee />} />
         <Route path="/areas" element={<Areas />} />
         <Route path="/proposals" element={<Proposals />} />
+        <Route path="/login" element={<LoginForm />} />
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
     </Router>
