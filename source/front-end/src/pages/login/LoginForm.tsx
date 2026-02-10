@@ -4,11 +4,14 @@ import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginAPI } from '../../store/auth/login'
 import { ToastContainer, toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
+import { sleep } from '../../helpers/sleep'
 
 type LoginFormInput = z.input<typeof loginSchema>
 type LoginFormData = z.infer<typeof loginSchema>
 
 const LoginForm: React.FC = () => {
+  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
@@ -24,18 +27,20 @@ const LoginForm: React.FC = () => {
       console.log('Submitting login data:', data)
       const loginResponse = await login(data).unwrap()
       localStorage.setItem('authToken', loginResponse.token)
-      toast.success('Login realizado com sucesso!', {
+      toast.success('Login realizado com sucesso! Redirecionando...', {
         position: 'top-right',
         autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
       })
       reset()
+      sleep(1000).then(() => {
+        navigate('/admin/define-champion', { replace: true })
+      })
     } catch (error) {
       console.error('Login failed:', error)
       toast.error('Falha no login. Por favor, verifique suas credenciais e tente novamente.')
     }
-    console.log('Submitting login data:', data)
   }
 
   const onInvalid = (formErrors: typeof errors) => {

@@ -12,15 +12,9 @@ import PrivateRoute from '../pages/private-route/PrivateRoute'
 const SuggestionSystemRouter: React.FC = () => {
   return (
     <Router>
+      <Sidebar />
       <Routes>
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <SuggestionForm />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/" element={<SuggestionForm />} />
         <Route path="/login" element={<LoginForm />} />
         <Route
           path="/suggestion-list"

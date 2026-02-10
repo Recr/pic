@@ -4,9 +4,11 @@ import { employeeAPI } from './employee/employee-api'
 import { areaAPI } from './area/area-api'
 import { categoryAPI } from './category/category-api'
 import { loginAPI } from './auth/login'
+import authReducer from './auth/auth-slice'
 
 export const store = configureStore({
   reducer: {
+    auth: authReducer,
     [proposalAPI.reducerPath]: proposalAPI.reducer,
     [employeeAPI.reducerPath]: employeeAPI.reducer,
     [areaAPI.reducerPath]: areaAPI.reducer,
