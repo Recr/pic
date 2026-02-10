@@ -30,11 +30,11 @@ const LoginForm: React.FC = () => {
         hideProgressBar: false,
         closeOnClick: true,
       })
+      reset()
     } catch (error) {
       console.error('Login failed:', error)
       toast.error('Falha no login. Por favor, verifique suas credenciais e tente novamente.')
     }
-    reset()
     console.log('Submitting login data:', data)
   }
 

@@ -1,16 +1,19 @@
-// TODO
+import type React from 'react'
+import type { ReactNode } from 'react'
+import { Navigate } from 'react-router-dom'
 
-// import type React from 'react'
-// import { Route, redirect } from 'react-router-dom'
+type PrivateRouteProps = {
+  children: ReactNode
+}
 
-// const PrivateRoute: React.FC<PrivateRouteProps> = ({component: Component, ...rest}) => (
-//   <Route
-//     {...rest}
-//     render={(props) =>
-//       localStorage.getItem('token') ? (
-//         <Component {...props} />
-//       ) : (
-//        { throw redirect("/login")}
-//       )
-//     }
-// )
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
+  const token = localStorage.getItem('authToken')
+
+  if (!token) {
+    return <Navigate to="/login" replace />
+  }
+
+  return <>{children}</>
+}
+
+export default PrivateRoute
