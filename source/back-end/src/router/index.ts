@@ -12,7 +12,7 @@ appRoutes.use('/areas', areaRoutes)
 appRoutes.use('/employees', employeeRoutes)
 appRoutes.use('/categories', categoryRoutes)
 appRoutes.use('/proposals', proposalsRoutes)
-appRoutes.use('/auth/', authRoutes)
+appRoutes.use('/auth', authRoutes)
 appRoutes.use(errorHandler)
 
 export { appRoutes }

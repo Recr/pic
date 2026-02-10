@@ -3,34 +3,52 @@ import { loginSchema } from '../../validation/schemas/login-schemas'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginAPI } from '../../store/auth/login'
+import { ToastContainer, toast } from 'react-toastify'
+
+type LoginFormInput = z.input<typeof loginSchema>
+type LoginFormData = z.infer<typeof loginSchema>
 
 const LoginForm: React.FC = () => {
-  type createUserFormData = z.infer<typeof loginSchema>
-  const { register, handleSubmit, reset } = useForm<createUserFormData>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<LoginFormInput, unknown, LoginFormData>({
     resolver: zodResolver(loginSchema),
   })
+  const [login] = loginAPI.useLoginMutation()
 
-  const onSubmit = (data: createUserFormData) => {
-    const loginData = {
-      re: parseInt(data.re, 10),
-      password: data.password,
-    }
-    const [ login ] = loginAPI.useLoginMutation()
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      login(login)
+      console.log('Submitting login data:', data)
+      const loginResponse = await login(data).unwrap()
+      localStorage.setItem('authToken', loginResponse.token)
+      toast.success('Login realizado com sucesso!', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+      })
     } catch (error) {
       console.error('Login failed:', error)
+      toast.error('Falha no login. Por favor, verifique suas credenciais e tente novamente.')
     }
-    const token = 'mocked-token'
-    localStorage.setItem('authToken', token)
     reset()
+    console.log('Submitting login data:', data)
+  }
+
+  const onInvalid = (formErrors: typeof errors) => {
+    console.error('Validation failed:', formErrors)
   }
 
   return (
     <div className="bg-gray-50 h-dvh pt-20">
+      <ToastContainer />
       <form
         className="mx-auto flex justify-center flex-col w-xs py-12 bg-white  rounded-lg items-center gap-4 shadow-xl drop-shadow-black"
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmit, onInvalid)}
+        noValidate
       >
         <h2 className="font-bold text-xl text-left w-3xs">Login</h2>
         <div className="flex flex-col">
@@ -38,13 +56,13 @@ const LoginForm: React.FC = () => {
             RE
           </label>
           <input
-            type="text"
+            type="number"
             id="re"
-            className="border-gray-300 border w-3xs p-2 rounded-md"
+            className="border-gray-300 border w-3xs p-2 rounded-md [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-moz-number-spin-button]:hidden"
             placeholder="Digite seu RE (Matrícula)"
-            required
-            {...register('re')}
+            {...register('re', { valueAsNumber: true })}
           />
+          {errors.re?.message && <p className="text-xs text-red-500 mt-1">{errors.re.message}</p>}
         </div>
         <div className="flex flex-col">
           <label htmlFor="password" className="text-gray-600 text-xs">
@@ -55,9 +73,11 @@ const LoginForm: React.FC = () => {
             id="password"
             className="border-gray-300 border w-3xs p-2 rounded-md"
             placeholder="Digite sua Senha"
-            required
             {...register('password')}
           />
+          {errors.password?.message && (
+            <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
+          )}
         </div>
         <button
           type="submit"
