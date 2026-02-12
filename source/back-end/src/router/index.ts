@@ -9,8 +9,8 @@ import { authMiddleware } from '../middlewares/auth.middeware'
 
 const appRoutes = Router()
 
-appRoutes.use('/areas', authMiddleware, areaRoutes)
-appRoutes.use('/employees', authMiddleware, employeeRoutes)
+appRoutes.use('/areas', areaRoutes)
+appRoutes.use('/employees', employeeRoutes)
 appRoutes.use('/categories', authMiddleware, categoryRoutes)
 appRoutes.use('/proposals', authMiddleware, proposalsRoutes)
 appRoutes.use('/auth', authRoutes)

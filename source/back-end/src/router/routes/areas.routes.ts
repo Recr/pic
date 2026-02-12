@@ -7,13 +7,14 @@ import {
   getAreaByIdSchema,
   updateAreaSchema,
 } from '../../utils/schemas/area.schemas'
+import { authMiddleware } from '../../middlewares/auth.middeware'
 
 const areaRoutes = Router()
 
 areaRoutes.get('/', AreasController.handleFindAll)
-areaRoutes.get('/:id', validate(getAreaByIdSchema), AreasController.handleFindById)
-areaRoutes.post('/', validate(createAreaSchema), AreasController.handleCreate)
-areaRoutes.put('/:id', validate(updateAreaSchema), AreasController.handleUpdate)
-areaRoutes.delete('/:id', validate(deleteAreaSchema), AreasController.handleDelete)
+areaRoutes.get('/:id', authMiddleware, validate(getAreaByIdSchema), AreasController.handleFindById)
+areaRoutes.post('/', authMiddleware, validate(createAreaSchema), AreasController.handleCreate)
+areaRoutes.put('/:id', authMiddleware, validate(updateAreaSchema), AreasController.handleUpdate)
+areaRoutes.delete('/:id', authMiddleware, validate(deleteAreaSchema), AreasController.handleDelete)
 
 export { areaRoutes }
