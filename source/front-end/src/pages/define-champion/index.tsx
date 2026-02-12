@@ -1,7 +1,7 @@
-import { employeeAPI } from '../../store/employee/employee-api'
-import { areaAPI } from '../../store/area/area-api'
-import { proposalAPI } from '../../store/proposal/proposal-api'
-import { categoryAPI } from '../../store/category/category-api'
+import { employeeAPI } from '../../features/employee/employee-api'
+import { areaAPI } from '../../features/area/area-api'
+import { proposalAPI } from '../../features/proposal/proposal-api'
+import { categoryAPI } from '../../features/category/category-api'
 import { ProposalCard } from './components/ProposalCard'
 
 const DefineChampion: React.FC = () => {

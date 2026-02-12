@@ -1,5 +1,5 @@
 import { Box, Check, Pen, X } from 'lucide-react'
-import { areaAPI } from '../../store/area/area-api'
+import { areaAPI } from '../../features/area/area-api'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import Modal from '../../components/modal/Modal'
 import { useState } from 'react'

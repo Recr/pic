@@ -1,5 +1,5 @@
 import type { Employee, CreateEmployee } from './types'
-import { api } from '../api'
+import { api } from '../../services/api'
 
 export const employeeAPI = api.injectEndpoints({
   endpoints: (builder) => ({

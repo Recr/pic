@@ -1,6 +1,6 @@
 import { setCredentials } from './auth-slice'
 import type { User } from './types'
-import { api } from '../api'
+import { api } from '../../services/api'
 
 interface LoginRequest {
   re: number
@@ -23,7 +23,6 @@ export const loginAPI = api.injectEndpoints({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         const { data } = await queryFulfilled
         dispatch(setCredentials({ user: data.user, token: data.token }))
-        localStorage.setItem('authToken', data.token)
       },
     }),
   }),

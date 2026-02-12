@@ -1,4 +1,4 @@
-import { proposalAPI } from '../../store/proposal/proposal-api'
+import { proposalAPI } from '../../features/proposal/proposal-api'
 import ReviewCard from './components/ReviewCard'
 
 const Proposals: React.FC = () => {

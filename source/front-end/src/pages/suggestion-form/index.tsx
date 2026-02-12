@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import logo from '../../assets/logo.png'
-import { proposalAPI } from '../../store/proposal/proposal-api'
-import { employeeAPI } from '../../store/employee/employee-api'
-import { areaAPI } from '../../store/area/area-api'
+import { proposalAPI } from '../../features/proposal/proposal-api'
+import { employeeAPI } from '../../features/employee/employee-api'
+import { areaAPI } from '../../features/area/area-api'
 import { ToastContainer, toast } from 'react-toastify'
 
 const SuggestionForm: React.FC = () => {

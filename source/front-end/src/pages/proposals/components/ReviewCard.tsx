@@ -1,6 +1,6 @@
 import StatusBadge from '../../../components/StatusBadge'
 import { getStatusColor } from '../../../helpers/getStatusColor'
-import type { Proposal } from '../../../store/proposal/types'
+import type { Proposal } from '../../../features/proposal/types'
 
 const ReviewCard: React.FC<Proposal> = (proposal) => {
   return (

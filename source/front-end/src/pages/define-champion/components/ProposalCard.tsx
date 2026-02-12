@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { proposalAPI } from '../../../store/proposal/proposal-api'
+import { proposalAPI } from '../../../features/proposal/proposal-api'
 import StatusBadge from '../../../components/StatusBadge'
 import { getStatusColor } from '../../../helpers/getStatusColor'
 

@@ -1,5 +1,5 @@
 import type { CreateProposalRequest, Proposal, UpdateProposalRequest } from './types'
-import { api } from '../api'
+import { api } from '../../services/api'
 
 export const proposalAPI = api.injectEndpoints({
   endpoints: (builder) => ({
