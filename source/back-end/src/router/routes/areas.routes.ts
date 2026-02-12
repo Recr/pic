@@ -1,7 +1,6 @@
 import { Router } from 'express'
 import { AreasController } from '../../controllers/areas.controller'
 import { validate } from '../../middlewares/validation.middleware'
-import { authMiddleware } from '../../middlewares/auth.middeware'
 import {
   createAreaSchema,
   deleteAreaSchema,
@@ -11,7 +10,7 @@ import {
 
 const areaRoutes = Router()
 
-areaRoutes.get('/', authMiddleware, AreasController.handleFindAll)
+areaRoutes.get('/', AreasController.handleFindAll)
 areaRoutes.get('/:id', validate(getAreaByIdSchema), AreasController.handleFindById)
 areaRoutes.post('/', validate(createAreaSchema), AreasController.handleCreate)
 areaRoutes.put('/:id', validate(updateAreaSchema), AreasController.handleUpdate)

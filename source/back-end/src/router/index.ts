@@ -5,13 +5,14 @@ import { errorHandler } from '../middlewares/error-handling.middleware'
 import { categoryRoutes } from './routes/categories.routes'
 import { proposalsRoutes } from './routes/proposals.routes'
 import { authRoutes } from './routes/auth.routes'
+import { authMiddleware } from '../middlewares/auth.middeware'
 
 const appRoutes = Router()
 
-appRoutes.use('/areas', areaRoutes)
-appRoutes.use('/employees', employeeRoutes)
-appRoutes.use('/categories', categoryRoutes)
-appRoutes.use('/proposals', proposalsRoutes)
+appRoutes.use('/areas', authMiddleware, areaRoutes)
+appRoutes.use('/employees', authMiddleware, employeeRoutes)
+appRoutes.use('/categories', authMiddleware, categoryRoutes)
+appRoutes.use('/proposals', authMiddleware, proposalsRoutes)
 appRoutes.use('/auth', authRoutes)
 appRoutes.use(errorHandler)
 

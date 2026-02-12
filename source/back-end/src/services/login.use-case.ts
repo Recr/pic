@@ -13,12 +13,14 @@ class LoginUseCase {
     if (!user || !(await bcrypt.compare(loginData.password, user.passwordHash)))
       throw new AppError('Invalid Credentials.', StatusCodes.UNAUTHORIZED)
 
+    const { passwordHash: _, ...safeUser } = user
+
     const secret = process.env.JWT_SECRET
     if (!secret) throw new AppError('JWT_SECRET not configured', StatusCodes.INTERNAL_SERVER_ERROR)
-    const token = jwt.sign({ name: user.name, id: user.id, role: user.role }, secret, {
-      expiresIn: '15min',
+    const token = jwt.sign({ name: user.name, sub: user.id, role: user.role }, secret, {
+      expiresIn: '1h',
     })
-    return token
+    return { token, user: safeUser }
   }
 }
 
