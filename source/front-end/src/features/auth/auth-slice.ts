@@ -7,9 +7,11 @@ type AuthState = {
   token: string | null
 }
 
+const storedToken = localStorage.getItem('authToken')
+
 const authSlice = createSlice({
   name: 'auth',
-  initialState: { user: null, token: null } as AuthState,
+  initialState: { user: null, token: storedToken } as AuthState,
   reducers: {
     setCredentials: (
       state,
