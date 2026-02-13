@@ -36,6 +36,7 @@ model Employee {
 
   proposalsChampion Proposal[]   @relation("ChampionReviewProposal")
   suggestions       Suggestion[]
+  refreshTokens     RefreshToken[]
 
   @@map("employee")
 }
@@ -88,4 +89,17 @@ model Suggestion {
 
   @@unique([employeeId, proposalId])
   @@map("suggestion")
+}
+
+model RefreshToken {
+  id         Int      @id @default(autoincrement())
+  employeeId Int      @map("employee_id")
+  tokenHash  String   @db.NVarChar(255)
+  expiresAt  DateTime @map("expires_at") @db.DateTime2
+  createdAt  DateTime @default(now()) @map("created_at") @db.DateTime2
+  revokedAt  DateTime? @map("revoked_at") @db.DateTime2
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("refresh_token")
 }
