@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:dev": "npx tsx watch ./src/app.ts",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "seed": "npx tsx ./prisma/seeds/seed.ts"
   },
   "keywords": [],
   "author": "",
@@ -26,7 +27,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "globals": "^17.0.0",
     "jiti": "^2.6.1",
-    "prisma": "^7.2.0",
+    "prisma": "^7.2.0" ,
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.0"
