@@ -4,12 +4,17 @@ import { PrismaEmployeeRepository } from '../repositories/employee.repository'
 import { LoginInput } from '../utils/types/login.types'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import { RefreshTokenRepository } from '../repositories/refresh-token.repository'
 
 class LoginUseCase {
-  constructor(private employeeRepository: PrismaEmployeeRepository) {}
+  constructor(
+    private employeeRepository: PrismaEmployeeRepository,
+    private refreshTokenRepository: RefreshTokenRepository,
+  ) {}
 
   public async executeLogin(loginData: LoginInput) {
     const user = await this.employeeRepository.findByReWithPassword(loginData.re)
+    console.log('Login attempt for RE:', loginData.re)
     if (!user || !(await bcrypt.compare(loginData.password, user.passwordHash)))
       throw new AppError('Invalid Credentials.', StatusCodes.UNAUTHORIZED)
 
@@ -33,9 +38,18 @@ class LoginUseCase {
       { name: user.name, sub: user.id, role: user.role },
       refreshTokenSecret,
       {
-        expiresIn: '7d',
+        expiresIn: '1d',
       },
     )
+
+    const tokenHash = await bcrypt.hash(refreshToken, 10)
+
+    await this.refreshTokenRepository.create(
+      tokenHash,
+      user.id,
+      new Date(Date.now() + 24 * 60 * 60 * 1000),
+    )
+
     return { accessToken, refreshToken, user: safeUser }
   }
 }
