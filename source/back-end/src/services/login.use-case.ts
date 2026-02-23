@@ -15,12 +15,28 @@ class LoginUseCase {
 
     const { passwordHash: _, ...safeUser } = user
 
-    const secret = process.env.JWT_SECRET
-    if (!secret) throw new AppError('JWT_SECRET not configured', StatusCodes.INTERNAL_SERVER_ERROR)
-    const token = jwt.sign({ name: user.name, sub: user.id, role: user.role }, secret, {
-      expiresIn: '1h',
-    })
-    return { token, user: safeUser }
+    const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
+    if (!accessTokenSecret)
+      throw new AppError('ACCESS_TOKEN_SECRET not configured', StatusCodes.INTERNAL_SERVER_ERROR)
+    const accessToken = jwt.sign(
+      { name: user.name, sub: user.id, role: user.role },
+      accessTokenSecret,
+      {
+        expiresIn: '15m',
+      },
+    )
+
+    const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET
+    if (!refreshTokenSecret)
+      throw new AppError('REFRESH_TOKEN_SECRET not configured', StatusCodes.INTERNAL_SERVER_ERROR)
+    const refreshToken = jwt.sign(
+      { name: user.name, sub: user.id, role: user.role },
+      refreshTokenSecret,
+      {
+        expiresIn: '7d',
+      },
+    )
+    return { accessToken, refreshToken, user: safeUser }
   }
 }
 

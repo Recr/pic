@@ -7,8 +7,8 @@ export const AuthController = {
     try {
       const data = req.body
       const loginUseCase = await new LoginUseCase(new PrismaEmployeeRepository())
-      const { token, user } = await loginUseCase.executeLogin(data)
-      res.json({ token, user })
+      const { accessToken, refreshToken, user } = await loginUseCase.executeLogin(data)
+      res.json({ accessToken, refreshToken, user })
     } catch (error) {
       next(error)
     }
