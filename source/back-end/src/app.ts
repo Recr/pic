@@ -1,6 +1,7 @@
 import express from 'express'
 import { appRoutes } from './router'
 import cors, { CorsOptions } from 'cors'
+import cookieParser from 'cookie-parser'
 
 const app = express()
 const port = 3000
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
 
 app.use(express.json())
 app.use(cors(corsOptions))
+app.use(cookieParser())
 app.use('/api', appRoutes)
 
 app.listen(port, () => {

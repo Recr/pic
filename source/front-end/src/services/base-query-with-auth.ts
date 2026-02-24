@@ -1,16 +1,9 @@
 import { fetchBaseQuery } from '@reduxjs/toolkit/query'
-import type { RootState } from '../app/store'
 import { logout } from '../features/auth/auth-slice'
 
 const baseQuery = fetchBaseQuery({
   baseUrl: 'http://localhost:3000/api',
-  prepareHeaders: (headers, { getState }) => {
-    const token = (getState() as RootState).auth.token
-    if (token) {
-      headers.set('authorization', `Bearer ${token}`)
-    }
-    return headers
-  },
+  credentials: 'include',
 })
 
 export const baseQueryWithAuth = async (args: any, api: any, extraOptions: any) => {

@@ -14,7 +14,6 @@ class LoginUseCase {
 
   public async executeLogin(loginData: LoginInput) {
     const user = await this.employeeRepository.findByReWithPassword(loginData.re)
-    console.log('Login attempt for RE:', loginData.re)
     if (!user || !(await bcrypt.compare(loginData.password, user.passwordHash)))
       throw new AppError('Invalid Credentials.', StatusCodes.UNAUTHORIZED)
 
@@ -49,7 +48,6 @@ class LoginUseCase {
       user.id,
       new Date(Date.now() + 24 * 60 * 60 * 1000),
     )
-
     return { accessToken, refreshToken, user: safeUser }
   }
 }

@@ -8,7 +8,6 @@ interface LoginRequest {
 }
 
 interface LoginResponse {
-  token: string
   user: User
 }
 
@@ -22,7 +21,11 @@ export const loginAPI = api.injectEndpoints({
       }),
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         const { data } = await queryFulfilled
-        dispatch(setCredentials({ user: data.user, token: data.token }))
+        dispatch(
+          setCredentials({
+            user: data.user,
+          }),
+        )
       },
     }),
   }),

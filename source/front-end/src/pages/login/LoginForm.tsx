@@ -25,8 +25,7 @@ const LoginForm: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       console.log('Submitting login data:', data)
-      const loginResponse = await login(data).unwrap()
-      localStorage.setItem('authToken', loginResponse.token)
+      await login(data).unwrap()
       toast.success('Login realizado com sucesso! Redirecionando...', {
         position: 'top-right',
         autoClose: 3000,

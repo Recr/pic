@@ -4,27 +4,20 @@ import type { User } from './types'
 
 type AuthState = {
   user: User | null
-  token: string | null
 }
-
-const storedToken = localStorage.getItem('authToken')
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState: { user: null, token: storedToken } as AuthState,
+  initialState: { user: null } as AuthState,
   reducers: {
     setCredentials: (
       state,
-      { payload: { user, token } }: PayloadAction<{ user: User; token: string }>,
+      { payload: { user } }: PayloadAction<{ user: User }>,
     ) => {
       state.user = user
-      state.token = token
-      localStorage.setItem('authToken', token)
     },
     logout: (state) => {
       state.user = null
-      state.token = null
-      localStorage.removeItem('authToken')
     },
   },
 })
