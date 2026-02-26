@@ -13,20 +13,22 @@ export const AuthController = {
       )
       const { accessToken, refreshToken, user } = await loginUseCase.executeLogin(data)
 
+      console.log(accessToken, refreshToken)
+
       const isProduction = process.env.NODE_ENV === 'production'
 
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
         secure: isProduction,
         sameSite: 'lax',
-        maxAge: 15 * 60 * 1000,
+        maxAge: 1 * 60 * 1000,
       })
 
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: isProduction,
         sameSite: 'lax',
-        maxAge: 24 * 60 * 60 * 1000,
+        maxAge: 3 * 60 * 1000,
       })
 
       res.json({ user })

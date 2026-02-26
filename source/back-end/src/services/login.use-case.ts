@@ -37,17 +37,27 @@ class LoginUseCase {
       { name: user.name, sub: user.id, role: user.role },
       refreshTokenSecret,
       {
-        expiresIn: '1d',
+        expiresIn: '3m',
       },
     )
 
     const tokenHash = await bcrypt.hash(refreshToken, 10)
 
-    await this.refreshTokenRepository.create(
-      tokenHash,
-      user.id,
-      new Date(Date.now() + 24 * 60 * 60 * 1000),
-    )
+    const existingToken = await this.refreshTokenRepository.findByEmployeeId(user.id)
+    if (existingToken) {
+      await this.refreshTokenRepository.update(
+        existingToken.id,
+        tokenHash,
+        new Date(Date.now() + 3 * 60 * 1000),
+      )
+    } else {
+      await this.refreshTokenRepository.create(
+        tokenHash,
+        user.id,
+        new Date(Date.now() + 3 * 60 * 1000),
+      )
+    }
+
     return { accessToken, refreshToken, user: safeUser }
   }
 }

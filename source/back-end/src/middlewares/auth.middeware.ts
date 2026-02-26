@@ -19,7 +19,9 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
 
   const secret = process.env.ACCESS_TOKEN_SECRET
   if (!secret) {
-    return next(new AppError('ACCESS_TOKEN_SECRET not configured', StatusCodes.INTERNAL_SERVER_ERROR))
+    return next(
+      new AppError('ACCESS_TOKEN_SECRET not configured', StatusCodes.INTERNAL_SERVER_ERROR),
+    )
   }
 
   jwt.verify(token, secret, (err, decoded) => {
