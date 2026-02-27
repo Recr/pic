@@ -10,6 +10,11 @@ type PrivateRouteProps = {
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   const user = useSelector((state: RootState) => state.auth.user)
+  const isAuthInitialized = useSelector((state: RootState) => state.auth.isAuthInitialized)
+
+  if (!isAuthInitialized) {
+    return null
+  }
 
   if (!user) {
     return <Navigate to="/login" replace />

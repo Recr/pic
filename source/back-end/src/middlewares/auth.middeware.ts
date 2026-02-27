@@ -4,15 +4,19 @@ import { StatusCodes } from 'http-status-codes'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-  const cookieToken = req.cookies?.accessToken
+  const accessToken = req.cookies?.accessToken
+  const refreshToken = req.cookies?.refreshToken
   const authHeader = req.headers['authorization']
 
-  if (!cookieToken && !authHeader) {
-    return next(new AppError('Token not found.', StatusCodes.FORBIDDEN))
+  if (!accessToken && !authHeader) {
+    return next(new AppError('Token not found.', StatusCodes.UNAUTHORIZED))
   }
+  // if (!refreshToken && !accessToken) {
+  //   return next(new AppError('Refresh token not found.', StatusCodes.UNAUTHORIZED))
+  // }
 
-  const token = cookieToken
-    ? cookieToken
+  const token = accessToken
+    ? accessToken
     : authHeader?.startsWith('Bearer ')
       ? authHeader.slice(7)
       : authHeader

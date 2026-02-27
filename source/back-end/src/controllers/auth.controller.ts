@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from 'express'
 import { LoginUseCase } from '../services/login.use-case'
 import { PrismaEmployeeRepository } from '../repositories/employee.repository'
 import { RefreshTokenRepository } from '../repositories/refresh-token.repository'
+import { AppError } from '../errors/AppError'
+import { StatusCodes } from 'http-status-codes'
 
 export const AuthController = {
   async handleLogin(req: Request, res: Response, next: NextFunction) {
@@ -31,6 +33,24 @@ export const AuthController = {
         maxAge: 3 * 60 * 1000,
       })
 
+      res.json({ user })
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  async handleGetCurrentUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = Number(req.user?.sub)
+      if (isNaN(userId)) {
+        throw new AppError('Invalid user ID in token.', StatusCodes.UNAUTHORIZED)
+      }
+
+      const employeeUseCase = new PrismaEmployeeRepository()
+      const user = await employeeUseCase.findById(userId)
+      if (!user) {
+        throw new AppError('User not found.', StatusCodes.NOT_FOUND)
+      }
       res.json({ user })
     } catch (error) {
       next(error)

@@ -4,17 +4,18 @@ import type { User } from './types'
 
 type AuthState = {
   user: User | null
+  isAuthInitialized: boolean
 }
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState: { user: null } as AuthState,
+  initialState: { user: null, isAuthInitialized: false } as AuthState,
   reducers: {
-    setCredentials: (
-      state,
-      { payload: { user } }: PayloadAction<{ user: User }>,
-    ) => {
+    setCredentials: (state, { payload: { user } }: PayloadAction<{ user: User }>) => {
       state.user = user
+    },
+    setAuthInitialized: (state, { payload }: PayloadAction<boolean>) => {
+      state.isAuthInitialized = payload
     },
     logout: (state) => {
       state.user = null
@@ -22,5 +23,5 @@ const authSlice = createSlice({
   },
 })
 
-export const { setCredentials, logout } = authSlice.actions
+export const { setCredentials, setAuthInitialized, logout } = authSlice.actions
 export default authSlice.reducer

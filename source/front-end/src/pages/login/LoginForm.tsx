@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { loginSchema } from '../../validation/schemas/login-schemas'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { loginAPI } from '../../features/auth/login'
+import { authAPI } from '../../features/auth/auth-api'
 import { ToastContainer, toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { sleep } from '../../helpers/sleep'
@@ -20,7 +20,7 @@ const LoginForm: React.FC = () => {
   } = useForm<LoginFormInput, unknown, LoginFormData>({
     resolver: zodResolver(loginSchema),
   })
-  const [login] = loginAPI.useLoginMutation()
+  const [login] = authAPI.useLoginMutation()
 
   const onSubmit = async (data: LoginFormData) => {
     try {
