@@ -6,10 +6,10 @@ export interface Employee {
 }
 
 export interface Proposal {
-  id?: number
+  id: number
   description: string
   status: string
-  createdAt?: Date
+  createdAt: Date
   employees: Employee[]
 }
 
