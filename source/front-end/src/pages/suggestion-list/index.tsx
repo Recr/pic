@@ -3,7 +3,6 @@ import ProposalItem from './components/ProposalItem'
 
 const SuggestionList: React.FC = () => {
   const { data: proposalsData } = proposalAPI.useGetProposalsWithEmployeesQuery()
-  console.log(proposalsData)
   return (
     <>
       <div className="text-left text-2xl font-semibold my-4 mx-4">Lista de Propostas</div>

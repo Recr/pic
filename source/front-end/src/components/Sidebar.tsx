@@ -4,10 +4,13 @@ import { useState } from 'react'
 const Sidebar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   return (
-    <div className="fixed top-0 left-0 z-1">
+    <div className="fixed top-0 left-0 z-50">
       {isSidebarOpen && (
-        <div>
-          <div className="flex flex-col gap-4 p-4 bg-gray-200 h-screen w-60">
+        <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0">
+          <div
+            className="flex flex-col gap-4 p-4 bg-gray-200 h-screen w-60"
+            onClick={(e) => e.stopPropagation()}
+          >
             <X
               onClick={() => setIsSidebarOpen(false)}
               className="hover:cursor-pointer hover:text-red-500 transition-all hover:size-7"

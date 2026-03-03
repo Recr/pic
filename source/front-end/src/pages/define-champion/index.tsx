@@ -13,7 +13,7 @@ const DefineChampion: React.FC = () => {
   return (
     <div className="bg-[#eee] min-h-screen font-sans">
       <div className="flex justify-between items-center py-2.5 px-5 bg-white shadow-md mb-2.5">
-        <h2 className="ml-8 text-xl">Lista de Sugestões</h2>
+        <h2 className="ml-8 text-xl">Definir Executor</h2>
       </div>
       <div className="flex flex-wrap">
         {!proposalsList || proposalsList.length === 0 ? (

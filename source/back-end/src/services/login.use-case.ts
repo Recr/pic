@@ -26,7 +26,7 @@ class LoginUseCase {
       { name: user.name, sub: user.id, role: user.role },
       accessTokenSecret,
       {
-        expiresIn: '1m',
+        expiresIn: '15m',
       },
     )
 
@@ -37,7 +37,7 @@ class LoginUseCase {
       { name: user.name, sub: user.id, role: user.role },
       refreshTokenSecret,
       {
-        expiresIn: '3m',
+        expiresIn: '1d',
       },
     )
 
@@ -46,7 +46,7 @@ class LoginUseCase {
     await this.refreshTokenRepository.create(
       tokenHash,
       user.id,
-      new Date(Date.now() + 3 * 60 * 1000),
+      new Date(Date.now() + 24 * 60 * 60 * 1000),
     )
 
     return { accessToken, refreshToken, user: safeUser }
@@ -81,7 +81,7 @@ class LoginUseCase {
       const accessToken = jwt.sign(
         { name: payload.name, sub: payload.sub, role: payload.role },
         accessTokenSecret,
-        { expiresIn: '1m' },
+        { expiresIn: '15m' },
       )
       const refreshTokenTtlSeconds = Math.floor(
         (tokenRecord.expiresAt.getTime() - Date.now()) / 1000,

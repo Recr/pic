@@ -18,11 +18,6 @@ const LoginForm: React.FC = () => {
   const isAuthInitialized = useSelector((state: RootState) => state.auth.isAuthInitialized)
   const isLoggedIn = user && isAuthInitialized
 
-  if (isLoggedIn) {
-    navigate('/admin/define-champion', { replace: true })
-    return null
-  }
-
   const {
     register,
     handleSubmit,
@@ -31,6 +26,12 @@ const LoginForm: React.FC = () => {
   } = useForm<LoginFormInput, unknown, LoginFormData>({
     resolver: zodResolver(loginSchema),
   })
+
+  if (isLoggedIn) {
+    navigate('/admin/define-champion', { replace: true })
+    return null
+  }
+
   const [login] = authAPI.useLoginMutation()
 
   const onSubmit = async (data: LoginFormData) => {
