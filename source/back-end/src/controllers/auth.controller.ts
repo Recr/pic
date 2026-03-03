@@ -56,4 +56,40 @@ export const AuthController = {
       next(error)
     }
   },
+
+  async handleRefreshToken(req: Request, res: Response, next: NextFunction) {
+    try {
+      const refreshToken = req.cookies.refreshToken
+      if (!refreshToken) {
+        throw new AppError('Refresh token is missing.', StatusCodes.BAD_REQUEST)
+      }
+
+      const loginUseCase = new LoginUseCase(
+        new PrismaEmployeeRepository(),
+        new RefreshTokenRepository(),
+      )
+      const { accessToken, refreshToken: newRefreshToken } =
+        await loginUseCase.executeRefreshToken(refreshToken)
+
+      const isProduction = process.env.NODE_ENV === 'production'
+
+      res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'lax',
+        maxAge: 1 * 60 * 1000,
+      })
+
+      res.cookie('refreshToken', newRefreshToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'lax',
+        maxAge: 3 * 60 * 1000,
+      })
+
+      res.json({ accessToken })
+    } catch (error) {
+      next(error)
+    }
+  },
 }

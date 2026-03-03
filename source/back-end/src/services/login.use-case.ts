@@ -26,7 +26,7 @@ class LoginUseCase {
       { name: user.name, sub: user.id, role: user.role },
       accessTokenSecret,
       {
-        expiresIn: '15m',
+        expiresIn: '1m',
       },
     )
 
@@ -43,22 +43,71 @@ class LoginUseCase {
 
     const tokenHash = await bcrypt.hash(refreshToken, 10)
 
-    const existingToken = await this.refreshTokenRepository.findByEmployeeId(user.id)
-    if (existingToken) {
-      await this.refreshTokenRepository.update(
-        existingToken.id,
-        tokenHash,
-        new Date(Date.now() + 3 * 60 * 1000),
-      )
-    } else {
-      await this.refreshTokenRepository.create(
-        tokenHash,
-        user.id,
-        new Date(Date.now() + 3 * 60 * 1000),
-      )
-    }
+    await this.refreshTokenRepository.create(
+      tokenHash,
+      user.id,
+      new Date(Date.now() + 3 * 60 * 1000),
+    )
 
     return { accessToken, refreshToken, user: safeUser }
+  }
+
+  public async executeRefreshToken(oldRefreshToken: string) {
+    const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET
+    const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
+    if (!accessTokenSecret)
+      throw new AppError('ACCESS_TOKEN_SECRET not configured', StatusCodes.INTERNAL_SERVER_ERROR)
+    if (!refreshTokenSecret)
+      throw new AppError('REFRESH_TOKEN_SECRET not configured', StatusCodes.INTERNAL_SERVER_ERROR)
+
+    try {
+      const payload = jwt.verify(oldRefreshToken, refreshTokenSecret) as jwt.JwtPayload
+      const employeeId = Number(payload.sub)
+
+      if (isNaN(employeeId)) {
+        throw new AppError('Invalid refresh token.', StatusCodes.UNAUTHORIZED)
+      }
+
+      const tokenRecord = await this.refreshTokenRepository.findByEmployeeId(employeeId)
+      if (!tokenRecord) {
+        throw new AppError('Invalid refresh token.', StatusCodes.UNAUTHORIZED)
+      }
+
+      const isValidToken = await bcrypt.compare(oldRefreshToken, tokenRecord.tokenHash)
+      if (!isValidToken) {
+        throw new AppError('Invalid refresh token.', StatusCodes.UNAUTHORIZED)
+      }
+
+      const accessToken = jwt.sign(
+        { name: payload.name, sub: payload.sub, role: payload.role },
+        accessTokenSecret,
+        { expiresIn: '1m' },
+      )
+      const refreshTokenTtlSeconds = Math.floor(
+        (tokenRecord.expiresAt.getTime() - Date.now()) / 1000,
+      )
+      if (refreshTokenTtlSeconds <= 0) {
+        throw new AppError('Invalid refresh token.', StatusCodes.UNAUTHORIZED)
+      }
+
+      const newRefreshToken = jwt.sign(
+        { name: payload.name, sub: payload.sub, role: payload.role },
+        refreshTokenSecret,
+        { expiresIn: refreshTokenTtlSeconds },
+      )
+
+      const newTokenHash = await bcrypt.hash(newRefreshToken, 10)
+      await this.refreshTokenRepository.rotate(
+        tokenRecord.id,
+        newTokenHash,
+        employeeId,
+        tokenRecord.expiresAt,
+      )
+
+      return { accessToken, refreshToken: newRefreshToken }
+    } catch {
+      throw new AppError('Invalid refresh token.', StatusCodes.UNAUTHORIZED)
+    }
   }
 }
 
