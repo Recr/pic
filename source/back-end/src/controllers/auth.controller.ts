@@ -15,8 +15,6 @@ export const AuthController = {
       )
       const { accessToken, refreshToken, user } = await loginUseCase.executeLogin(data)
 
-      console.log(accessToken, refreshToken)
-
       const isProduction = process.env.NODE_ENV === 'production'
 
       res.cookie('accessToken', accessToken, {
@@ -87,7 +85,7 @@ export const AuthController = {
         maxAge: 3 * 60 * 1000,
       })
 
-      res.json({ accessToken })
+      res.json({ message: 'Token refreshed successfully.' })
     } catch (error) {
       next(error)
     }

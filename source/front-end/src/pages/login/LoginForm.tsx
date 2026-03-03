@@ -6,12 +6,23 @@ import { authAPI } from '../../features/auth/auth-api'
 import { ToastContainer, toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { sleep } from '../../helpers/sleep'
+import { useSelector } from 'react-redux'
+import type { RootState } from '../../app/store'
 
 type LoginFormInput = z.input<typeof loginSchema>
 type LoginFormData = z.infer<typeof loginSchema>
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate()
+  const user = useSelector((state: RootState) => state.auth.user)
+  const isAuthInitialized = useSelector((state: RootState) => state.auth.isAuthInitialized)
+  const isLoggedIn = user && isAuthInitialized
+
+  if (isLoggedIn) {
+    navigate('/admin/define-champion', { replace: true })
+    return null
+  }
+
   const {
     register,
     handleSubmit,
