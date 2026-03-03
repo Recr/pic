@@ -8,11 +8,16 @@ import Proposals from '../pages/proposals'
 import LoginForm from '../pages/login/LoginForm'
 import Employee from '../pages/employee'
 import PrivateRoute from '../pages/private-route/PrivateRoute'
+import { useSelector } from 'react-redux'
+import type { RootState } from '../app/store'
 
 const SuggestionSystemRouter: React.FC = () => {
+  const user = useSelector((state: RootState) => state.auth.user)
+  const isAuthInitialized = useSelector((state: RootState) => state.auth.isAuthInitialized)
+  const isLoggedIn = user && isAuthInitialized
   return (
     <Router>
-      <Sidebar />
+      {isLoggedIn && <Sidebar />}
       <Routes>
         <Route path="/" element={<SuggestionForm />} />
         <Route path="/login" element={<LoginForm />} />
