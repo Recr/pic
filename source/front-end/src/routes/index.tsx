@@ -17,52 +17,56 @@ const SuggestionSystemRouter: React.FC = () => {
   const isLoggedIn = user && isAuthInitialized
   return (
     <Router>
-      {isLoggedIn && <Sidebar />}
-      <Routes>
-        <Route path="/" element={<SuggestionForm />} />
-        <Route path="/login" element={<LoginForm />} />
-        <Route
-          path="/suggestion-list"
-          element={
-            <PrivateRoute>
-              <SuggestionList />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/admin/define-champion"
-          element={
-            <PrivateRoute>
-              <DefineChampion />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/employee"
-          element={
-            <PrivateRoute>
-              <Employee />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/areas"
-          element={
-            <PrivateRoute>
-              <Areas />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/proposals"
-          element={
-            <PrivateRoute>
-              <Proposals />
-            </PrivateRoute>
-          }
-        />
-        <Route path="*" element={<div>404 Not Found</div>} />
-      </Routes>
+      <div className="flex min-h-screen">
+        {isLoggedIn && <Sidebar />}
+        <main className="flex-1 overflow-auto">
+          <Routes>
+            <Route path="/" element={<SuggestionForm />} />
+            <Route path="/login" element={<LoginForm />} />
+            <Route
+              path="/suggestion-list"
+              element={
+                <PrivateRoute>
+                  <SuggestionList />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/admin/define-champion"
+              element={
+                <PrivateRoute>
+                  <DefineChampion />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/employee"
+              element={
+                <PrivateRoute>
+                  <Employee />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/areas"
+              element={
+                <PrivateRoute>
+                  <Areas />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/proposals"
+              element={
+                <PrivateRoute>
+                  <Proposals />
+                </PrivateRoute>
+              }
+            />
+            <Route path="*" element={<div>404 Not Found</div>} />
+          </Routes>
+        </main>
+      </div>
     </Router>
   )
 }

@@ -19,6 +19,31 @@ async function main() {
       role: 'ADMIN',
     },
   })
+
+  await prisma.area.createMany({
+    data: [
+      { name: 'Mezanino' },
+      { name: 'Metalização' },
+      { name: 'Montagem' },
+      { name: 'Cabine Pintura' },
+      { name: 'Expedição' },
+      { name: 'Montagem Small' },
+      { name: 'Injeção' },
+      { name: 'Área Externa' },
+    ],
+  })
+
+  await prisma.category.createMany({
+    data: [
+      { name: 'Segurança e Ergonomia' },
+      { name: 'Qualidade' },
+      { name: 'Produtividade' },
+      { name: '5S' },
+      { name: 'Esperas' },
+      { name: 'Processo desnecessário ou inadequado' },
+      { name: 'Identificação e correção de documentos' },
+    ],
+  })
 }
 
 main()

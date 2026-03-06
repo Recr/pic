@@ -1,54 +1,102 @@
-import { TextAlignJustify, X } from 'lucide-react'
+import {
+  BoxSelectIcon,
+  FormIcon,
+  LandPlotIcon,
+  Lightbulb,
+  ListIcon,
+  PersonStandingIcon,
+  TextAlignJustify,
+  X,
+} from 'lucide-react'
 import { useState } from 'react'
 
 const Sidebar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   return (
-    <div className="fixed top-0 left-0 z-50">
-      {isSidebarOpen && (
-        <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0">
-          <div
-            className="flex flex-col gap-4 p-4 bg-gray-200 h-screen w-60"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <X
-              onClick={() => setIsSidebarOpen(false)}
-              className="hover:cursor-pointer hover:text-red-500 transition-all hover:size-7"
-            />
-            <a href="/" className="hover:cursor-pointer hover:bg-gray-300 p-2 rounded">
-              Formulário de Sugestões
-            </a>
-            <a
-              href="/suggestion-list"
-              className="hover:cursor-pointer hover:bg-gray-300 p-2 rounded"
-            >
-              Lista de Sugestões
-            </a>
-            <a
-              href="/admin/define-champion"
-              className="hover:cursor-pointer hover:bg-gray-300 p-2 rounded"
-            >
-              Definir Campeão
-            </a>
-            <a href="/employee" className="hover:cursor-pointer hover:bg-gray-300 p-2 rounded">
-              Colaboradores
-            </a>
-            <a href="/areas" className="hover:cursor-pointer hover:bg-gray-300 p-2 rounded">
-              Áreas
-            </a>
-            <a href="/proposals" className="hover:cursor-pointer hover:bg-gray-300 p-2 rounded">
-              Propostas
-            </a>
-          </div>
-        </div>
-      )}
+    <aside
+      className={`flex flex-col gap-4 p-4 bg-gray-200 h-screen transition-all duration-300 ease-in-out ${
+        isSidebarOpen ? 'w-64' : 'w-16'
+      }`}
+    >
       {!isSidebarOpen && (
         <TextAlignJustify
           onClick={() => setIsSidebarOpen(true)}
-          className="ml-4 mt-4 hover:cursor-pointer hover:text-blue-500 transition-all hover:size-7"
+          className="hover:cursor-pointer hover:text-red-500 transition-all hover:size-7 flex-shrink-0"
         />
       )}
-    </div>
+      {isSidebarOpen && (
+        <X
+          onClick={() => setIsSidebarOpen(false)}
+          className="hover:cursor-pointer hover:text-red-500 transition-all hover:size-7 flex-shrink-0"
+        />
+      )}
+      <div className="flex items-center gap-2">
+        <FormIcon className="hover:cursor-pointer hover:text-red-500 transition-all hover:size-7 flex-shrink-0" />
+        {isSidebarOpen && (
+          <a
+            href="/"
+            className="hover:cursor-pointer hover:bg-gray-300 px-2 rounded whitespace-nowrap"
+          >
+            Formulário de Sugestões
+          </a>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        <ListIcon className="hover:cursor-pointer hover:text-red-500 transition-all hover:size-7 flex-shrink-0" />
+        {isSidebarOpen && (
+          <a
+            href="/suggestion-list"
+            className="hover:cursor-pointer hover:bg-gray-300 px-2 rounded whitespace-nowrap"
+          >
+            Lista de Sugestões
+          </a>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        <BoxSelectIcon className="hover:cursor-pointer hover:text-red-500 transition-all hover:size-7 flex-shrink-0" />
+        {isSidebarOpen && (
+          <a
+            href="/admin/define-champion"
+            className="hover:cursor-pointer hover:bg-gray-300 px-2 rounded whitespace-nowrap"
+          >
+            Definir Campeão
+          </a>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        <PersonStandingIcon className="hover:cursor-pointer hover:text-red-500 transition-all hover:size-7 flex-shrink-0" />
+        {isSidebarOpen && (
+          <a
+            href="/employee"
+            className="hover:cursor-pointer hover:bg-gray-300 px-2 rounded whitespace-nowrap"
+          >
+            Colaboradores
+          </a>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        <LandPlotIcon className="hover:cursor-pointer hover:text-red-500 transition-all hover:size-7 flex-shrink-0" />
+        {isSidebarOpen && (
+          <a
+            href="/areas"
+            className="hover:cursor-pointer hover:bg-gray-300 px-2 rounded whitespace-nowrap"
+          >
+            Áreas
+          </a>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        <Lightbulb className="hover:cursor-pointer hover:text-red-500 transition-all hover:size-7 flex-shrink-0" />
+        {isSidebarOpen && (
+          <a
+            href="/proposals"
+            className="hover:cursor-pointer hover:bg-gray-300 px-2 rounded whitespace-nowrap"
+          >
+            Propostas
+          </a>
+        )}
+      </div>
+    </aside>
   )
 }
 
