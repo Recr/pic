@@ -9,5 +9,6 @@ const authRoutes = Router()
 authRoutes.post('/login', validate(loginSchema), AuthController.handleLogin)
 authRoutes.get('/me', authMiddleware, AuthController.handleGetCurrentUser)
 authRoutes.post('/refresh', AuthController.handleRefreshToken)
+authRoutes.post('/logout', authMiddleware, AuthController.handleLogout)
 
 export { authRoutes }

@@ -109,6 +109,25 @@ class LoginUseCase {
       throw new AppError('Invalid refresh token.', StatusCodes.UNAUTHORIZED)
     }
   }
+
+  public async executeLogout(refreshToken: string) {
+    const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET
+    if (!refreshTokenSecret)
+      throw new AppError('REFRESH_TOKEN_SECRET not configured', StatusCodes.INTERNAL_SERVER_ERROR)
+
+    try {
+      const payload = jwt.verify(refreshToken, refreshTokenSecret) as jwt.JwtPayload
+      const employeeId = Number(payload.sub)
+
+      if (isNaN(employeeId)) {
+        throw new AppError('Invalid refresh token.', StatusCodes.UNAUTHORIZED)
+      }
+
+      await this.refreshTokenRepository.revokeByEmployeeId(employeeId)
+    } catch {
+      throw new AppError('Invalid refresh token.', StatusCodes.UNAUTHORIZED)
+    }
+  }
 }
 
 export { LoginUseCase }

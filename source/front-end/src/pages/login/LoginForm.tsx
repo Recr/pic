@@ -14,9 +14,7 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate()
-  const user = useSelector((state: RootState) => state.auth.user)
-  const isAuthInitialized = useSelector((state: RootState) => state.auth.isAuthInitialized)
-  const isLoggedIn = user && isAuthInitialized
+  const isLoggedin = useSelector((state: RootState) => state.auth.isLoggedin)
 
   const {
     register,
@@ -27,7 +25,7 @@ const LoginForm: React.FC = () => {
     resolver: zodResolver(loginSchema),
   })
 
-  if (isLoggedIn) {
+  if (isLoggedin) {
     navigate('/admin/define-champion', { replace: true })
     return null
   }

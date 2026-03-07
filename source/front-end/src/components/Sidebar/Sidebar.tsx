@@ -4,6 +4,7 @@ import {
   LandPlotIcon,
   Lightbulb,
   ListIcon,
+  LogOut,
   PersonStandingIcon,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -45,6 +46,7 @@ const Sidebar: React.FC = () => {
       label: 'Propostas',
       path: '/proposals',
     },
+    { icon: <LogOut />, label: 'Sair', path: '/logout' },
   ]
 
   return (

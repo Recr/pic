@@ -1,5 +1,5 @@
 import { useForm, type SubmitHandler } from 'react-hook-form'
-import type { CreateEmployee, Employee } from '../../features/employee/types'
+import type { CreateEmployee, Employee as EmployeeType } from '../../features/employee/types'
 import { employeeAPI } from '../../features/employee/employee-api'
 import Input from './components/Input'
 import Modal from '../../components/modal/Modal'
@@ -51,7 +51,7 @@ const Employee: React.FC = () => {
       <h1 className="font-inter font-light text-3xl bg-gray-300 py-10 pl-10">Colaboradores</h1>
       <div>
         <div className="w-4/5 sm:w-2/3 md:w-1/2 m-auto rounded-lg p-2 flex flex-col gap-2 mt-10">
-          {data?.map((employee: Employee) => (
+          {data?.map((employee: EmployeeType) => (
             <div
               key={employee.re}
               className="flex justify-between gap-2 bg-gray-100 px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-blue-200 transition-all"

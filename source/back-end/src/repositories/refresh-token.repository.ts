@@ -69,6 +69,13 @@ class RefreshTokenRepository {
       })
     })
   }
+
+  public async revokeByEmployeeId(employeeId: number) {
+    await prisma.refreshToken.updateMany({
+      where: { employeeId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    })
+  }
 }
 
 export { RefreshTokenRepository }

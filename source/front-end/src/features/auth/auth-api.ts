@@ -1,4 +1,4 @@
-import { setAuthInitialized, setCredentials } from './auth-slice'
+import { logout, setAuthInitialized, setCredentials } from './auth-slice'
 import type { User } from './types'
 import { api } from '../../services/api'
 
@@ -45,6 +45,20 @@ export const authAPI = api.injectEndpoints({
           console.error('Failed to fetch current user:', error)
         } finally {
           dispatch(setAuthInitialized(true))
+        }
+      },
+    }),
+    logout: builder.mutation<void, void>({
+      query: () => ({
+        url: '/auth/logout',
+        method: 'POST',
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled
+          dispatch(logout())
+        } catch (error) {
+          console.error('Failed to logout:', error)
         }
       },
     }),

@@ -6,19 +6,18 @@ import Areas from '../pages/areas'
 import Sidebar from '../components/Sidebar/Sidebar'
 import Proposals from '../pages/proposals'
 import LoginForm from '../pages/login/LoginForm'
-import Employee from '../pages/employee'
+import Employee from '../pages/employee/index'
 import PrivateRoute from '../pages/private-route/PrivateRoute'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../app/store'
+import Logout from '../pages/logout/Logout'
 
 const SuggestionSystemRouter: React.FC = () => {
-  const user = useSelector((state: RootState) => state.auth.user)
-  const isAuthInitialized = useSelector((state: RootState) => state.auth.isAuthInitialized)
-  const isLoggedIn = user && isAuthInitialized
+  const isLoggedin = useSelector((state: RootState) => state.auth.isLoggedin)
   return (
     <Router>
       <div className="flex min-h-screen">
-        {isLoggedIn && <Sidebar />}
+        {isLoggedin && <Sidebar />}
         <main className="flex-1 overflow-auto">
           <Routes>
             <Route path="/" element={<SuggestionForm />} />
@@ -63,6 +62,7 @@ const SuggestionSystemRouter: React.FC = () => {
                 </PrivateRoute>
               }
             />
+            <Route path="/logout" element={<Logout />} />
             <Route path="*" element={<div>404 Not Found</div>} />
           </Routes>
         </main>

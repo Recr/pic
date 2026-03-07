@@ -90,4 +90,21 @@ export const AuthController = {
       next(error)
     }
   },
+
+  async handleLogout(req: Request, res: Response, next: NextFunction) {
+    try {
+      const refreshToken = req.cookies.refreshToken
+      if (!refreshToken) {
+        throw new AppError('Refresh token is missing.', StatusCodes.BAD_REQUEST)
+      }
+      const loginUseCase = new LoginUseCase(
+        new PrismaEmployeeRepository(),
+        new RefreshTokenRepository(),
+      )
+      await loginUseCase.executeLogout(refreshToken)
+      res.json({ message: 'Logged out successfully.' })
+    } catch (error) {
+      next(error)
+    }
+  },
 }

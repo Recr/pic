@@ -6,6 +6,8 @@ import { employeeAPI } from '../../features/employee/employee-api'
 import { areaAPI } from '../../features/area/area-api'
 import { ToastContainer, toast } from 'react-toastify'
 import { useNavigate } from 'react-router'
+import { useSelector } from 'react-redux'
+import type { RootState } from '../../app/store'
 
 const SuggestionForm: React.FC = () => {
   const [employeeCount, setEmployeeCount] = useState(1)
@@ -19,6 +21,8 @@ const SuggestionForm: React.FC = () => {
   const { data: areas = [] } = areaAPI.useGetAreasQuery()
 
   const navigate = useNavigate()
+
+  const isLoggedin = useSelector((state: RootState) => state.auth.isLoggedin)
 
   const handleEmployeeSelect = (num: number, re: string) => {
     const reNumber = Number(re)
@@ -81,12 +85,14 @@ const SuggestionForm: React.FC = () => {
   return (
     <div className="bg-gray-100 flex flex-col">
       <ToastContainer />
-      <button
-        onClick={() => navigate('/login')}
-        className="px-4 py-2 bg-blue-500 text-white font-semibold w-fit rounded-sm ml-auto mr-4 absolute top-4 right-4 hover:bg-blue-700 transition-colors hover:cursor-pointer"
-      >
-        Entrar
-      </button>
+      {!isLoggedin && (
+        <button
+          onClick={() => navigate('/login')}
+          className="px-4 py-2 bg-blue-500 text-white font-semibold w-fit rounded-sm ml-auto mr-4 absolute top-4 right-4 hover:bg-blue-700 transition-colors hover:cursor-pointer"
+        >
+          Entrar
+        </button>
+      )}
       <div className="flex justify-center flex-col pt-4">
         <div className="flex flex-col items-center">
           <img
