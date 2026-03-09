@@ -12,7 +12,7 @@ const appRoutes = Router()
 appRoutes.use('/areas', areaRoutes)
 appRoutes.use('/employees', employeeRoutes)
 appRoutes.use('/categories', authMiddleware, categoryRoutes)
-appRoutes.use('/proposals', authMiddleware, proposalsRoutes)
+appRoutes.use('/proposals', proposalsRoutes)
 appRoutes.use('/auth', authRoutes)
 appRoutes.use(errorHandler)
 

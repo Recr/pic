@@ -8,14 +8,24 @@ import { ToastContainer, toast } from 'react-toastify'
 import { useNavigate } from 'react-router'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../app/store'
+import EmployeeCombobox from '../../components/EmployeeCombobox'
+
+const EMPLOYEE_OPTIONS = [1, 2, 3] as const
+
+const TOAST_OPTIONS = {
+  position: 'top-right' as const,
+  autoClose: 3000,
+  hideProgressBar: false,
+  closeOnClick: true,
+}
 
 const SuggestionForm: React.FC = () => {
+  const [formKey, setFormKey] = useState(0)
   const [employeeCount, setEmployeeCount] = useState(1)
   const [selectedEmployees, setSelectedEmployees] = useState<
     Record<number, { name: string; shift: string }>
   >({})
-  const [createProposal, { isLoading, isSuccess, isError, reset }] =
-    proposalAPI.useCreateProposalMutation()
+  const [createProposal, { isLoading }] = proposalAPI.useCreateProposalMutation()
 
   const { data: employees = [] } = employeeAPI.useGetEmployeesQuery()
   const { data: areas = [] } = areaAPI.useGetAreasQuery()
@@ -27,6 +37,7 @@ const SuggestionForm: React.FC = () => {
   const handleEmployeeSelect = (num: number, re: string) => {
     const reNumber = Number(re)
     const selectedEmployee = employees.find((emp) => emp.re === reNumber)
+
     if (selectedEmployee) {
       setSelectedEmployees((prev) => ({
         ...prev,
@@ -35,7 +46,28 @@ const SuggestionForm: React.FC = () => {
           shift: selectedEmployee.shift || '',
         },
       }))
+      return
     }
+
+    setSelectedEmployees((prev) => {
+      return Object.fromEntries(
+        Object.entries(prev).filter(([key]) => Number(key) !== num),
+      ) as Record<number, { name: string; shift: string }>
+    })
+  }
+
+  const handleEmployeeFieldChange = (num: number, field: 'name' | 'shift', value: string) => {
+    setSelectedEmployees((prev) => {
+      const current = prev[num] || { name: '', shift: '' }
+
+      return {
+        ...prev,
+        [num]: {
+          ...current,
+          [field]: value,
+        },
+      }
+    })
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -46,38 +78,32 @@ const SuggestionForm: React.FC = () => {
       Number(formData.get(`re-${i + 1}`)),
     )
 
-    const areaName = formData.get('area') as string
-    const area = areas.find((a) => a.name === areaName)
+    if (employeeRes.some((re) => Number.isNaN(re))) {
+      toast.error('Preencha um RE válido para todos os funcionários.', TOAST_OPTIONS)
+      return
+    }
 
-    if (!area) return
+    const areaId = Number(formData.get('areaId'))
+
+    if (!areaId) {
+      toast.error('Ah não. Algo deu errado!', TOAST_OPTIONS)
+      return
+    }
 
     try {
       await createProposal({
         employeeRes,
-        areaId: area.id,
+        areaId,
         description: formData.get('description') as string,
-      })
-        .unwrap()
-        .then(() =>
-          toast.success('Sugestão enviada. Obrigado!', {
-            position: 'top-right',
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-          }),
-        )
-        .catch(() =>
-          toast.error('Ah não. Algo deu errado!', {
-            position: 'top-right',
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-          }),
-        )
+      }).unwrap()
 
-      e.currentTarget.reset()
+      toast.success('Sugestão enviada. Obrigado!', TOAST_OPTIONS)
+
       setSelectedEmployees({})
+      setEmployeeCount(1)
+      setFormKey((prev) => prev + 1)
     } catch (error) {
+      toast.error('Ah não. Algo deu errado!', TOAST_OPTIONS)
       console.error('Erro ao enviar sugestão:', error)
     }
   }
@@ -103,6 +129,7 @@ const SuggestionForm: React.FC = () => {
           />
         </div>
         <form
+          key={formKey}
           onSubmit={handleSubmit}
           className="bg-white flex flex-col items-center w-90 sm:w-auto shadow-custom py-5 px-[30px] mx-auto mb-[30px] rounded-[20px]"
         >
@@ -110,37 +137,21 @@ const SuggestionForm: React.FC = () => {
           <div id="employee_amount_radio" className="my-8 mx-auto flex flex-col items-center">
             <label>Quantidade de Funcionários:</label>
             <div className="flex justify-center gap-2.5">
-              <input
-                type="radio"
-                id="radio1"
-                name="employeeAmount"
-                value="1"
-                checked={employeeCount === 1}
-                onChange={() => setEmployeeCount(1)}
-                required
-                className="cursor-pointer w-5"
-              />
-              <label htmlFor="radio1">1</label>
-              <input
-                type="radio"
-                id="radio2"
-                name="employeeAmount"
-                value="2"
-                checked={employeeCount === 2}
-                onChange={() => setEmployeeCount(2)}
-                className="cursor-pointer w-5"
-              />
-              <label htmlFor="radio2">2</label>
-              <input
-                type="radio"
-                id="radio3"
-                name="employeeAmount"
-                value="3"
-                checked={employeeCount === 3}
-                onChange={() => setEmployeeCount(3)}
-                className="cursor-pointer w-5"
-              />
-              <label htmlFor="radio3">3</label>
+              {EMPLOYEE_OPTIONS.map((value) => (
+                <div key={value} className="flex items-center gap-1">
+                  <input
+                    type="radio"
+                    id={`radio${value}`}
+                    name="employeeAmount"
+                    value={value}
+                    checked={employeeCount === value}
+                    onChange={() => setEmployeeCount(value)}
+                    required={value === 1}
+                    className="cursor-pointer w-5"
+                  />
+                  <label htmlFor={`radio${value}`}>{value}</label>
+                </div>
+              ))}
             </div>
           </div>
           {/* employee_information */}
@@ -155,37 +166,28 @@ const SuggestionForm: React.FC = () => {
               >
                 <h4>Funcionário {num}</h4>
                 <label>RE:</label>
-                <input
-                  type="number"
+                <EmployeeCombobox
                   name={`re-${num}`}
-                  placeholder="Número de registro"
-                  list="employees-list"
+                  listId={`employees-list-${num}`}
+                  employees={employees}
                   required
-                  className="w-4/5 p-2.5 my-1.5 rounded-[5px] border border-[#ccc]"
-                  onChange={(e) => handleEmployeeSelect(num, e.target.value)}
+                  onSelect={(value) => handleEmployeeSelect(num, value)}
                 />
-                <datalist id="employees-list">
-                  {employees.map((emp) => (
-                    <option key={emp.re} value={emp.re}>
-                      {emp.name} - {emp.shift}
-                    </option>
-                  ))}
-                </datalist>
                 <label>Nome:</label>
                 <input
                   type="text"
                   name={`name-${num}`}
                   value={selectedEmployees[num]?.name || ''}
-                  readOnly
-                  className="w-4/5 p-2.5 my-1.5 rounded-[5px] border border-[#ccc] bg-gray-50"
+                  onChange={(e) => handleEmployeeFieldChange(num, 'name', e.target.value)}
+                  className="w-4/5 p-2.5 my-1.5 rounded-[5px] border border-[#ccc]"
                 />
                 <label>Turno:</label>
                 <input
                   type="text"
                   name={`shift-${num}`}
                   value={selectedEmployees[num]?.shift || ''}
-                  readOnly
-                  className="w-4/5 p-2.5 my-1.5 rounded-[5px] border border-[#ccc] bg-gray-50"
+                  onChange={(e) => handleEmployeeFieldChange(num, 'shift', e.target.value)}
+                  className="w-4/5 p-2.5 my-1.5 rounded-[5px] border border-[#ccc]"
                 />
               </div>
             ))}
@@ -196,19 +198,21 @@ const SuggestionForm: React.FC = () => {
             className="flex flex-col gap-1.5 justify-center items-center w-90"
           >
             <label>Local:</label>
-            <input
-              type="text"
-              name="area"
-              placeholder="Pesquisar área"
-              list="areas-list"
+            <select
+              name="areaId"
+              defaultValue=""
               required
-              className="w-4/5 p-2.5 my-1.5 rounded-[5px] border border-[#ccc]"
-            />
-            <datalist id="areas-list">
+              className="w-4/5 p-2.5 my-1.5 rounded-[5px] border border-[#ccc] bg-white"
+            >
+              <option value="" disabled>
+                Selecione uma área
+              </option>
               {areas.map((area) => (
-                <option key={area.id} value={area.name} />
+                <option key={area.id} value={area.id}>
+                  {area.name}
+                </option>
               ))}
-            </datalist>
+            </select>
           </div>
           <label>Sugestão:</label>
           <textarea

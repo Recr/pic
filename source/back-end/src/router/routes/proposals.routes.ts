@@ -6,18 +6,34 @@ import {
   proposalIdSchema,
   updateProposalWithChampion,
 } from '../../utils/schemas/proposal.schemas'
+import { authMiddleware } from '../../middlewares/auth.middeware'
 
 const proposalsRoutes = Router()
 
-proposalsRoutes.get('/', ProposalsController.handleFindAll)
-proposalsRoutes.get('/with-employees', ProposalsController.handleFindAllWithEmployees)
-proposalsRoutes.get('/:id', validate(proposalIdSchema), ProposalsController.handleFindById)
+proposalsRoutes.get('/', authMiddleware, ProposalsController.handleFindAll)
+proposalsRoutes.get(
+  '/with-employees',
+  authMiddleware,
+  ProposalsController.handleFindAllWithEmployees,
+)
+proposalsRoutes.get(
+  '/:id',
+  validate(proposalIdSchema),
+  authMiddleware,
+  ProposalsController.handleFindById,
+)
 proposalsRoutes.post('/', validate(createProposalSchema), ProposalsController.handleCreate)
 proposalsRoutes.put(
   '/:id/define-champion',
   validate(updateProposalWithChampion),
+  authMiddleware,
   ProposalsController.handleDefineChampion,
 )
-proposalsRoutes.put('/:id/reject', validate(proposalIdSchema), ProposalsController.handleRejection)
+proposalsRoutes.put(
+  '/:id/reject',
+  validate(proposalIdSchema),
+  authMiddleware,
+  ProposalsController.handleRejection,
+)
 
 export { proposalsRoutes }

@@ -10,6 +10,7 @@ export interface CreateProposalInput extends CreateProposal {
 
 export interface CreateProposalWithSuggestions extends CreateProposal {
   employeeIds: number[]
+  employeeRes: number[]
 }
 
 export interface UpdateProposalWithChampion {

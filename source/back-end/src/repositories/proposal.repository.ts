@@ -46,6 +46,7 @@ class PrismaProposalRepository {
 
   public async createWithSuggestions({
     employeeIds,
+    employeeRes,
     ...newProposal
   }: CreateProposalWithSuggestions) {
     const proposal = await prisma.proposal.create({
@@ -55,6 +56,7 @@ class PrismaProposalRepository {
           createMany: {
             data: employeeIds.map((id) => ({
               employeeId: id,
+              employee
             })),
           },
         },

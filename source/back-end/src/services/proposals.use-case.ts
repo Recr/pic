@@ -36,6 +36,11 @@ class ProposalsUseCase {
   }
 
   public async executeCreate({ employeeRes, ...newProposal }: CreateProposalInput) {
+    let employeeIds: number[] = []
+    for (const employeeRe of employeeRes) {
+      const employeeId = await this.employeeRepository.findByRe(employeeRe)
+      if (!employeeId) employeeIds.push(undefined as unknown as number)
+    }
     const employeeIds: number[] = (await this.employeeRepository.findManyByRe(employeeRes)).map(
       (employee) => employee.id,
     )
@@ -44,6 +49,7 @@ class ProposalsUseCase {
     const newProposalWithIds: CreateProposalWithSuggestions = {
       ...newProposal,
       employeeIds,
+      employeeRes,
     }
     const proposal = await this.proposalRepository.createWithSuggestions(newProposalWithIds)
     return proposal

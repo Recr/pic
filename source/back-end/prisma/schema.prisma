@@ -80,11 +80,14 @@ model Payout {
 
 model Suggestion {
   id         Int @id @default(autoincrement())
-  employeeId Int @map("employee_id")
+  employeeId Int? @map("employee_id")
   proposalId Int @map("proposal_id")
+  employeeRe Int @map("employee_re")
+  employeeName String? @map("employee_name") @db.NVarChar(100)
+  employeeShift String? @map("employee_shift") @db.NVarChar(20)
 
   payout   Payout[]
-  employee Employee @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employee Employee? @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([employeeId, proposalId])

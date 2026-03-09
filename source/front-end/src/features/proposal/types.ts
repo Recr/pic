@@ -1,3 +1,9 @@
+interface EmployeeInput {
+  re: number
+  name: string
+  shift: string
+}
+
 export interface Employee {
   re: number
   name: string
@@ -15,7 +21,7 @@ export interface Proposal {
 
 export interface CreateProposalRequest {
   description: string
-  employeeRes: number[]
+  employees: EmployeeInput[]
   areaId: number
 }
 
