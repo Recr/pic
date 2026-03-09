@@ -1,16 +1,18 @@
-export interface CreateProposal {
+export interface EmployeeInfo {
+  re: number
+  name: string
+  shift: string
+}
+export interface CreateProposalInput {
   description: string
-  rewardAmount: number
   areaId: number
+  employees: EmployeeInfo[]
 }
 
-export interface CreateProposalInput extends CreateProposal {
-  employeeRes: number[]
-}
-
-export interface CreateProposalWithSuggestions extends CreateProposal {
-  employeeIds: number[]
-  employeeRes: number[]
+export interface CreateProposalWithSuggestions {
+  description: string
+  areaId: number
+  employees: (EmployeeInfo & { id: number })[]
 }
 
 export interface UpdateProposalWithChampion {

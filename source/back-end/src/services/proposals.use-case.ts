@@ -4,6 +4,7 @@ import { PrismaProposalRepository } from '../repositories/proposal.repository'
 import {
   CreateProposalInput,
   CreateProposalWithSuggestions,
+  EmployeeInfo,
   UpdateProposalWithChampion,
 } from '../utils/types/proposals.types'
 import { PrismaEmployeeRepository } from '../repositories/employee.repository'
@@ -35,21 +36,27 @@ class ProposalsUseCase {
     return proposal
   }
 
-  public async executeCreate({ employeeRes, ...newProposal }: CreateProposalInput) {
-    let employeeIds: number[] = []
-    for (const employeeRe of employeeRes) {
-      const employeeId = await this.employeeRepository.findByRe(employeeRe)
-      if (!employeeId) employeeIds.push(undefined as unknown as number)
-    }
-    const employeeIds: number[] = (await this.employeeRepository.findManyByRe(employeeRes)).map(
-      (employee) => employee.id,
+  public async executeCreate({
+    employees: employeeWithoutIds,
+    ...newProposal
+  }: CreateProposalInput) {
+    const employees: ((EmployeeInfo & { id: number }) | null)[] = await Promise.all(
+      employeeWithoutIds.map(async (employeeWithoutId) => {
+        const employeeWithId = await this.employeeRepository.findByRe(employeeWithoutId.re)
+
+        if (!employeeWithId) return null
+
+        return { ...employeeWithoutId, id: employeeWithId.id }
+      }),
     )
-    if (employeeIds.length !== employeeRes.length)
-      throw new AppError('Employees not found', StatusCodes.NOT_FOUND)
+    console.log(employees)
+    const employeesWithIds = employees.filter(
+      (employee): employee is EmployeeInfo & { id: number } => employee !== null,
+    )
+
     const newProposalWithIds: CreateProposalWithSuggestions = {
       ...newProposal,
-      employeeIds,
-      employeeRes,
+      employees: employeesWithIds,
     }
     const proposal = await this.proposalRepository.createWithSuggestions(newProposalWithIds)
     return proposal
