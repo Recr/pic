@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { sleep } from '../../helpers/sleep'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../app/store'
+import { useEffect } from 'react'
 
 type LoginFormInput = z.input<typeof loginSchema>
 type LoginFormData = z.infer<typeof loginSchema>
@@ -15,6 +16,7 @@ type LoginFormData = z.infer<typeof loginSchema>
 const LoginForm: React.FC = () => {
   const navigate = useNavigate()
   const isLoggedin = useSelector((state: RootState) => state.auth.isLoggedin)
+  const [login] = authAPI.useLoginMutation()
 
   const {
     register,
@@ -25,16 +27,18 @@ const LoginForm: React.FC = () => {
     resolver: zodResolver(loginSchema),
   })
 
+  useEffect(() => {
+    if (isLoggedin) {
+      navigate('/admin/define-champion', { replace: true })
+    }
+  }, [isLoggedin, navigate])
+
   if (isLoggedin) {
-    navigate('/admin/define-champion', { replace: true })
     return null
   }
 
-  const [login] = authAPI.useLoginMutation()
-
   const onSubmit = async (data: LoginFormData) => {
     try {
-      console.log('Submitting login data:', data)
       await login(data).unwrap()
       toast.success('Login realizado com sucesso! Redirecionando...', {
         position: 'top-right',

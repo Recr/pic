@@ -3,22 +3,37 @@ import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { logout } from '../../features/auth/auth-slice'
 import { api } from '../../services/api'
+import { authAPI } from '../../features/auth/auth-api'
 
 const Logout: React.FC = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [triggerLogout] = authAPI.useLogoutMutation()
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      dispatch(logout())
-      dispatch(api.util.resetApiState())
-      navigate('/login', { replace: true })
-    }, 1000)
+    let isMounted = true
+
+    const handleLogout = async () => {
+      try {
+        console.log('Attempting to log out...')
+        await triggerLogout().unwrap()
+      } catch (error) {
+        console.error('Logout failed:', error)
+      } finally {
+        if (isMounted) {
+          dispatch(logout())
+          dispatch(api.util.resetApiState())
+          navigate('/login', { replace: true })
+        }
+      }
+    }
+
+    handleLogout()
 
     return () => {
-      window.clearTimeout(timeoutId)
+      isMounted = false
     }
-  }, [dispatch, navigate])
+  }, [dispatch, navigate, triggerLogout])
 
   return (
     <div className="m-auto">

@@ -102,6 +102,17 @@ export const AuthController = {
         new RefreshTokenRepository(),
       )
       await loginUseCase.executeLogout(refreshToken)
+
+      const isProduction = process.env.NODE_ENV === 'production'
+      const cookieOptions = {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'lax' as const,
+      }
+
+      res.clearCookie('accessToken', cookieOptions)
+      res.clearCookie('refreshToken', cookieOptions)
+
       res.json({ message: 'Logged out successfully.' })
     } catch (error) {
       next(error)
