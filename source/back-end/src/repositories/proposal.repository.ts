@@ -8,8 +8,11 @@ class PrismaProposalRepository {
     return proposals
   }
 
-  public async findAllWithEmployees() {
+  public async findAllWithEmployees(userId?: number) {
     const proposals = await prisma.proposal.findMany({
+      // where: {
+      //   championId: userId,
+      // },
       select: {
         id: true,
         description: true,
@@ -20,6 +23,9 @@ class PrismaProposalRepository {
             id: false,
             employeeId: false,
             proposalId: false,
+            employeeName: true,
+            employeeRe: true,
+            employeeShift: true,
             employee: {
               select: {
                 re: true,
@@ -28,6 +34,46 @@ class PrismaProposalRepository {
                 shift: true,
               },
             },
+          },
+        },
+      },
+    })
+    return proposals
+  }
+
+  public async findAllWithoutChampion() {
+    const proposals = await prisma.proposal.findMany({
+      where: {
+        championId: null,
+        status: 'DEFINE_CHAMPION',
+      },
+      select: {
+        id: true,
+        description: true,
+        status: true,
+        createdAt: true,
+        suggestions: {
+          select: {
+            id: false,
+            employeeId: false,
+            proposalId: false,
+            employeeName: true,
+            employeeRe: true,
+            employeeShift: true,
+            employee: {
+              select: {
+                re: true,
+                name: true,
+                role: true,
+                shift: true,
+              },
+            },
+          },
+        },
+        area: {
+          select: {
+            id: true,
+            name: true,
           },
         },
       },

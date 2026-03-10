@@ -19,6 +19,25 @@ export interface Proposal {
   employees: Employee[]
 }
 
+export interface ProposalWithSuggestions {
+  id: number
+  description: string
+  status: string
+  createdAt: Date
+  suggestions: [
+    {
+      employeeName: string
+      employeeRe: number
+      employeeShift?: string
+      employee?: Employee
+    },
+  ]
+  area: {
+    id: number
+    name: string
+  }
+}
+
 export interface CreateProposalRequest {
   description: string
   employees: EmployeeInput[]

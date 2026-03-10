@@ -3,6 +3,8 @@ import { ProposalsUseCase } from '../services/proposals.use-case'
 import { PrismaProposalRepository } from '../repositories/proposal.repository'
 import { CreateProposalInput } from '../utils/types/proposals.types'
 import { PrismaEmployeeRepository } from '../repositories/employee.repository'
+import { AppError } from '../errors/AppError'
+import { StatusCodes } from 'http-status-codes'
 
 export const ProposalsController = {
   async handleFindAll(req: Request, res: Response, next: NextFunction) {
@@ -24,7 +26,26 @@ export const ProposalsController = {
         new PrismaProposalRepository(),
         new PrismaEmployeeRepository(),
       )
-      const proposals = await proposalUseCase.executeFindAllWithEmployees()
+
+      const userId = Number(req.user?.sub)
+      if (Number.isNaN(userId)) {
+        return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
+      }
+
+      const proposals = await proposalUseCase.executeFindAllWithEmployees(userId)
+      res.send(proposals)
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  async handleFindAllWithoutChampion(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+      )
+      const proposals = await proposalUseCase.executeFindAllWithoutChampion()
       res.send(proposals)
     } catch (error) {
       next(error)

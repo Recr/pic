@@ -13,10 +13,11 @@ const passwordHash = await bcrypt.hash('admin', 10)
 async function main() {
   await prisma.employee.create({
     data: {
-      re: 1,
-      name: 'Admin',
+      re: 10283,
+      name: 'Eliel da Silva',
       passwordHash,
       role: 'ADMIN',
+      shift: 'ADM',
     },
   })
 
@@ -35,13 +36,13 @@ async function main() {
 
   await prisma.category.createMany({
     data: [
-      { name: 'Segurança e Ergonomia' },
-      { name: 'Qualidade' },
-      { name: 'Produtividade' },
-      { name: '5S' },
-      { name: 'Esperas' },
-      { name: 'Processo desnecessário ou inadequado' },
-      { name: 'Identificação e correção de documentos' },
+      { name: 'Segurança e Ergonomia', categoryReward: 45.0 },
+      { name: 'Qualidade', categoryReward: 45.0 },
+      { name: 'Produtividade', categoryReward: 45.0 },
+      { name: '5S', categoryReward: 22.5 },
+      { name: 'Esperas', categoryReward: 15.0 },
+      { name: 'Processo inadequado ou desnecessário', categoryReward: 15.0 },
+      { name: 'Identificação e correção de documentos', categoryReward: 7.5 },
     ],
   })
 }

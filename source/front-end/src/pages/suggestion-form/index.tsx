@@ -90,11 +90,29 @@ const SuggestionForm: React.FC = () => {
       return
     }
 
+    const description = String(formData.get('description') ?? '').trim()
+    if (!description) {
+      toast.error('Preencha a sugestão.', TOAST_OPTIONS)
+      return
+    }
+
+    const employeeInputs = employeeRes.map((re, index) => {
+      const employeeNumber = index + 1
+      const selectedEmployee = selectedEmployees[employeeNumber]
+      const matchedEmployee = employees.find((employee) => employee.re === re)
+
+      return {
+        re,
+        name: selectedEmployee?.name?.trim() || matchedEmployee?.name || '',
+        shift: selectedEmployee?.shift?.trim() || matchedEmployee?.shift || '',
+      }
+    })
+
     try {
       await createProposal({
-        employeeRes,
+        employees: employeeInputs,
         areaId,
-        description: formData.get('description') as string,
+        description,
       }).unwrap()
 
       toast.success('Sugestão enviada. Obrigado!', TOAST_OPTIONS)
@@ -148,6 +166,7 @@ const SuggestionForm: React.FC = () => {
                     onChange={() => setEmployeeCount(value)}
                     required={value === 1}
                     className="cursor-pointer w-5"
+                    autoComplete="off"
                   />
                   <label htmlFor={`radio${value}`}>{value}</label>
                 </div>
@@ -180,6 +199,7 @@ const SuggestionForm: React.FC = () => {
                   value={selectedEmployees[num]?.name || ''}
                   onChange={(e) => handleEmployeeFieldChange(num, 'name', e.target.value)}
                   className="w-4/5 p-2.5 my-1.5 rounded-[5px] border border-[#ccc]"
+                  autoComplete="off"
                 />
                 <label>Turno:</label>
                 <input
@@ -188,6 +208,7 @@ const SuggestionForm: React.FC = () => {
                   value={selectedEmployees[num]?.shift || ''}
                   onChange={(e) => handleEmployeeFieldChange(num, 'shift', e.target.value)}
                   className="w-4/5 p-2.5 my-1.5 rounded-[5px] border border-[#ccc]"
+                  autoComplete="off"
                 />
               </div>
             ))}

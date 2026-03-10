@@ -6,7 +6,7 @@ export interface CreateEmployeeInput {
   password: string
 }
 
-enum Role {
+export enum Role {
   ADMIN = 'ADMIN',
   OPERATOR = 'OPERATOR',
   LEADER = 'LEADER',

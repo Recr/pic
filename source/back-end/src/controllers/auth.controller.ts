@@ -75,14 +75,14 @@ export const AuthController = {
         httpOnly: true,
         secure: isProduction,
         sameSite: 'lax',
-        maxAge: 1 * 60 * 1000,
+        maxAge: 15 * 60 * 1000,
       })
 
       res.cookie('refreshToken', newRefreshToken, {
         httpOnly: true,
         secure: isProduction,
         sameSite: 'lax',
-        maxAge: 3 * 60 * 1000,
+        maxAge: 24 * 60 * 60 * 1000,
       })
 
       res.json({ message: 'Token refreshed successfully.' })

@@ -21,13 +21,14 @@ class ProposalsUseCase {
     return proposals
   }
 
-  public async executeFindAllWithEmployees() {
-    const proposals = await this.proposalRepository.findAllWithEmployees()
-    const formatedProposals = proposals.map(({ suggestions, ...proposal }) => ({
-      ...proposal,
-      employees: suggestions.map((s) => s.employee),
-    }))
-    return formatedProposals
+  public async executeFindAllWithEmployees(userId?: number) {
+    const proposals = await this.proposalRepository.findAllWithEmployees(userId)
+    return proposals
+  }
+
+  public async executeFindAllWithoutChampion() {
+    const proposals = await this.proposalRepository.findAllWithoutChampion()
+    return proposals
   }
 
   public async executeFindById(proposalId: number) {
@@ -44,7 +45,12 @@ class ProposalsUseCase {
       employeeWithoutIds.map(async (employeeWithoutId) => {
         const employeeWithId = await this.employeeRepository.findByRe(employeeWithoutId.re)
 
-        if (!employeeWithId) return null
+        if (!employeeWithId)
+          return {
+            name: employeeWithoutId.name,
+            re: employeeWithoutId.re,
+            shift: employeeWithoutId.shift,
+          } as EmployeeInfo & { id: number }
 
         return { ...employeeWithoutId, id: employeeWithId.id }
       }),

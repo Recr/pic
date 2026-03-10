@@ -7,6 +7,8 @@ import {
   updateProposalWithChampion,
 } from '../../utils/schemas/proposal.schemas'
 import { authMiddleware } from '../../middlewares/auth.middeware'
+import { checkRole } from '../../middlewares/role.middleware'
+import { Role } from '../../utils/types/employees.types'
 
 const proposalsRoutes = Router()
 
@@ -15,6 +17,12 @@ proposalsRoutes.get(
   '/with-employees',
   authMiddleware,
   ProposalsController.handleFindAllWithEmployees,
+)
+proposalsRoutes.get(
+  '/to-define-champion',
+  authMiddleware,
+  checkRole([Role.ADMIN]),
+  ProposalsController.handleFindAllWithoutChampion,
 )
 proposalsRoutes.get(
   '/:id',

@@ -5,9 +5,9 @@ import { categoryAPI } from '../../features/category/category-api'
 import { ProposalCard } from './components/ProposalCard'
 
 const DefineChampion: React.FC = () => {
-  const { data: employees } = employeeAPI.useGetEmployeesQuery()
+  const { data: championList } = employeeAPI.useGetEmployeesQuery()
   const { data: areas } = areaAPI.useGetAreasQuery()
-  const { data: proposalsList } = proposalAPI.useGetProposalsWithEmployeesQuery()
+  const { data: proposalsList } = proposalAPI.useGetProposalsWithoutChampionQuery()
   const { data: categories } = categoryAPI.useGetCategoriesQuery()
 
   return (
@@ -25,8 +25,8 @@ const DefineChampion: React.FC = () => {
               <ProposalCard
                 key={proposal.id}
                 proposal={proposal}
-                employees={employees}
-                areas={areas}
+                availableChampions={championList}
+                availableAreas={areas}
                 categories={categories}
               />
             ))
