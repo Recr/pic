@@ -34,3 +34,12 @@ export const updateProposalWithChampion = z.object({
     id: z.coerce.number(),
   }),
 })
+
+export const updateProposalStatusByChampionSchema = z.object({
+  params: z.object({
+    id: z.coerce.number(),
+  }),
+  body: z.object({
+    status: z.enum(['TO_IMPLEMENT', 'REJECTED', 'UNDER_VALIDATION', 'NOT_VIABLE']),
+  }),
+})

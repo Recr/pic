@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { ProposalsUseCase } from '../services/proposals.use-case'
 import { PrismaProposalRepository } from '../repositories/proposal.repository'
-import { CreateProposalInput } from '../utils/types/proposals.types'
+import { CreateProposalInput, UpdateProposalStatus } from '../utils/types/proposals.types'
 import { PrismaEmployeeRepository } from '../repositories/employee.repository'
 import { AppError } from '../errors/AppError'
 import { StatusCodes } from 'http-status-codes'
@@ -95,14 +95,29 @@ export const ProposalsController = {
     }
   },
 
-  async handleRejection(req: Request, res: Response, next: NextFunction) {
+  async handleAdminRejection(req: Request, res: Response, next: NextFunction) {
     try {
       const proposalId = Number(req.params.id)
       const proposalUseCase = new ProposalsUseCase(
         new PrismaProposalRepository(),
         new PrismaEmployeeRepository(),
       )
-      const updatedProposal = await proposalUseCase.executeRejection(proposalId)
+      const updatedProposal = await proposalUseCase.executeAdminRejection(proposalId)
+      res.send(updatedProposal)
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  async handleStatusUpdate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalId = Number(req.params.id)
+      const data: UpdateProposalStatus = req.body
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+      )
+      const updatedProposal = await proposalUseCase.executeChampionReview(proposalId, data.status)
       res.send(updatedProposal)
     } catch (error) {
       next(error)

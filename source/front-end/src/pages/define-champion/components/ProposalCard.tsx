@@ -80,7 +80,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
   })
   const [updateProposal, { isLoading }] = proposalAPI.useUpdateProposalWithChampionMutation()
   const [rejectProposal, { isLoading: isRejecting }] =
-    proposalAPI.useUpdateProposalWithRejectionMutation()
+    proposalAPI.useRejectProposalAsAdminMutation()
 
   const onSubmit = async (data: UpdateProposalFormOutput) => {
     try {
@@ -107,7 +107,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
 
   return (
     <form
-      className="border border-[#ccc] rounded-md p-4 m-2.5 w-[350px] bg-white flex flex-col"
+      className="border border-[#ccc] rounded-md p-4 m-2.5 w-87.5 bg-white flex flex-col"
       onSubmit={handleSubmit(onSubmit)}
     >
       <div>
@@ -145,7 +145,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
         </label>
         <select
           id={`area-input-${proposal.id}`}
-          defaultValue=""
+          defaultValue={proposal.areaName}
           className="p-2.5 w-full border border-[#ccc] rounded bg-white"
           {...register('areaId', { valueAsNumber: true })}
         >
@@ -153,7 +153,11 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
             Selecione uma área
           </option>
           {availableAreas?.map((area: Area) => (
-            <option key={area.id} value={area.id}>
+            <option
+              key={area.id}
+              value={area.id}
+              defaultValue={proposal.areaName === area.name ? area.id : ''}
+            >
               {area.name}
             </option>
           ))}

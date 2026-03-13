@@ -56,9 +56,20 @@ export const proposalAPI = api.injectEndpoints({
         { type: 'Proposal', id: 'LIST' },
       ],
     }),
-    updateProposalWithRejection: builder.mutation<Proposal, { proposalId: string }>({
+    proposalChampionReview: builder.mutation<Proposal, { proposalId: string; status: string }>({
+      query: ({ proposalId, status }) => ({
+        url: `/proposals/${proposalId}/champion-review`,
+        method: 'PUT',
+        body: { status },
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
+    rejectProposalAsAdmin: builder.mutation<Proposal, { proposalId: string }>({
       query: ({ proposalId }) => ({
-        url: `/proposals/${proposalId}/reject`,
+        url: `/proposals/${proposalId}/admin-rejection`,
         method: 'PUT',
       }),
       invalidatesTags: (_result, _error, { proposalId }) => [

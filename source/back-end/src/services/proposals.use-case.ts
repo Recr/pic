@@ -84,13 +84,25 @@ class ProposalsUseCase {
     return updatedProposal
   }
 
-  public async executeRejection(proposalId: number) {
+  public async executeChampionReview(proposalId: number, newStatus: string) {
     const proposal = await this.proposalRepository.findById(proposalId)
     if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
     const updatedStatus: Prisma.ProposalUpdateInput = {
-      status: 'REJECTED',
+      status: newStatus,
+      championReviewedAt: new Date(),
     }
     const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedStatus)
+    return updatedProposal
+  }
+
+  public async executeAdminRejection(proposalId: number) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+    const updatedData: Prisma.ProposalUpdateInput = {
+      adminReviewedAt: new Date(),
+      status: 'REJECTED',
+    }
+    const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
     return updatedProposal
   }
 }

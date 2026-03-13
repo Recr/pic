@@ -4,6 +4,7 @@ import { validate } from '../../middlewares/validation.middleware'
 import {
   createProposalSchema,
   proposalIdSchema,
+  updateProposalStatusByChampionSchema,
   updateProposalWithChampion,
 } from '../../utils/schemas/proposal.schemas'
 import { authMiddleware } from '../../middlewares/auth.middeware'
@@ -35,13 +36,22 @@ proposalsRoutes.put(
   '/:id/define-champion',
   validate(updateProposalWithChampion),
   authMiddleware,
+  checkRole([Role.ADMIN]),
   ProposalsController.handleDefineChampion,
 )
 proposalsRoutes.put(
-  '/:id/reject',
+  '/:id/champion-review',
+  validate(updateProposalStatusByChampionSchema),
+  authMiddleware,
+  ProposalsController.handleStatusUpdate,
+)
+
+proposalsRoutes.put(
+  '/:id/admin-rejection',
   validate(proposalIdSchema),
   authMiddleware,
-  ProposalsController.handleRejection,
+  checkRole([Role.ADMIN]),
+  ProposalsController.handleAdminRejection,
 )
 
 export { proposalsRoutes }

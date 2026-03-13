@@ -20,3 +20,7 @@ export interface UpdateProposalWithChampion {
   areaId: number
   categoryId: number
 }
+
+export interface UpdateProposalStatus {
+  status: 'TO_IMPLEMENT' | 'REJECTED' | 'UNDER_VALIDATION' | 'NOT_VIABLE'
+}
