@@ -36,6 +36,11 @@ export interface ProposalWithSuggestions {
     id: number
     name: string
   }
+  category: {
+    id: number
+    name: string
+    categoryReward: number
+  }
 }
 
 export interface CreateProposalRequest {

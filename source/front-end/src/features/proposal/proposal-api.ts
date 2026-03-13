@@ -16,7 +16,7 @@ export const proposalAPI = api.injectEndpoints({
       }),
       invalidatesTags: ['Proposal'],
     }),
-    getProposalsWithEmployees: builder.query<Proposal[], void>({
+    getProposalsWithEmployees: builder.query<ProposalWithSuggestions[], void>({
       query: () => ({
         url: '/proposals/with-employees',
         method: 'GET',

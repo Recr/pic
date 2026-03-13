@@ -41,6 +41,19 @@ class PrismaProposalRepository {
             },
           },
         },
+        area: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
+            categoryReward: true,
+          },
+        },
       },
     })
     return proposals

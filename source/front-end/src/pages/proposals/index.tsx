@@ -1,5 +1,21 @@
 import { proposalAPI } from '../../features/proposal/proposal-api'
+import type { ProposalWithSuggestions } from '../../features/proposal/types'
+import ImplementationCard from './components/ImplementationCard'
 import ReviewCard from './components/ReviewCard'
+import StartImplementationCard from './components/StartImplementationCard'
+
+type CardRenderer = (proposal: ProposalWithSuggestions) => React.ReactNode
+
+const CardTypes: Record<string, CardRenderer> = {
+  UNDER_VALIDATION: (proposal) => <ReviewCard key={proposal.id} {...proposal} />,
+  TO_IMPLEMENT: (proposal) => <StartImplementationCard key={proposal.id} {...proposal} />,
+  IMPLEMENTATION: (proposal) => <ImplementationCard key={proposal.id} {...proposal} />,
+}
+function renderProposalCard(proposal: ProposalWithSuggestions) {
+  const renderer = CardTypes[proposal.status]
+  if (!renderer) return null
+  return renderer(proposal)
+}
 
 const Proposals: React.FC = () => {
   const { data: proposalsList } = proposalAPI.useGetProposalsWithEmployeesQuery()
@@ -15,7 +31,7 @@ const Proposals: React.FC = () => {
         ) : (
           proposalsList
             .filter((proposal) => proposal && proposal.id !== undefined)
-            .map((proposal) => <ReviewCard key={proposal.id} {...proposal} />)
+            .map(renderProposalCard)
         )}
       </div>
     </div>

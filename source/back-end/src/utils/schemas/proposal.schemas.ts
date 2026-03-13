@@ -40,6 +40,13 @@ export const updateProposalStatusByChampionSchema = z.object({
     id: z.coerce.number(),
   }),
   body: z.object({
-    status: z.enum(['TO_IMPLEMENT', 'REJECTED', 'UNDER_VALIDATION', 'NOT_VIABLE']),
+    status: z.enum([
+      'TO_IMPLEMENT',
+      'REJECTED',
+      'UNDER_VALIDATION',
+      'NOT_VIABLE',
+      'IMPLEMENTATION',
+      'IMPLEMENTED',
+    ]),
   }),
 })

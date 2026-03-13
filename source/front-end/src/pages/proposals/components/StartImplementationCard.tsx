@@ -1,9 +1,9 @@
 import StatusBadge from '../../../components/StatusBadge'
-import { getStatusColor } from '../../../helpers/getStatusColor'
-import type { ProposalWithSuggestions } from '../../../features/proposal/types'
 import { proposalAPI } from '../../../features/proposal/proposal-api'
+import type { ProposalWithSuggestions } from '../../../features/proposal/types'
+import { getStatusColor } from '../../../helpers/getStatusColor'
 
-const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
+const StartImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
   const [proposalChampionReview] = proposalAPI.useProposalChampionReviewMutation()
 
   const handleStatusUpdate = async (newStatus: string) => {
@@ -42,6 +42,16 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
           })
         )}
       </ul>
+      <div className="flex justify-between">
+        <div className="flex flex-col">
+          <strong>Área</strong>
+          <span>{proposal.area.name}</span>
+        </div>
+        <div className="flex flex-col">
+          <strong>Categoria</strong>
+          <span>{proposal.category.name}</span>
+        </div>
+      </div>
 
       <p>
         <strong>Sugestão:</strong>
@@ -50,26 +60,14 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
       </p>
       <div className="flex gap-2 items-center pt-4">
         <button
-          onClick={() => handleStatusUpdate('TO_IMPLEMENT')}
-          className="py-2 px-2 cursor-pointer rounded border border-green-800 bg-green-500 text-white w-1/3 hover:w-1/2 transition-all"
+          onClick={() => handleStatusUpdate('IMPLEMENTATION')}
+          className="py-2 px-2 cursor-pointer rounded border border-blue-800 bg-blue-500 hover:bg-blue-700 text-white transition-all"
         >
-          Aprovar
-        </button>
-        <button
-          onClick={() => handleStatusUpdate('NOT_VIABLE')}
-          className="py-2 px-2 cursor-pointer rounded border border-orange-600 bg-orange-400 text-white w-1/3 hover:w-1/2 transition-all min-w-24"
-        >
-          Não viável
-        </button>
-        <button
-          onClick={() => handleStatusUpdate('REJECTED')}
-          className="py-2 px-3 cursor-pointer rounded border border-[#c0392b] bg-[#e74c3c] text-white w-1/3 hover:w-1/2 transition-all"
-        >
-          Rejeitar
+          Iniciar Implementação
         </button>
       </div>
     </div>
   )
 }
 
-export default ReviewCard
+export default StartImplementationCard
