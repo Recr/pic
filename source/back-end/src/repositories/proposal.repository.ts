@@ -9,10 +9,15 @@ class PrismaProposalRepository {
   }
 
   public async findAllWithEmployees(userId?: number) {
+    const where: Prisma.ProposalWhereInput =
+      userId === undefined
+        ? {}
+        : {
+            championId: userId,
+          }
+
     const proposals = await prisma.proposal.findMany({
-      // where: {
-      //   championId: userId,
-      // },
+      where,
       select: {
         id: true,
         description: true,
