@@ -9,11 +9,15 @@ import {
 } from '../utils/types/proposals.types'
 import { PrismaEmployeeRepository } from '../repositories/employee.repository'
 import { Prisma } from '../../prisma/client/client'
+import { PrismaCategoryRepository } from '../repositories/category.repository'
+import { PrismaSuggestionRepository } from '../repositories/suggestion.repository'
 
 class ProposalsUseCase {
   constructor(
     private proposalRepository: PrismaProposalRepository,
     private employeeRepository: PrismaEmployeeRepository,
+    private categoryRepository: PrismaCategoryRepository,
+    private suggestionRepository: PrismaSuggestionRepository,
   ) {}
 
   public async executeFindAll() {
@@ -23,6 +27,11 @@ class ProposalsUseCase {
 
   public async executeFindAllWithEmployees(userId?: number) {
     const proposals = await this.proposalRepository.findAllWithEmployees(userId)
+    return proposals
+  }
+
+  public async executeFindAllDetailed() {
+    const proposals = await this.proposalRepository.findAllDetailed()
     return proposals
   }
 
@@ -87,17 +96,48 @@ class ProposalsUseCase {
   public async executeChampionReview(proposalId: number, newStatus: string) {
     const proposal = await this.proposalRepository.findById(proposalId)
     if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
-    const updatedStatus: Prisma.ProposalUpdateInput = { status: newStatus }
+    const updatedData: Prisma.ProposalUpdateInput = { status: newStatus }
+
     if (newStatus == 'TO_IMPLEMENT' || newStatus == 'NOT_VIABLE' || newStatus == 'REJECTED') {
-      updatedStatus.championReviewedAt = new Date()
+      updatedData.championReviewedAt = new Date()
     } else if (newStatus == 'IMPLEMENTATION') {
-      updatedStatus.implementationStartedAt = new Date()
+      updatedData.implementationStartedAt = new Date()
     } else if (newStatus == 'IMPLEMENTED') {
-      updatedStatus.completedAt = new Date()
+      updatedData.completedAt = new Date()
+
+      if (!proposal.categoryId) throw new AppError('Category not defined.', StatusCodes.BAD_REQUEST)
+      const category = await this.categoryRepository.findById(proposal.categoryId)
+      if (category?.categoryReward == null)
+        throw new AppError('Category reward not defined.', StatusCodes.BAD_REQUEST)
+      updatedData.rewardAmount = category?.categoryReward
+
+      const suggestionIdList = (await this.suggestionRepository.findByProposalId(proposal.id)).map(
+        (suggestion) => {
+          return suggestion.id
+        },
+      )
+
+      if (suggestionIdList.length === 0)
+        throw new AppError('Proposal has no suggestions.', StatusCodes.BAD_REQUEST)
+
+      const payoutData: Prisma.PayoutCreateManyInput[] = suggestionIdList.map((id) => {
+        return {
+          status: 'PENDING',
+          value: Number(category.categoryReward) / suggestionIdList.length,
+          suggestionId: id,
+        }
+      })
+
+      const completedProposal = await this.proposalRepository.completeProposal(
+        proposal.id,
+        updatedData,
+        payoutData,
+      )
+      return completedProposal
     } else {
       throw new AppError('Invalid Status.', StatusCodes.BAD_REQUEST)
     }
-    const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedStatus)
+    const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
     return updatedProposal
   }
 

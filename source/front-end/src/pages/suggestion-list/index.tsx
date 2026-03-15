@@ -2,7 +2,7 @@ import { proposalAPI } from '../../features/proposal/proposal-api'
 import ProposalItem from './components/ProposalItem'
 
 const SuggestionList: React.FC = () => {
-  const { data: proposalsData } = proposalAPI.useGetProposalsWithEmployeesQuery()
+  const { data: proposalsData } = proposalAPI.useGetProposalsDetailedQuery()
   return (
     <>
       <div className="text-left text-2xl font-semibold my-4 mx-4">Lista de Propostas</div>

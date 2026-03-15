@@ -31,7 +31,7 @@ const AppShell: React.FC = () => {
           <Route
             path="/suggestion-list"
             element={
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['ADMIN']}>
                 <SuggestionList />
               </PrivateRoute>
             }
@@ -47,7 +47,7 @@ const AppShell: React.FC = () => {
           <Route
             path="/employee"
             element={
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['ADMIN']}>
                 <Employee />
               </PrivateRoute>
             }
@@ -55,7 +55,7 @@ const AppShell: React.FC = () => {
           <Route
             path="/areas"
             element={
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['ADMIN']}>
                 <Areas />
               </PrivateRoute>
             }

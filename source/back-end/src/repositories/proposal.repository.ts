@@ -8,6 +8,70 @@ class PrismaProposalRepository {
     return proposals
   }
 
+  public async findAllDetailed() {
+    const proposals = await prisma.proposal.findMany({
+      select: {
+        id: true,
+        description: true,
+        status: true,
+        createdAt: true,
+        adminReviewedAt: true,
+        championReviewedAt: true,
+        implementationStartedAt: true,
+        completedAt: true,
+        notes: true,
+        rejectionNote: true,
+        rewardAmount: true,
+        area: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
+            categoryReward: true,
+          },
+        },
+        champion: {
+          select: {
+            re: true,
+            name: true,
+            role: true,
+            shift: true,
+          },
+        },
+        suggestions: {
+          select: {
+            employeeName: true,
+            employeeRe: true,
+            employeeShift: true,
+            employee: {
+              select: {
+                re: true,
+                name: true,
+                role: true,
+                shift: true,
+              },
+            },
+            // payout: {
+            //   select: {
+            //     id: true,
+            //     createdAt: true,
+            //     payedAt: true,
+            //     status: true,
+            //     value: true,
+            //   },
+            // },
+          },
+        },
+      },
+    })
+    return proposals
+  }
+
   public async findAllWithEmployees(userId?: number) {
     const where: Prisma.ProposalWhereInput =
       userId === undefined
@@ -136,6 +200,28 @@ class PrismaProposalRepository {
         ...updatedProposal,
       },
     })
+    return proposal
+  }
+
+  public async completeProposal(
+    proposalId: number,
+    updatedProposal: Prisma.ProposalUpdateInput,
+    payouts: Prisma.PayoutCreateManyInput[],
+  ) {
+    const [proposal] = await prisma.$transaction([
+      prisma.proposal.update({
+        where: {
+          id: proposalId,
+        },
+        data: {
+          ...updatedProposal,
+        },
+      }),
+      prisma.payout.createMany({
+        data: payouts,
+      }),
+    ])
+
     return proposal
   }
 }

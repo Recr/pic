@@ -1,11 +1,11 @@
 import React from 'react'
 import Modal from '../../../components/modal/Modal'
 import StatusBadge from '../../../components/StatusBadge'
-import type { Proposal } from '../../../features/proposal/types'
+import type { Proposal, ProposalWithSuggestions } from '../../../features/proposal/types'
 import { translateStatus } from '../../../helpers/translateStatus'
 import { getStatusColor } from '../../../helpers/getStatusColor'
 
-const ProposalItem: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
+const ProposalItem: React.FC<{ proposal: ProposalWithSuggestions }> = ({ proposal }) => {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   return (
     <>
@@ -15,12 +15,18 @@ const ProposalItem: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
       >
         <p>{proposal.id}</p>
         <p>{proposal.description}</p>
-        <p>{proposal.employees.map((employee) => employee.name).join(', ')}</p>
+        <p>
+          {proposal.suggestions
+            .map((suggestion) =>
+              suggestion.employee ? suggestion.employee.name : suggestion.employeeName,
+            )
+            .join(', ')}
+        </p>
         <p>{new Date(proposal.createdAt).toLocaleDateString()}</p>
         <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div className="w-[640px] max-w-[95vw] p-6 space-y-5">
+        <div className="w-160 max-w-[95vw] p-6 space-y-5">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-xl font-semibold">Detalhes da Proposta</h2>
@@ -50,14 +56,14 @@ const ProposalItem: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
           <div>
             <p className="text-sm font-semibold mb-2">Funcionários</p>
             <div className="flex flex-wrap gap-2">
-              {proposal.employees.map((employee, index) => (
+              {/* {proposal.suggestions.map((suggestion, index) => (
                 <span
-                  key={`${proposal.id}-${employee.name}-${index}`}
+                  key={`${proposal.id}-${suggestion.name}-${index}`}
                   className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm"
                 >
                   {employee.name}
                 </span>
-              ))}
+              ))} */}
             </div>
           </div>
         </div>

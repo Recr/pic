@@ -132,7 +132,7 @@ const SuggestionForm: React.FC = () => {
       {!isLoggedin && (
         <button
           onClick={() => navigate('/login')}
-          className="px-4 py-2 bg-blue-500 text-white font-semibold w-fit rounded-sm ml-auto mr-4 absolute top-4 right-4 hover:bg-blue-700 transition-colors hover:cursor-pointer"
+          className="px-4 py-2 bg-blue-500 text-white font-semibold w-fit rounded-sm absolute top-4 right-4 hover:bg-blue-700 transition-colors hover:cursor-pointer"
         >
           Entrar
         </button>
@@ -143,13 +143,13 @@ const SuggestionForm: React.FC = () => {
             id="logo"
             src={logo}
             alt="Logo"
-            className="object-contain w-90 max-w-[400px] mb-5 border-[5px] border-[#ccc] rounded-[20px]"
+            className="object-contain w-90 max-w-100 mb-5 border-[5px] border-[#ccc] rounded-[20px]"
           />
         </div>
         <form
           key={formKey}
           onSubmit={handleSubmit}
-          className="bg-white flex flex-col items-center w-90 sm:w-auto shadow-custom py-5 px-[30px] mx-auto mb-[30px] rounded-[20px]"
+          className="bg-white flex flex-col items-center w-90 sm:w-auto shadow-custom py-5 px-7.5 mx-auto mb-7.5 rounded-[20px]"
         >
           {/* employee_amount_radio */}
           <div id="employee_amount_radio" className="my-8 mx-auto flex flex-col items-center">
@@ -176,12 +176,12 @@ const SuggestionForm: React.FC = () => {
           {/* employee_information */}
           <div
             id="employee_information"
-            className="flex flex-col md:flex-row items-center gap-5 w-full mb-[30px] md:max-w-[700px] md:justify-center"
+            className="flex flex-col md:flex-row items-center gap-5 w-full mb-7.5 md:max-w-175 md:justify-center"
           >
             {Array.from({ length: employeeCount }, (_, i) => i + 1).map((num) => (
               <div
                 key={num}
-                className="employee_block flex flex-col items-center w-full md:min-w-[200px]"
+                className="employee_block flex flex-col items-center w-full md:min-w-50"
               >
                 <h4>Funcionário {num}</h4>
                 <label>RE:</label>

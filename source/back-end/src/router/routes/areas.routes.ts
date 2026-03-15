@@ -8,13 +8,39 @@ import {
   updateAreaSchema,
 } from '../../utils/schemas/area.schemas'
 import { authMiddleware } from '../../middlewares/auth.middeware'
+import { checkRole } from '../../middlewares/role.middleware'
+import { Role } from '../../utils/types/employees.types'
 
 const areaRoutes = Router()
 
 areaRoutes.get('/', AreasController.handleFindAll)
-areaRoutes.get('/:id', authMiddleware, validate(getAreaByIdSchema), AreasController.handleFindById)
-areaRoutes.post('/', authMiddleware, validate(createAreaSchema), AreasController.handleCreate)
-areaRoutes.put('/:id', authMiddleware, validate(updateAreaSchema), AreasController.handleUpdate)
-areaRoutes.delete('/:id', authMiddleware, validate(deleteAreaSchema), AreasController.handleDelete)
+areaRoutes.get(
+  '/:id',
+  authMiddleware,
+  checkRole([Role.ADMIN]),
+  validate(getAreaByIdSchema),
+  AreasController.handleFindById,
+)
+areaRoutes.post(
+  '/',
+  authMiddleware,
+  checkRole([Role.ADMIN]),
+  validate(createAreaSchema),
+  AreasController.handleCreate,
+)
+areaRoutes.put(
+  '/:id',
+  authMiddleware,
+  checkRole([Role.ADMIN]),
+  validate(updateAreaSchema),
+  AreasController.handleUpdate,
+)
+areaRoutes.delete(
+  '/:id',
+  authMiddleware,
+  checkRole([Role.ADMIN]),
+  validate(deleteAreaSchema),
+  AreasController.handleDelete,
+)
 
 export { areaRoutes }

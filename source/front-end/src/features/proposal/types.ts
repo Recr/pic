@@ -43,6 +43,38 @@ export interface ProposalWithSuggestions {
   }
 }
 
+export interface ProposalDetailed {
+  id: number
+  description: string
+  status: string
+  createdAt: Date
+  adminReviewedAt: Date
+  championReviewedAt: Date
+  implementationStartedAt: Date
+  completedAt: Date
+  notes: string | null
+  rejectionNote: string | null
+  rewardAmount: number | null
+  suggestions: [
+    {
+      employeeName: string
+      employeeRe: number
+      employeeShift?: string
+      employee?: Employee
+    },
+  ]
+  area: {
+    id: number
+    name: string
+  }
+  category: {
+    id: number
+    name: string
+    categoryReward: number
+  }
+  champion: Employee | null
+}
+
 export interface CreateProposalRequest {
   description: string
   employees: EmployeeInput[]

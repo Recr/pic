@@ -1,6 +1,7 @@
 import type {
   CreateProposalRequest,
   Proposal,
+  ProposalDetailed,
   ProposalWithSuggestions,
   UpdateProposalRequest,
 } from './types'
@@ -19,6 +20,19 @@ export const proposalAPI = api.injectEndpoints({
     getProposalsWithEmployees: builder.query<ProposalWithSuggestions[], void>({
       query: () => ({
         url: '/proposals/with-employees',
+        method: 'GET',
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ id }) => ({ type: 'Proposal' as const, id })),
+              { type: 'Proposal', id: 'LIST' },
+            ]
+          : [{ type: 'Proposal', id: 'LIST' }],
+    }),
+    getProposalsDetailed: builder.query<ProposalDetailed[], void>({
+      query: () => ({
+        url: '/proposals/detailed',
         method: 'GET',
       }),
       providesTags: (result) =>

@@ -23,6 +23,15 @@ class PrismaSuggestionRepository {
     return suggestion
   }
 
+  public async findByProposalId(proposalId: number) {
+    const suggestion = await prisma.suggestion.findMany({
+      where: {
+        proposalId: proposalId,
+      },
+    })
+    return suggestion
+  }
+
   public async delete(suggestionId: number) {
     const suggestion = await prisma.suggestion.delete({
       where: {

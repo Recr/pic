@@ -23,7 +23,7 @@ const Logout: React.FC = () => {
         if (isMounted) {
           dispatch(logout())
           dispatch(api.util.resetApiState())
-          navigate('/login', { replace: true })
+          navigate('/', { replace: true })
         }
       }
     }

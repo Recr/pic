@@ -16,7 +16,6 @@ interface ProposalWithEmployees {
   id: number
   description: string
   status: string
-  areaName?: string
   suggestions: [
     {
       employeeName: string
@@ -30,6 +29,10 @@ interface ProposalWithEmployees {
       }
     },
   ]
+  area?: {
+    id: number
+    name: string
+  }
 }
 
 interface ProposalCardProps {
@@ -145,7 +148,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
         </label>
         <select
           id={`area-input-${proposal.id}`}
-          defaultValue={proposal.areaName}
+          defaultValue={proposal.area?.id || ''}
           className="p-2.5 w-full border border-[#ccc] rounded bg-white"
           {...register('areaId', { valueAsNumber: true })}
         >
@@ -153,11 +156,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
             Selecione uma área
           </option>
           {availableAreas?.map((area: Area) => (
-            <option
-              key={area.id}
-              value={area.id}
-              defaultValue={proposal.areaName === area.name ? area.id : ''}
-            >
+            <option key={area.id} value={area.id}>
               {area.name}
             </option>
           ))}

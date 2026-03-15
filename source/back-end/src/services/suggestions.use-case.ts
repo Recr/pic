@@ -17,6 +17,11 @@ class SuggestionUseCase {
     return suggestion
   }
 
+  public async executeFindByProposalId(proposalId: number) {
+    const suggestions = await this.suggestionRepository.findByProposalId(proposalId)
+    return suggestions
+  }
+
   public async executeCreate(newSuggestion: Prisma.SuggestionCreateInput) {
     const suggestion = await this.suggestionRepository.create(newSuggestion)
     return suggestion

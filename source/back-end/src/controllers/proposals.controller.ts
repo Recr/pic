@@ -5,6 +5,8 @@ import { CreateProposalInput, UpdateProposalStatus } from '../utils/types/propos
 import { PrismaEmployeeRepository } from '../repositories/employee.repository'
 import { AppError } from '../errors/AppError'
 import { StatusCodes } from 'http-status-codes'
+import { PrismaCategoryRepository } from '../repositories/category.repository'
+import { PrismaSuggestionRepository } from '../repositories/suggestion.repository'
 
 export const ProposalsController = {
   async handleFindAll(req: Request, res: Response, next: NextFunction) {
@@ -12,6 +14,8 @@ export const ProposalsController = {
       const proposalUseCase = new ProposalsUseCase(
         new PrismaProposalRepository(),
         new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
       )
       const proposals = await proposalUseCase.executeFindAll()
       res.send(proposals)
@@ -20,11 +24,29 @@ export const ProposalsController = {
     }
   },
 
-  async handleFindAllWithEmployees(req: Request, res: Response, next: NextFunction) {
+  async handleFindAllProposalsDetailed(req: Request, res: Response, next: NextFunction) {
     try {
       const proposalUseCase = new ProposalsUseCase(
         new PrismaProposalRepository(),
         new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
+      )
+
+      const proposals = await proposalUseCase.executeFindAllDetailed()
+      res.send(proposals)
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  async handleFindAllUserProposalsWithEmployees(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
       )
 
       const userId = Number(req.user?.sub)
@@ -44,6 +66,8 @@ export const ProposalsController = {
       const proposalUseCase = new ProposalsUseCase(
         new PrismaProposalRepository(),
         new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
       )
       const proposals = await proposalUseCase.executeFindAllWithoutChampion()
       res.send(proposals)
@@ -58,6 +82,8 @@ export const ProposalsController = {
       const proposalUseCase = new ProposalsUseCase(
         new PrismaProposalRepository(),
         new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
       )
       const proposals = await proposalUseCase.executeFindById(proposalId)
       res.send(proposals)
@@ -72,6 +98,8 @@ export const ProposalsController = {
       const proposalUseCase = new ProposalsUseCase(
         new PrismaProposalRepository(),
         new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
       )
       const proposal = await proposalUseCase.executeCreate(data)
       res.send(proposal)
@@ -87,6 +115,8 @@ export const ProposalsController = {
       const proposalUseCase = new ProposalsUseCase(
         new PrismaProposalRepository(),
         new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
       )
       const updatedProposal = await proposalUseCase.executeDefineChampion(proposalId, data)
       res.send(updatedProposal)
@@ -101,6 +131,8 @@ export const ProposalsController = {
       const proposalUseCase = new ProposalsUseCase(
         new PrismaProposalRepository(),
         new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
       )
       const updatedProposal = await proposalUseCase.executeAdminRejection(proposalId)
       res.send(updatedProposal)
@@ -116,6 +148,8 @@ export const ProposalsController = {
       const proposalUseCase = new ProposalsUseCase(
         new PrismaProposalRepository(),
         new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
       )
       const updatedProposal = await proposalUseCase.executeChampionReview(proposalId, data.status)
       res.send(updatedProposal)

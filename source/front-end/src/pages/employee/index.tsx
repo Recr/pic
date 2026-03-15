@@ -1,49 +1,48 @@
 import { useForm, type SubmitHandler } from 'react-hook-form'
-import type { CreateEmployee, Employee as EmployeeType } from '../../features/employee/types'
+import type { Employee as EmployeeType } from '../../features/employee/types'
 import { employeeAPI } from '../../features/employee/employee-api'
-import Input from './components/Input'
 import Modal from '../../components/modal/Modal'
 import { useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { createEmployeeSchema } from '../../validation/schemas/employee-schemas'
+import type z from 'zod'
 
 const Employee: React.FC = () => {
+  type CreateEmployeeSchemaInput = z.input<typeof createEmployeeSchema>
+  type CreateEmployeeSchemaOutput = z.output<typeof createEmployeeSchema>
   const {
     register,
     handleSubmit,
-    watch,
     reset,
     formState: { errors },
-  } = useForm<CreateEmployee>()
+  } = useForm<CreateEmployeeSchemaInput, undefined, CreateEmployeeSchemaOutput>({
+    resolver: zodResolver(createEmployeeSchema),
+  })
   const { data } = employeeAPI.useGetEmployeesQuery()
-  const [createEmployee, { isLoading, isSuccess, isError }] =
-    employeeAPI.useCreateEmployeeMutation()
+  const [createEmployee, { isLoading }] = employeeAPI.useCreateEmployeeMutation()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
 
-  const onSubmit: SubmitHandler<CreateEmployee> = async (data) => {
-    await createEmployee({
-      ...data,
-      re: Number(data.re),
-    })
-      .unwrap()
-      .then(() => {
-        toast('Colaborador cadastrado com sucesso!', {
-          position: 'top-right',
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-        })
-        reset()
-        setIsAddModalOpen(false)
+  const onSubmit: SubmitHandler<CreateEmployeeSchemaOutput> = async (data) => {
+    try {
+      await createEmployee(data).unwrap()
+      toast('Colaborador cadastrado com sucesso!', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
       })
-      .catch(() => {
-        toast('Erro ao cadastrar colaborador.', {
-          position: 'top-right',
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-        })
+      reset()
+      setIsAddModalOpen(false)
+    } catch {
+      toast('Nao foi possivel cadastrar o colaborador.', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
       })
+    }
   }
   return (
     <div className="font-inter">
@@ -88,19 +87,29 @@ const Employee: React.FC = () => {
               {...register('name')}
               placeholder="Nome completo do operador"
             />
+            {errors.name && <span className="text-xs text-red-600">{errors.name.message}</span>}
             <label>RE:</label>
             <input
               className="bg-white px-4 py-1"
-              type="text"
+              type="number"
               {...register('re')}
               placeholder="RE do operador"
+              min={0}
+              max={50000}
             />
+            {errors.re && <span className="text-xs text-red-600">{errors.re.message}</span>}
             <label>Cargo:</label>
             <select className="bg-white px-4 py-1" {...register('role')}>
               <option value="OPERATOR">Operador</option>
-              <option value="LEADER">Líder</option>
+              <option value="TEAM_LEADER">Team Leader</option>
+              <option value="SUPERVISOR">Supervisor</option>
+              <option value="MANAGER">Gerente</option>
+              <option value="GENERAL_MANAGER">Gerente Geral (GM)</option>
+              <option value="HUMAN_RESOURCES">Recursos Humanos (RH)</option>
+              <option value="TECHNICAL_SUPPORT">Suporte Técnico</option>
               <option value="ADMIN">Administrador</option>
             </select>
+            {errors.role && <span className="text-xs text-red-600">{errors.role.message}</span>}
             <label>Turno:</label>
             <select className="bg-white px-4 py-1" {...register('shift')}>
               <option value="1">1º</option>
@@ -108,6 +117,7 @@ const Employee: React.FC = () => {
               <option value="3">3º</option>
               <option value="ADM">Administrativo</option>
             </select>
+            {errors.shift && <span className="text-xs text-red-600">{errors.shift.message}</span>}
             <label>Senha:</label>
             <input
               className="bg-white px-4 py-1"
@@ -115,11 +125,15 @@ const Employee: React.FC = () => {
               {...register('password')}
               placeholder="Senha do operador"
             />
+            {errors.password && (
+              <span className="text-xs text-red-600">{errors.password.message}</span>
+            )}
             <button
               className="hover:cursor-pointer hover:bg-blue-700 transition-all bg-blue-500 text-white py-2 px-4 rounded mt-4"
               type="submit"
+              disabled={isLoading}
             >
-              Cadastrar
+              {isLoading ? 'Cadastrando...' : 'Cadastrar'}
             </button>
           </div>
         </form>

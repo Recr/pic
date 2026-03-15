@@ -62,6 +62,12 @@ const LoginForm: React.FC = () => {
 
   return (
     <div className="bg-gray-50 h-dvh pt-20">
+      <button
+        onClick={() => navigate('/')}
+        className="px-4 py-2 bg-blue-500 text-white font-semibold w-fit rounded-sm absolute top-4 left-4 hover:bg-blue-700 transition-colors hover:cursor-pointer"
+      >
+        Voltar
+      </button>
       <ToastContainer />
       <form
         className="mx-auto flex justify-center flex-col w-xs py-12 bg-white  rounded-lg items-center gap-4 shadow-xl drop-shadow-black"
