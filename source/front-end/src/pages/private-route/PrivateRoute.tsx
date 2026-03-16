@@ -14,8 +14,8 @@ type PrivateRouteProps = {
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) => {
   const isLoggedin = useSelector((state: RootState) => state.auth.isLoggedin)
-  const user = useSelector((state: RootState) => state.auth.user)
   const isAuthInitialized = useSelector((state: RootState) => state.auth.isAuthInitialized)
+  const userRole = useSelector((state: RootState) => state.auth.user?.role)
 
   if (!isAuthInitialized) return null
 
@@ -23,7 +23,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) =
     return <Navigate to="/login" replace />
   }
 
-  if (allowedRoles?.length && (!user?.role || !allowedRoles.includes(user.role)))
+  if (allowedRoles?.length && (!userRole || !allowedRoles.includes(userRole)))
     return <Navigate to="/" />
 
   return <>{children}</>

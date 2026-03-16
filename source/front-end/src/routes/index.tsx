@@ -39,7 +39,7 @@ const AppShell: React.FC = () => {
           <Route
             path="/admin/define-champion"
             element={
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['ADMIN']}>
                 <DefineChampion />
               </PrivateRoute>
             }

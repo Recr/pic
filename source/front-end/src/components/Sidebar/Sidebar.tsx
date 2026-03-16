@@ -10,10 +10,13 @@ import {
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import SideBarItem from './SidebarItem'
+import { useSelector } from 'react-redux'
+import type { RootState } from '../../app/store'
 
 const Sidebar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const navigate = useNavigate()
+  const userRole = useSelector((state: RootState) => state.auth.user?.role)
 
   const sidebarItems = [
     {
@@ -25,21 +28,25 @@ const Sidebar: React.FC = () => {
       icon: <ListIcon />,
       label: 'Lista de Sugestões',
       path: '/suggestion-list',
+      allowedRoles: ['ADMIN'],
     },
     {
       icon: <BoxSelectIcon />,
       label: 'Definir Campeão',
       path: '/admin/define-champion',
+      allowedRoles: ['ADMIN'],
     },
     {
       icon: <PersonStandingIcon />,
       label: 'Colaboradores',
       path: '/employee',
+      allowedRoles: ['ADMIN'],
     },
     {
       icon: <LandPlotIcon />,
       label: 'Áreas',
       path: '/areas',
+      allowedRoles: ['ADMIN'],
     },
     {
       icon: <Lightbulb />,
@@ -57,15 +64,20 @@ const Sidebar: React.FC = () => {
       onMouseOver={() => setIsSidebarOpen(true)}
       onMouseLeave={() => setIsSidebarOpen(false)}
     >
-      {sidebarItems.map((item) => (
-        <SideBarItem
-          key={item.path}
-          icon={item.icon}
-          label={item.label}
-          onClickFunction={() => navigate(item.path)}
-          isSidebarOpen={isSidebarOpen}
-        />
-      ))}
+      {sidebarItems
+        .filter(
+          (item) =>
+            !item.allowedRoles || (userRole ? item.allowedRoles?.includes(userRole) : false),
+        )
+        .map((item) => (
+          <SideBarItem
+            key={item.path}
+            icon={item.icon}
+            label={item.label}
+            onClickFunction={() => navigate(item.path)}
+            isSidebarOpen={isSidebarOpen}
+          />
+        ))}
     </aside>
   )
 }
