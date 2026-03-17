@@ -153,7 +153,7 @@ const SuggestionForm: React.FC = () => {
         >
           {/* employee_amount_radio */}
           <div id="employee_amount_radio" className="my-8 mx-auto flex flex-col items-center">
-            <label>Quantidade de Funcionários:</label>
+            <label>Quantidade de Colaboradores:</label>
             <div className="flex justify-center gap-2.5">
               {EMPLOYEE_OPTIONS.map((value) => (
                 <div key={value} className="flex items-center gap-1">
@@ -183,7 +183,7 @@ const SuggestionForm: React.FC = () => {
                 key={num}
                 className="employee_block flex flex-col items-center w-full md:min-w-50"
               >
-                <h4>Funcionário {num}</h4>
+                <h4>Colaborador {num}</h4>
                 <label>RE:</label>
                 <EmployeeCombobox
                   name={`re-${num}`}
@@ -247,7 +247,7 @@ const SuggestionForm: React.FC = () => {
             disabled={isLoading}
             className="w-4/5 p-2.5 my-5 rounded-[5px] text-lg border-none bg-blue-600 text-white cursor-pointer transition-all duration-500 hover:bg-blue-950 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Enviando...' : 'Enviar Sugestão'}
+            {isLoading ? 'Enviando...' : 'Enviar Proposta'}
           </button>
         </form>
       </div>

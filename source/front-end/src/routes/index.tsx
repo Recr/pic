@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux'
 import type { RootState } from '../app/store'
 import Logout from '../pages/logout/Logout'
 import { authAPI } from '../features/auth/auth-api'
+import Profile from '../pages/profile/Profile'
 
 const AppShell: React.FC = () => {
   const isLoggedin = useSelector((state: RootState) => state.auth.isLoggedin)
@@ -28,6 +29,14 @@ const AppShell: React.FC = () => {
         <Routes>
           <Route path="/" element={<SuggestionForm />} />
           <Route path="/login" element={<LoginForm />} />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
           <Route
             path="/suggestion-list"
             element={

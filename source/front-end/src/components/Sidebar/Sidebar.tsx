@@ -6,6 +6,7 @@ import {
   ListIcon,
   LogOut,
   PersonStandingIcon,
+  UserIcon,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -23,6 +24,11 @@ const Sidebar: React.FC = () => {
       icon: <FormIcon />,
       label: 'Formulário de Sugestões',
       path: '/',
+    },
+    {
+      icon: <UserIcon />,
+      label: 'Perfil',
+      path: '/profile',
     },
     {
       icon: <ListIcon />,
