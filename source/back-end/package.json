@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "prisma generate && tsup",
+    "start": "node dist/app.js",
     "start:dev": "npx tsx watch ./src/app.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -29,6 +31,7 @@
     "globals": "^17.0.0",
     "jiti": "^2.6.1",
     "prisma": "7.3.0",
+    "tsup": "^8.5.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.0"
