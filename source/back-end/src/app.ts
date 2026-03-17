@@ -4,7 +4,7 @@ import cors, { CorsOptions } from 'cors'
 import cookieParser from 'cookie-parser'
 
 const app = express()
-const port = 3000
+const port = process.env.PORT || 3030
 
 const corsOptions: CorsOptions = {
   origin: 'http://localhost:5173',

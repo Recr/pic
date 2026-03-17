@@ -1,7 +1,6 @@
 import { logout, setAuthInitialized, setCredentials } from './auth-slice'
 import type { ChangePasswordRequest, User } from './types'
 import { api } from '../../services/api'
-import { changePasswordSchema } from '../../validation/schemas/employee-schemas'
 
 interface LoginRequest {
   re: number
@@ -49,7 +48,7 @@ export const authAPI = api.injectEndpoints({
         }
       },
     }),
-    logout: builder.mutation<undefined, undefined>({
+    logout: builder.mutation<void, void>({
       query: () => ({
         url: '/auth/logout',
         method: 'POST',

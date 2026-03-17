@@ -1,8 +1,10 @@
 import { fetchBaseQuery } from '@reduxjs/toolkit/query'
 import { logout } from '../features/auth/auth-slice'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3030/api'
+
 const baseQuery = fetchBaseQuery({
-  baseUrl: 'http://localhost:3000/api',
+  baseUrl: API_BASE_URL,
   credentials: 'include',
 })
 

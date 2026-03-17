@@ -1,7 +1,7 @@
 import React from 'react'
 import Modal from '../../../components/modal/Modal'
 import StatusBadge from '../../../components/StatusBadge'
-import type { Proposal, ProposalWithSuggestions } from '../../../features/proposal/types'
+import type { ProposalWithSuggestions } from '../../../features/proposal/types'
 import { translateStatus } from '../../../helpers/translateStatus'
 import { getStatusColor } from '../../../helpers/getStatusColor'
 
