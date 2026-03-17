@@ -118,4 +118,22 @@ export const AuthController = {
       next(error)
     }
   },
+
+  async handleChangePassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = Number(req.user?.sub)
+      if (isNaN(userId)) {
+        throw new AppError('Invalid user ID in token.', StatusCodes.UNAUTHORIZED)
+      }
+      const { currentPassword, newPassword } = req.body
+      const loginUseCase = new LoginUseCase(
+        new PrismaEmployeeRepository(),
+        new RefreshTokenRepository(),
+      )
+      await loginUseCase.executeChangePassword(userId, currentPassword, newPassword)
+      res.json({ message: 'Password changed successfully.' })
+    } catch (error) {
+      next(error)
+    }
+  },
 }

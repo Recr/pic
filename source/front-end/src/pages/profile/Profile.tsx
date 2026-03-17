@@ -7,12 +7,22 @@ import { useForm } from 'react-hook-form'
 import type z from 'zod'
 import { changePasswordSchema } from '../../validation/schemas/employee-schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { authAPI } from '../../features/auth/auth-api'
+import { toast, ToastContainer } from 'react-toastify/unstyled'
 
 type ChangePasswordSchema = z.infer<typeof changePasswordSchema>
+
+const TOAST_OPTIONS = {
+  position: 'top-right' as const,
+  autoClose: 3000,
+  hideProgressBar: false,
+  closeOnClick: true,
+}
 
 const Profile: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [changePassword] = authAPI.useChangePasswordMutation()
 
   const {
     register,
@@ -23,13 +33,23 @@ const Profile: React.FC = () => {
     resolver: zodResolver(changePasswordSchema),
   })
 
-  const onSubmit = (data: ChangePasswordSchema) => {
-    console.log(data)
-    reset()
-    setIsModalOpen(false)
+  const onSubmit = async (data: ChangePasswordSchema) => {
+    try {
+      await changePassword(data).unwrap()
+      reset()
+      setIsModalOpen(false)
+      toast.success('Senha alterada com sucesso!', TOAST_OPTIONS)
+    } catch (error) {
+      toast.error(
+        'Erro ao alterar senha. Verifique suas credenciais e tente novamente.',
+        TOAST_OPTIONS,
+      )
+      console.error('Failed to change password:', error)
+    }
   }
   return (
     <>
+      <ToastContainer />
       <form
         className="bg-gray-50 flex flex-col items-center w-90 shadow-custom py-5 px-7.5 mx-auto mb-7.5 rounded-[20px] mt-20"
         action=""

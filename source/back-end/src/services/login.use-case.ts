@@ -128,6 +128,19 @@ class LoginUseCase {
       throw new AppError('Invalid refresh token.', StatusCodes.UNAUTHORIZED)
     }
   }
+
+  public async executeChangePassword(
+    employeeId: number,
+    currentPassword: string,
+    newPassword: string,
+  ) {
+    const user = await this.employeeRepository.findByIdWithPassword(employeeId)
+    if (!user) throw new AppError('User not found.', StatusCodes.NOT_FOUND)
+    const isMatch = await bcrypt.compare(currentPassword, user.passwordHash)
+    if (!isMatch) throw new AppError('Current password is incorrect.', StatusCodes.UNAUTHORIZED)
+    const passwordHash = await bcrypt.hash(newPassword, 10)
+    await this.employeeRepository.update(employeeId, { passwordHash })
+  }
 }
 
 export { LoginUseCase }

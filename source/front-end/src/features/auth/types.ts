@@ -6,6 +6,12 @@ export interface User {
   shift: string
 }
 
+export interface ChangePasswordRequest {
+  currentPassword: string
+  newPassword: string
+  confirmPassword: string
+}
+
 type Role =
   | 'OPERATOR'
   | 'TEAM_LEADER'

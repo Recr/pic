@@ -1,6 +1,7 @@
 import { logout, setAuthInitialized, setCredentials } from './auth-slice'
-import type { User } from './types'
+import type { ChangePasswordRequest, User } from './types'
 import { api } from '../../services/api'
+import { changePasswordSchema } from '../../validation/schemas/employee-schemas'
 
 interface LoginRequest {
   re: number
@@ -48,10 +49,25 @@ export const authAPI = api.injectEndpoints({
         }
       },
     }),
-    logout: builder.mutation<void, void>({
+    logout: builder.mutation<undefined, undefined>({
       query: () => ({
         url: '/auth/logout',
         method: 'POST',
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled
+          dispatch(logout())
+        } catch (error) {
+          console.error('Failed to logout:', error)
+        }
+      },
+    }),
+    changePassword: builder.mutation<undefined, ChangePasswordRequest>({
+      query: (changePasswordData) => ({
+        url: '/auth/change-password',
+        method: 'POST',
+        body: changePasswordData,
       }),
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {

@@ -8,3 +8,10 @@ export const loginSchema = z.object({
     })
     .strict(),
 })
+
+export const changePasswordSchema = z.object({
+  body: z.object({
+    currentPassword: z.string().nonempty('Current password is required.'),
+    newPassword: z.string().min(8, 'New password must be at least 8 characters long.'),
+  }),
+})
