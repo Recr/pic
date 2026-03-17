@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express'
 import { AppError } from '../errors/AppError'
 import { StatusCodes } from 'http-status-codes'
 import jwt, { JwtPayload } from 'jsonwebtoken'
-import type { VerifyErrors } from 'jsonwebtoken'
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   const accessToken = req.cookies?.accessToken
@@ -29,15 +28,11 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
     )
   }
 
-  jwt.verify(
-    token,
-    secret,
-    (err: VerifyErrors | null, decoded: string | JwtPayload | undefined) => {
-      if (err) {
-        return next(new AppError('Invalid token.', StatusCodes.UNAUTHORIZED))
-      }
-      req.user = decoded as JwtPayload
-      next()
-    },
-  )
+  jwt.verify(token, secret, (err: Error | null, decoded: unknown) => {
+    if (err) {
+      return next(new AppError('Invalid token.', StatusCodes.UNAUTHORIZED))
+    }
+    req.user = decoded as JwtPayload
+    next()
+  })
 }

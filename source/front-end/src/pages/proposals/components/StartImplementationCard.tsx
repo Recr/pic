@@ -23,6 +23,10 @@ const StartImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) =>
         <h3 className="text-lg m-0">Sugestão #{proposal.id}</h3>
         <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
       </div>
+      <div className="flex justify-between">
+        <strong>Data: </strong>
+        <span>{new Date(proposal.createdAt).toLocaleDateString()}</span>
+      </div>
       <p>
         <strong>Colaboradores:</strong>
       </p>

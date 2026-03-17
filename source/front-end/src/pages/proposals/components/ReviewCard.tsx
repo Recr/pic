@@ -23,10 +23,14 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
         <h3 className="text-lg m-0">Sugestão #{proposal.id}</h3>
         <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
       </div>
-      <p>
+      <div className="flex justify-between">
+        <strong>Data: </strong>
+        <span>{new Date(proposal.createdAt).toLocaleDateString()}</span>
+      </div>
+      <p className="py-2">
         <strong>Colaboradores:</strong>
       </p>
-      <ul className="ml-5">
+      <ul className="ml-5 gap-1 flex flex-col py-2">
         {!proposal.suggestions ? (
           <p>Nenhum colaborador encontrado</p>
         ) : (
@@ -42,11 +46,20 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
           })
         )}
       </ul>
-
-      <p>
+      <div className="flex justify-between">
+        <div className="flex flex-col">
+          <strong>Área</strong>
+          <span>{proposal.area.name}</span>
+        </div>
+        <div className="flex flex-col">
+          <strong>Categoria</strong>
+          <span>{proposal.category.name}</span>
+        </div>
+      </div>
+      <p className="mt-2">
         <strong>Sugestão:</strong>
         <br />
-        <span>{proposal.description}</span>
+        <span className="">{proposal.description}</span>
       </p>
       <div className="flex gap-2 items-center pt-4">
         <button
