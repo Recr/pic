@@ -5,9 +5,10 @@ import cookieParser from 'cookie-parser'
 
 const app = express()
 const port = process.env.PORT || 3030
+const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173'
 
 const corsOptions: CorsOptions = {
-  origin: 'http://localhost:5173',
+  origin: corsOrigin,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,

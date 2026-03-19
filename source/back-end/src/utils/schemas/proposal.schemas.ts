@@ -13,8 +13,8 @@ export const createProposalSchema = z.object({
       employees: z
         .object({
           re: z.number().positive(),
-          name: z.string(),
-          shift: z.string(),
+          name: z.string().nonempty(),
+          shift: z.string().nonempty(),
         })
         .array()
         .max(3, 'The max employees per proposal is 3.')
