@@ -1,11 +1,11 @@
 import React from 'react'
 import Modal from '../../../components/modal/Modal'
 import StatusBadge from '../../../components/StatusBadge'
-import type { ProposalWithSuggestions } from '../../../features/proposal/types'
+import type { ProposalDetailed, ProposalWithSuggestions } from '../../../features/proposal/types'
 import { translateStatus } from '../../../helpers/translateStatus'
 import { getStatusColor } from '../../../helpers/getStatusColor'
 
-const ProposalItem: React.FC<{ proposal: ProposalWithSuggestions }> = ({ proposal }) => {
+const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) => {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   return (
     <>
@@ -14,7 +14,11 @@ const ProposalItem: React.FC<{ proposal: ProposalWithSuggestions }> = ({ proposa
         onClick={() => setIsModalOpen(true)}
       >
         <p>{proposal.id}</p>
-        <p>{proposal.description}</p>
+        <p>
+          {proposal.description.length > 50
+            ? `${proposal.description.substring(0, 50)}...`
+            : proposal.description}
+        </p>
         <p>
           {proposal.suggestions
             .map((suggestion) =>
@@ -29,7 +33,7 @@ const ProposalItem: React.FC<{ proposal: ProposalWithSuggestions }> = ({ proposa
         <div className="w-160 max-w-[95vw] p-6 space-y-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="text-xl font-semibold">Detalhes da Proposta</h2>
+              <h2 className="text-xl font-semibold">Proposta #{proposal.id}</h2>
               <p className="text-sm text-gray-600 mt-1">
                 Criado em {new Date(proposal.createdAt).toLocaleDateString()}
               </p>
@@ -39,12 +43,14 @@ const ProposalItem: React.FC<{ proposal: ProposalWithSuggestions }> = ({ proposa
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gray-50 rounded p-3">
-              <p className="text-xs text-gray-500">ID</p>
-              <p className="font-medium">#{proposal.id}</p>
+              <p className="text-xs text-gray-500">Area</p>
+              <p className="font-medium">{proposal.area.name}</p>
             </div>
             <div className="bg-gray-50 rounded p-3">
-              <p className="text-xs text-gray-500">Status</p>
-              <p className="font-medium">{translateStatus(proposal.status)}</p>
+              <p className="text-xs text-gray-500">Categoria</p>
+              <p className="font-medium">
+                {proposal.category?.name ? proposal.category.name : 'Nenhuma'}
+              </p>
             </div>
           </div>
 
@@ -56,16 +62,26 @@ const ProposalItem: React.FC<{ proposal: ProposalWithSuggestions }> = ({ proposa
           <div>
             <p className="text-sm font-semibold mb-2">Funcionários</p>
             <div className="flex flex-wrap gap-2">
-              {/* {proposal.suggestions.map((suggestion, index) => (
+              {proposal.suggestions.map((suggestion, index) => (
                 <span
-                  key={`${proposal.id}-${suggestion.name}-${index}`}
+                  key={`${proposal.id}-${suggestion.employee?.name || suggestion.employeeName}-${index}`}
                   className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm"
                 >
-                  {employee.name}
+                  {suggestion.employee ? suggestion.employee.name : suggestion.employeeName}
                 </span>
-              ))} */}
+              ))}
             </div>
           </div>
+          {proposal.champion && (
+            <div>
+              <p className="text-sm font-semibold mb-2">Executor</p>
+              <div className="flex flex-wrap gap-2">
+                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">
+                  {proposal.champion.name}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </Modal>
     </>
