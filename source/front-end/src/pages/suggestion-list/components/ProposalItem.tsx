@@ -1,8 +1,7 @@
 import React from 'react'
 import Modal from '../../../components/modal/Modal'
 import StatusBadge from '../../../components/StatusBadge'
-import type { ProposalDetailed, ProposalWithSuggestions } from '../../../features/proposal/types'
-import { translateStatus } from '../../../helpers/translateStatus'
+import type { ProposalDetailed } from '../../../features/proposal/types'
 import { getStatusColor } from '../../../helpers/getStatusColor'
 
 const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) => {

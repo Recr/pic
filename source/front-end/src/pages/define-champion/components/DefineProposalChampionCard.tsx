@@ -138,13 +138,17 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
         <p>
           <strong>Sugestão:</strong>
           <br />
-          <span>{proposal.description}</span>
+          <span>
+            {proposal.description.length > 100
+              ? proposal.description.substring(0, 100).concat('...')
+              : proposal.description}
+          </span>
         </p>
       </div>
 
       <div className="flex flex-col gap-2 items-start my-5 pt-2.5 border-t border-[#eee]">
         <label htmlFor={`area-input-${proposal.id}`}>
-          <strong>Definir Área:</strong>
+          <strong>Área:</strong>
         </label>
         <select
           id={`area-input-${proposal.id}`}
@@ -162,9 +166,12 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           ))}
         </select>
         {errors.areaId && <p className="text-sm text-red-600">{errors.areaId.message}</p>}
+        <p className="text-xs text-gray-500 mt-0.5">
+          Mantenha a seleção do colaborador ou escolha na lista
+        </p>
 
         <label htmlFor={`category-input-${proposal.id}`}>
-          <strong>Definir Categoria:</strong>
+          <strong>Categoria:</strong>
         </label>
         <select
           id={`category-input-${proposal.id}`}
@@ -182,9 +189,10 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           ))}
         </select>
         {errors.categoryId && <p className="text-sm text-red-600">{errors.categoryId.message}</p>}
+        <p className="text-xs text-gray-500 mt-0.5">Selecione a categoria da sugestão.</p>
 
         <label htmlFor={`champion-input-${proposal.id}`}>
-          <strong>Definir Champion:</strong>
+          <strong>Defina o Executor:</strong>
         </label>
         <EmployeeCombobox
           name={`champion-input-${proposal.id}`}
@@ -198,24 +206,23 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
         />
         <input type="hidden" {...register('championRe', { valueAsNumber: true })} />
         {errors.championRe && <p className="text-sm text-red-600">{errors.championRe.message}</p>}
-
-        <button
-          type="submit"
-          disabled={isLoading || isRejecting}
-          className="py-2 px-3 cursor-pointer rounded border border-[#ccc] bg-blue-500 text-white w-38"
-        >
-          {isLoading ? 'Salvando...' : 'Definir dados'}
-        </button>
-      </div>
-      <div className="mt-auto flex gap-2.5">
-        <button
-          type="button"
-          onClick={handleReject}
-          disabled={isLoading || isRejecting}
-          className="py-2 px-3 cursor-pointer rounded border border-[#c0392b] bg-[#e74c3c] text-white w-38"
-        >
-          {isRejecting ? 'Rejeitando...' : 'Rejeitar'}
-        </button>
+        <div className="w-full">
+          <button
+            type="submit"
+            disabled={isLoading || isRejecting}
+            className="py-2 px-3 cursor-pointer rounded border bg-blue-500 text-white w-1/2 hover:cursor-pointer hover:bg-blue-700 transition-colors"
+          >
+            {isLoading ? 'Salvando...' : 'Definir dados'}
+          </button>
+          <button
+            type="button"
+            onClick={handleReject}
+            disabled={isLoading || isRejecting}
+            className="py-2 px-3 cursor-pointer rounded border bg-red-500 text-white w-1/2 hover:cursor-pointer hover:bg-red-700 transition-colors"
+          >
+            {isRejecting ? 'Rejeitando...' : 'Rejeitar'}
+          </button>
+        </div>
       </div>
     </form>
   )

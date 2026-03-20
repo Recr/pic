@@ -127,7 +127,7 @@ const SuggestionForm: React.FC = () => {
   }
 
   return (
-    <div className="bg-gray-100 flex flex-col">
+    <div className="bg-gray-100 flex flex-col min-h-svh">
       <ToastContainer />
       {!isLoggedin && (
         <button

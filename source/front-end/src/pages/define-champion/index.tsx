@@ -2,7 +2,7 @@ import { employeeAPI } from '../../features/employee/employee-api'
 import { areaAPI } from '../../features/area/area-api'
 import { proposalAPI } from '../../features/proposal/proposal-api'
 import { categoryAPI } from '../../features/category/category-api'
-import { ProposalCard } from './components/ProposalCard'
+import { ProposalCard } from './components/DefineProposalChampionCard'
 
 const DefineChampion: React.FC = () => {
   const { data: championList } = employeeAPI.useGetEmployeesQuery()
