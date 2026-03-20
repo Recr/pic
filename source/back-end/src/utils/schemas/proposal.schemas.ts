@@ -9,7 +9,7 @@ export const proposalIdSchema = z.object({
 export const createProposalSchema = z.object({
   body: z
     .object({
-      description: z.string(),
+      description: z.string().max(1000, 'A sugestão deve ter no máximo 1000 caracteres.'),
       employees: z
         .object({
           re: z.number().positive(),

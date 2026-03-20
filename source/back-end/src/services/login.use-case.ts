@@ -23,7 +23,7 @@ class LoginUseCase {
     if (!accessTokenSecret)
       throw new AppError('ACCESS_TOKEN_SECRET not configured', StatusCodes.INTERNAL_SERVER_ERROR)
     const accessToken = jwt.sign(
-      { name: user.name, sub: user.id, role: user.role },
+      { name: user.name, sub: user.id, role: user.role, isFirstAccess: user.isFirstAccess },
       accessTokenSecret,
       {
         expiresIn: '15m',
@@ -79,7 +79,12 @@ class LoginUseCase {
       }
 
       const accessToken = jwt.sign(
-        { name: payload.name, sub: payload.sub, role: payload.role },
+        {
+          name: payload.name,
+          sub: payload.sub,
+          role: payload.role,
+          isFirstAccess: payload.isFirstAccess,
+        },
         accessTokenSecret,
         { expiresIn: '15m' },
       )
