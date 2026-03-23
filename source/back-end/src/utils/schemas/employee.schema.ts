@@ -6,6 +6,9 @@ export const createEmployeeSchema = z.object({
     re: z.number().int(),
     role: z.enum([
       'OPERATOR',
+      'TEAM_LEADER',
+      'SUPERVISOR',
+      'MANAGER',
       'LEADER',
       'ADMIN',
       'GENERAL_MANAGER',

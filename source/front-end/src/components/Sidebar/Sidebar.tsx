@@ -64,6 +64,7 @@ const Sidebar: React.FC = () => {
       icon: <Coins />,
       label: 'Pagamentos',
       path: '/payouts',
+      allowedRoles: ['ADMIN', 'HUMAN_RESOURCES'],
     },
     { icon: <LogOut />, label: 'Sair', path: '/logout' },
   ]
