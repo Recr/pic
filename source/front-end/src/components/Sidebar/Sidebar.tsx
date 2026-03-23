@@ -7,6 +7,7 @@ import {
   LogOut,
   PersonStandingIcon,
   UserIcon,
+  Coins,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -58,6 +59,11 @@ const Sidebar: React.FC = () => {
       icon: <Lightbulb />,
       label: 'Propostas',
       path: '/proposals',
+    },
+    {
+      icon: <Coins />,
+      label: 'Pagamentos',
+      path: '/payouts',
     },
     { icon: <LogOut />, label: 'Sair', path: '/logout' },
   ]

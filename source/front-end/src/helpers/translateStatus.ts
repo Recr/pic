@@ -7,6 +7,9 @@ export function translateStatus(status: string): string {
     REJECTED: 'Rejeitado',
     NOT_VIABLE: 'Não Viável',
     IMPLEMENTED: 'Implementado',
+    PENDING: 'Pendente',
+    PAID: 'Pago',
+    CANCELLED: 'Cancelado',
   }
   return translations[status] || status
 }

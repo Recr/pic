@@ -70,7 +70,10 @@ const StartImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) =>
               : proposal.description}
           </span>
         </p>
-        <div className="mt-auto flex gap-2 items-center pt-4">
+        <div
+          className="mt-auto flex gap-2 items-center pt-4"
+          onClick={(event) => event.stopPropagation()}
+        >
           <button
             onClick={() => handleStatusUpdate('IMPLEMENTATION')}
             className="py-2 px-2 cursor-pointer rounded border border-blue-800 bg-blue-500 hover:bg-blue-700 text-white transition-all"

@@ -6,6 +6,7 @@ import { categoryRoutes } from './routes/categories.routes'
 import { proposalsRoutes } from './routes/proposals.routes'
 import { authRoutes } from './routes/auth.routes'
 import { authMiddleware } from '../middlewares/auth.middeware'
+import { payoutRoutes } from './routes/payout.routes'
 
 const appRoutes = Router()
 
@@ -14,6 +15,7 @@ appRoutes.use('/employees', employeeRoutes)
 appRoutes.use('/categories', authMiddleware, categoryRoutes)
 appRoutes.use('/proposals', proposalsRoutes)
 appRoutes.use('/auth', authRoutes)
+appRoutes.use('/payouts', payoutRoutes)
 appRoutes.use(errorHandler)
 
 export { appRoutes }

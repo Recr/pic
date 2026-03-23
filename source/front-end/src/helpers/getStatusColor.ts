@@ -9,6 +9,9 @@ export function getStatusColor(status: string): StatusBadgeColor {
     REJECTED: 'red',
     NOT_VIABLE: 'gray',
     IMPLEMENTED: 'green',
+    PENDING: 'orange',
+    PAID: 'green',
+    CANCELLED: 'red',
   }
   return translations[status] || 'gray'
 }

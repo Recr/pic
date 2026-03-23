@@ -14,10 +14,10 @@ import Logout from '../pages/logout/Logout'
 import { authAPI } from '../features/auth/auth-api'
 import Profile from '../pages/profile/Profile'
 import PasswordChangePage from '../pages/password-change/PasswordChangePage'
+import PayoutList from '../pages/payout-list'
 
 const AppShell: React.FC = () => {
   const isLoggedin = useSelector((state: RootState) => state.auth.isLoggedin)
-  const mustChangePassword = useSelector((state: RootState) => state.auth.user?.mustChangePassword)
   const location = useLocation()
 
   authAPI.useGetCurrentUserQuery(undefined, {
@@ -76,6 +76,14 @@ const AppShell: React.FC = () => {
             element={
               <PrivateRoute>
                 <Proposals />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/payouts"
+            element={
+              <PrivateRoute>
+                <PayoutList />
               </PrivateRoute>
             }
           />
