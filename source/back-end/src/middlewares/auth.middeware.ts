@@ -5,7 +5,6 @@ import jwt, { JwtPayload } from 'jsonwebtoken'
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   const accessToken = req.cookies?.accessToken
-  const refreshToken = req.cookies?.refreshToken
   const authHeader = req.headers['authorization']
 
   if (!accessToken && !authHeader) {
@@ -32,7 +31,27 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
     if (err) {
       return next(new AppError('Invalid token.', StatusCodes.UNAUTHORIZED))
     }
-    req.user = decoded as JwtPayload
+    const payload = decoded as JwtPayload
+
+    const allowedWhenMustChangePassword = new Set([
+      '/auth/me',
+      '/auth/change-password',
+      '/auth/logout',
+    ])
+
+    const requestPath = (req.originalUrl ?? '').split('?').at(0) ?? ''
+    const normalizedPath = requestPath.replace(/^\/api/, '')
+
+    if (payload.mustChangePassword === true && !allowedWhenMustChangePassword.has(normalizedPath)) {
+      return next(
+        new AppError(
+          'Password change required before accessing this resource.',
+          StatusCodes.FORBIDDEN,
+        ),
+      )
+    }
+
+    req.user = payload
     next()
   })
 }

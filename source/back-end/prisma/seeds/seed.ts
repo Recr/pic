@@ -18,7 +18,7 @@ async function main() {
       passwordHash,
       role: 'ADMIN',
       shift: 'ADM',
-      isFirstAccess: false,
+      mustChangePassword: false,
     },
   })
 

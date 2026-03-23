@@ -33,7 +33,7 @@ model Employee {
   re           Int?    @unique
   shift        String? @db.NVarChar(20)
   passwordHash String  @map("password_hash") @db.NVarChar(100)
-  isFirstAccess Boolean @map("isFirstAccess") @default(true)
+  mustChangePassword Boolean @map("must_change_password") @default(true)
 
   proposalsChampion Proposal[]   @relation("ChampionReviewProposal")
   suggestions       Suggestion[]

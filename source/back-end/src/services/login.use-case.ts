@@ -23,7 +23,12 @@ class LoginUseCase {
     if (!accessTokenSecret)
       throw new AppError('ACCESS_TOKEN_SECRET not configured', StatusCodes.INTERNAL_SERVER_ERROR)
     const accessToken = jwt.sign(
-      { name: user.name, sub: user.id, role: user.role, isFirstAccess: user.isFirstAccess },
+      {
+        name: user.name,
+        sub: user.id,
+        role: user.role,
+        mustChangePassword: user.mustChangePassword,
+      },
       accessTokenSecret,
       {
         expiresIn: '15m',
@@ -73,6 +78,11 @@ class LoginUseCase {
         throw new AppError('Invalid refresh token.', StatusCodes.UNAUTHORIZED)
       }
 
+      const user = await this.employeeRepository.findById(employeeId)
+      if (!user) {
+        throw new AppError('User not found.', StatusCodes.NOT_FOUND)
+      }
+
       const isValidToken = await bcrypt.compare(oldRefreshToken, tokenRecord.tokenHash)
       if (!isValidToken) {
         throw new AppError('Invalid refresh token.', StatusCodes.UNAUTHORIZED)
@@ -80,10 +90,10 @@ class LoginUseCase {
 
       const accessToken = jwt.sign(
         {
-          name: payload.name,
-          sub: payload.sub,
-          role: payload.role,
-          isFirstAccess: payload.isFirstAccess,
+          name: user.name,
+          sub: user.id,
+          role: user.role,
+          mustChangePassword: user.mustChangePassword,
         },
         accessTokenSecret,
         { expiresIn: '15m' },
@@ -144,7 +154,8 @@ class LoginUseCase {
     const isMatch = await bcrypt.compare(currentPassword, user.passwordHash)
     if (!isMatch) throw new AppError('Current password is incorrect.', StatusCodes.UNAUTHORIZED)
     const passwordHash = await bcrypt.hash(newPassword, 10)
-    await this.employeeRepository.update(employeeId, { passwordHash })
+    const mustChangePassword = false
+    await this.employeeRepository.update(employeeId, { passwordHash, mustChangePassword })
   }
 }
 

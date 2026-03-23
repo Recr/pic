@@ -4,6 +4,7 @@ export interface User {
   role: Role
   re: number
   shift: string
+  mustChangePassword: boolean
 }
 
 export interface ChangePasswordRequest {
