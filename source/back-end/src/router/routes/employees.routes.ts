@@ -16,6 +16,12 @@ const employeeRoutes = Router()
 
 employeeRoutes.get('/', EmployeesController.handleFindAll)
 employeeRoutes.get(
+  '/unregistered',
+  authMiddleware,
+  checkRole([Role.ADMIN]),
+  EmployeesController.handleFindUnregistered,
+)
+employeeRoutes.get(
   '/:id',
   authMiddleware,
   validate(getEmployeeByIdSchema),
@@ -29,6 +35,7 @@ employeeRoutes.get(
   checkRole([Role.ADMIN]),
   EmployeesController.handleFindByRe,
 )
+
 employeeRoutes.post(
   '/',
   authMiddleware,

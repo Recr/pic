@@ -4,11 +4,16 @@ import { PrismaEmployeeRepository } from '../repositories/employee.repository'
 import { CreateEmployeeInput } from '../utils/types/employees.types'
 import { AppError } from '../errors/AppError'
 import { StatusCodes } from 'http-status-codes'
+import { PrismaSuggestionRepository } from '../repositories/suggestion.repository'
+import { prisma } from '../lib/prisma'
 
 const SALT_ROUNDS = 12
 
 class EmployeesUseCase {
-  constructor(private employeeRepository: PrismaEmployeeRepository) {}
+  constructor(
+    private employeeRepository: PrismaEmployeeRepository,
+    private suggestionRepository: PrismaSuggestionRepository,
+  ) {}
 
   public async executeFindAll() {
     const employees = await this.employeeRepository.findAll()
@@ -27,6 +32,11 @@ class EmployeesUseCase {
     return employee
   }
 
+  public async executeFindUnregisteredEmployees() {
+    const employees = await this.employeeRepository.findUnregisteredEmployees()
+    return employees
+  }
+
   public async executeCreate({ password, ...data }: CreateEmployeeInput) {
     const existingEmployee = await this.employeeRepository.findByRe(data.re)
     if (existingEmployee)
@@ -37,7 +47,29 @@ class EmployeesUseCase {
       ...data,
       passwordHash,
     }
-    const employee = await this.employeeRepository.create(newEmployee)
+
+    const employee = await prisma.$transaction(async (tx) => {
+      const unregisteredEmployeesRes = (
+        await this.employeeRepository.findUnregisteredEmployees(tx)
+      ).map((register) => register.employeeRe)
+
+      const createdEmployee = await this.employeeRepository.create(newEmployee, tx)
+
+      console.log('Unregistered Employees REs:', unregisteredEmployeesRes)
+      console.log('Created Employee:', createdEmployee)
+      console.log('Employee Data:', data)
+
+      if (unregisteredEmployeesRes.includes(data.re)) {
+        await this.suggestionRepository.updateSuggestionsWithoutRegisteredEmployee(
+          createdEmployee.id,
+          data.re,
+          tx,
+        )
+      }
+
+      return createdEmployee
+    })
+
     return employee
   }
 

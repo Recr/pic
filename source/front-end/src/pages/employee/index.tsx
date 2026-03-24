@@ -1,5 +1,5 @@
 import { useForm, type SubmitHandler } from 'react-hook-form'
-import type { Employee as EmployeeType } from '../../features/employee/types'
+import type { Employee as EmployeeType, UnregisteredEmployee } from '../../features/employee/types'
 import { employeeAPI } from '../../features/employee/employee-api'
 import Modal from '../../components/modal/Modal'
 import { useState } from 'react'
@@ -16,15 +16,19 @@ const Employee: React.FC = () => {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<CreateEmployeeSchemaInput, undefined, CreateEmployeeSchemaOutput>({
     resolver: zodResolver(createEmployeeSchema),
   })
-  const { data } = employeeAPI.useGetEmployeesQuery()
+  const { data: registeredEmployees } = employeeAPI.useGetEmployeesQuery()
+  const { data: unregisteredEmployees } = employeeAPI.useGetUnregisteredEmployeesQuery()
   const [createEmployee, { isLoading }] = employeeAPI.useCreateEmployeeMutation()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [selectedEmployee, setSelectedEmployee] = useState<EmployeeType | null>(null)
+  const [selectedUnregisteredEmployee, setSelectedUnregisteredEmployee] =
+    useState<UnregisteredEmployee | null>(null)
 
   const formatShift = (shift?: string) => {
     const shiftMap: Record<string, string> = {
@@ -65,21 +69,47 @@ const Employee: React.FC = () => {
     <div className="font-inter">
       <ToastContainer />
       <h1 className="font-inter font-light text-3xl bg-gray-300 py-10 pl-10">Colaboradores</h1>
-      <div>
-        <div className="w-4/5 sm:w-2/3 md:w-1/2 m-auto rounded-lg p-2 flex flex-col gap-2 mt-10">
-          {data?.map((employee: EmployeeType) => (
-            <div
-              key={employee.re}
-              className="flex justify-between gap-2 bg-gray-100 px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-blue-200 transition-all"
-              onClick={() => {
-                setSelectedEmployee(employee)
-                setIsEditModalOpen(true)
-              }}
-            >
-              <span>{employee.name}</span>
-              <span>{employee.re}</span>
-            </div>
-          ))}
+      <div className="flex justify-evenly">
+        <div>
+          <h2 className="font-inter font-light text-2xl py-10 pl-10">Colaboradores Cadastrados</h2>
+          <div className="m-auto rounded-lg p-2 flex flex-col gap-2">
+            {registeredEmployees?.map((employee: EmployeeType) => (
+              <div
+                key={employee.re}
+                className="flex justify-between gap-2 bg-gray-100 px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-blue-200 transition-all"
+                onClick={() => {
+                  setSelectedEmployee(employee)
+                  setIsEditModalOpen(true)
+                }}
+              >
+                <span>{employee.name}</span>
+                <span>{employee.re}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <h2 className="font-inter font-light text-2xl py-10 pl-10">
+            Colaboradores Nao Cadastrados
+          </h2>
+          <div className="m-auto rounded-lg p-2 flex flex-col gap-2">
+            {unregisteredEmployees?.map((employee: UnregisteredEmployee) => (
+              <div
+                key={employee.employeeRe}
+                className="flex justify-between gap-2 bg-gray-100 px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-blue-200 transition-all"
+                onClick={() => {
+                  setSelectedUnregisteredEmployee(employee)
+                  setIsAddModalOpen(true)
+                  setValue('name', employee.employeeName)
+                  setValue('re', employee.employeeRe)
+                  setValue('shift', employee.employeeShift ? employee.employeeShift : 'ADM')
+                }}
+              >
+                <span>{employee.employeeName}</span>
+                <span>{employee.employeeRe}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
       <div className="flex my-5">
@@ -129,7 +159,17 @@ const Employee: React.FC = () => {
           )}
         </div>
       </Modal>
-      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => {
+          setIsAddModalOpen(false)
+          console.log(selectedUnregisteredEmployee)
+          if (selectedUnregisteredEmployee != null) {
+            setSelectedUnregisteredEmployee(null)
+            reset()
+          }
+        }}
+      >
         <h2 className="text-center">Adicionar Colaborador</h2>
         <form
           className="flex flex-col m-auto mt-10 p-4 bg-gray-100 rounded-lg shadow-lg"

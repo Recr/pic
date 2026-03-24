@@ -2,6 +2,10 @@ import { Prisma } from '../../prisma/client/client'
 import { prisma } from '../lib/prisma'
 
 class PrismaEmployeeRepository {
+  private getClient(tx?: Prisma.TransactionClient) {
+    return tx ?? prisma
+  }
+
   public async findAll() {
     const employees = await prisma.employee.findMany()
     return employees
@@ -58,8 +62,28 @@ class PrismaEmployeeRepository {
     return employees
   }
 
-  public async create(newEmployee: Prisma.EmployeeCreateInput) {
-    const employee = await prisma.employee.create({
+  public async findUnregisteredEmployees(tx?: Prisma.TransactionClient) {
+    const db = this.getClient(tx)
+    const suggestions = await db.suggestion.findMany({
+      where: {
+        employee: null,
+      },
+      distinct: ['employeeRe'],
+      orderBy: {
+        employeeRe: 'asc',
+      },
+      select: {
+        employeeRe: true,
+        employeeName: true,
+        employeeShift: true,
+      },
+    })
+    return suggestions
+  }
+
+  public async create(newEmployee: Prisma.EmployeeCreateInput, tx?: Prisma.TransactionClient) {
+    const db = this.getClient(tx)
+    const employee = await db.employee.create({
       data: newEmployee,
     })
     return employee
