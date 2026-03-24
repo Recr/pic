@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createEmployeeSchema } from '../../validation/schemas/employee-schemas'
+import { translateRoles } from '../../helpers/translateRoles'
 import type z from 'zod'
 
 const Employee: React.FC = () => {
@@ -23,6 +24,22 @@ const Employee: React.FC = () => {
   const [createEmployee, { isLoading }] = employeeAPI.useCreateEmployeeMutation()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [selectedEmployee, setSelectedEmployee] = useState<EmployeeType | null>(null)
+
+  const formatShift = (shift?: string) => {
+    const shiftMap: Record<string, string> = {
+      '1': '1º turno',
+      '2': '2º turno',
+      '3': '3º turno',
+      ADM: 'Administrativo',
+    }
+
+    if (!shift) {
+      return 'Nao informado'
+    }
+
+    return shiftMap[shift] || shift
+  }
 
   const onSubmit: SubmitHandler<CreateEmployeeSchemaOutput> = async (data) => {
     try {
@@ -54,7 +71,10 @@ const Employee: React.FC = () => {
             <div
               key={employee.re}
               className="flex justify-between gap-2 bg-gray-100 px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-blue-200 transition-all"
-              onClick={() => setIsEditModalOpen(true)}
+              onClick={() => {
+                setSelectedEmployee(employee)
+                setIsEditModalOpen(true)
+              }}
             >
               <span>{employee.name}</span>
               <span>{employee.re}</span>
@@ -70,8 +90,44 @@ const Employee: React.FC = () => {
           Adicionar Colaborador
         </button>
       </div>
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
-        <div>WIP</div>
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false)
+          setSelectedEmployee(null)
+        }}
+      >
+        <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
+          <h2 className="text-center text-xl font-semibold text-gray-800">Dados do colaborador</h2>
+          {selectedEmployee ? (
+            <div className="mt-6 space-y-3 rounded-lg bg-gray-50 p-4">
+              <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+                <span className="text-sm text-gray-600">Nome</span>
+                <span className="font-medium text-gray-900">{selectedEmployee.name}</span>
+              </div>
+              <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+                <span className="text-sm text-gray-600">RE</span>
+                <span className="font-medium text-gray-900">{selectedEmployee.re}</span>
+              </div>
+              <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+                <span className="text-sm text-gray-600">Cargo</span>
+                <span className="font-medium text-gray-900">
+                  {translateRoles(selectedEmployee.role)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Turno</span>
+                <span className="font-medium text-gray-900">
+                  {formatShift(selectedEmployee.shift)}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <p className="mt-6 text-center text-sm text-gray-500">
+              Nenhum colaborador selecionado.
+            </p>
+          )}
+        </div>
       </Modal>
       <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
         <h2 className="text-center">Adicionar Colaborador</h2>
