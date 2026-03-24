@@ -7,6 +7,7 @@ const connectionString = `${process.env.DATABASE_URL}`
 const omitConfig = {
   employee: {
     passwordHash: true,
+    passwordToken: true,
   },
 } as const
 

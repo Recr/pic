@@ -157,6 +157,13 @@ class LoginUseCase {
     const mustChangePassword = false
     await this.employeeRepository.update(employeeId, { passwordHash, mustChangePassword })
   }
+
+  public async executeRequestPasswordResetToken(re: number) {
+    const user = await this.employeeRepository.findByRe(re)
+    if (!user) throw new AppError('User not found.', StatusCodes.NOT_FOUND)
+    const passwordToken = Math.floor(100000 + Math.random() * 900000)
+    await this.employeeRepository.update(user.id, { passwordToken })
+  }
 }
 
 export { LoginUseCase }
