@@ -70,8 +70,10 @@ const Employee: React.FC = () => {
       <ToastContainer />
       <h1 className="font-inter font-light text-3xl bg-gray-300 py-10 pl-10">Colaboradores</h1>
       <div className="flex justify-evenly">
-        <div>
-          <h2 className="font-inter font-light text-2xl py-10 pl-10">Colaboradores Cadastrados</h2>
+        <div className="w-sm">
+          <h2 className="font-inter font-light text-2xl py-10 text-center">
+            Colaboradores Cadastrados
+          </h2>
           <div className="m-auto rounded-lg p-2 flex flex-col gap-2">
             {registeredEmployees?.map((employee: EmployeeType) => (
               <div
@@ -88,29 +90,31 @@ const Employee: React.FC = () => {
             ))}
           </div>
         </div>
-        <div>
-          <h2 className="font-inter font-light text-2xl py-10 pl-10">
-            Colaboradores Nao Cadastrados
-          </h2>
-          <div className="m-auto rounded-lg p-2 flex flex-col gap-2">
-            {unregisteredEmployees?.map((employee: UnregisteredEmployee) => (
-              <div
-                key={employee.employeeRe}
-                className="flex justify-between gap-2 bg-gray-100 px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-blue-200 transition-all"
-                onClick={() => {
-                  setSelectedUnregisteredEmployee(employee)
-                  setIsAddModalOpen(true)
-                  setValue('name', employee.employeeName)
-                  setValue('re', employee.employeeRe)
-                  setValue('shift', employee.employeeShift ? employee.employeeShift : 'ADM')
-                }}
-              >
-                <span>{employee.employeeName}</span>
-                <span>{employee.employeeRe}</span>
-              </div>
-            ))}
+        {unregisteredEmployees && unregisteredEmployees.length > 0 && (
+          <div className="w-sm">
+            <h2 className="font-inter font-light text-2xl py-10 text-center">
+              Colaboradores Nao Cadastrados
+            </h2>
+            <div className="m-auto rounded-lg p-2 flex flex-col gap-2">
+              {unregisteredEmployees?.map((employee: UnregisteredEmployee) => (
+                <div
+                  key={employee.employeeRe}
+                  className="flex justify-between gap-2 bg-gray-100 px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-blue-200 transition-all"
+                  onClick={() => {
+                    setSelectedUnregisteredEmployee(employee)
+                    setIsAddModalOpen(true)
+                    setValue('name', employee.employeeName)
+                    setValue('re', employee.employeeRe)
+                    setValue('shift', employee.employeeShift ? employee.employeeShift : 'ADM')
+                  }}
+                >
+                  <span>{employee.employeeName}</span>
+                  <span>{employee.employeeRe}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
       <div className="flex my-5">
         <button
@@ -163,7 +167,6 @@ const Employee: React.FC = () => {
         isOpen={isAddModalOpen}
         onClose={() => {
           setIsAddModalOpen(false)
-          console.log(selectedUnregisteredEmployee)
           if (selectedUnregisteredEmployee != null) {
             setSelectedUnregisteredEmployee(null)
             reset()

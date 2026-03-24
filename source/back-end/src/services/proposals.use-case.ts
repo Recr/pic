@@ -64,7 +64,6 @@ class ProposalsUseCase {
         return { ...employeeWithoutId, id: employeeWithId.id }
       }),
     )
-    console.log(employees)
     const employeesWithIds = employees.filter(
       (employee): employee is EmployeeInfo & { id: number } => employee !== null,
     )

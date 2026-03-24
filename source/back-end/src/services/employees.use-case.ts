@@ -55,10 +55,6 @@ class EmployeesUseCase {
 
       const createdEmployee = await this.employeeRepository.create(newEmployee, tx)
 
-      console.log('Unregistered Employees REs:', unregisteredEmployeesRes)
-      console.log('Created Employee:', createdEmployee)
-      console.log('Employee Data:', data)
-
       if (unregisteredEmployeesRes.includes(data.re)) {
         await this.suggestionRepository.updateSuggestionsWithoutRegisteredEmployee(
           createdEmployee.id,
