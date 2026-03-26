@@ -1,5 +1,9 @@
 import { useForm, type SubmitHandler } from 'react-hook-form'
-import type { Employee as EmployeeType, UnregisteredEmployee, PasswordResetRequester } from '../../features/employee/types'
+import type {
+  Employee as EmployeeType,
+  UnregisteredEmployee,
+  PasswordResetRequester,
+} from '../../features/employee/types'
 import { employeeAPI } from '../../features/employee/employee-api'
 import Modal from '../../components/modal/Modal'
 import { useState } from 'react'
@@ -117,6 +121,14 @@ const Employee: React.FC = () => {
           </div>
         )}
       </div>
+      <div className="flex my-5">
+        <button
+          className="bg-blue-400 text-white py-2 px-4 rounded-2xl m-auto hover:bg-blue-700 transition-all hover:cursor-pointer"
+          onClick={() => setIsAddModalOpen(true)}
+        >
+          Adicionar Colaborador
+        </button>
+      </div>
       {passwordResetRequesters && passwordResetRequesters.length > 0 && (
         <div className="mt-8 mb-8">
           <h2 className="font-inter font-light text-2xl py-10 text-center">
@@ -147,14 +159,6 @@ const Employee: React.FC = () => {
           </div>
         </div>
       )}
-      <div className="flex my-5">
-        <button
-          className="bg-blue-400 text-white py-2 px-4 rounded-2xl m-auto hover:bg-blue-700 transition-all hover:cursor-pointer"
-          onClick={() => setIsAddModalOpen(true)}
-        >
-          Adicionar Colaborador
-        </button>
-      </div>
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => {

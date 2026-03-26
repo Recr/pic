@@ -1,4 +1,9 @@
-import type { Employee, CreateEmployee, UnregisteredEmployee, PasswordResetRequester } from './types'
+import type {
+  Employee,
+  CreateEmployee,
+  UnregisteredEmployee,
+  PasswordResetRequester,
+} from './types'
 import { api } from '../../services/api'
 
 export const employeeAPI = api.injectEndpoints({
