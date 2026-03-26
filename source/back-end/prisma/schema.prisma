@@ -34,7 +34,7 @@ model Employee {
   shift        String? @db.NVarChar(20)
   passwordHash String  @map("password_hash") @db.NVarChar(100)
   mustChangePassword Boolean @map("must_change_password") @default(true)
-  passwordToken Int? @map("password_token") 
+  passwordToken String? @map("password_token") @db.NVarChar(100)
 
   proposalsChampion Proposal[]   @relation("ChampionReviewProposal")
   suggestions       Suggestion[]

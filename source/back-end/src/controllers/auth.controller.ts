@@ -137,7 +137,7 @@ export const AuthController = {
     }
   },
 
-  async handleRequestPasswordResetToken (req: Request, res: Response, next: NextFunction) {
+  async handleRequestPasswordResetToken(req: Request, res: Response, next: NextFunction) {
     try {
       const { re } = req.body
       const loginUseCase = new LoginUseCase(
@@ -145,7 +145,26 @@ export const AuthController = {
         new RefreshTokenRepository(),
       )
       await loginUseCase.executeRequestPasswordResetToken(re)
-      res.json({ message: 'Password reset token sent successfully.' })
+      res.json({
+        message:
+          'Password reset token created successfully. Contact an administrator for further assistance.',
+      })
+    } catch (error) {
+      next(error)
     }
-  }
+  },
+
+  async handleResetPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { re, passwordToken, newPassword } = req.body
+      const loginUseCase = new LoginUseCase(
+        new PrismaEmployeeRepository(),
+        new RefreshTokenRepository(),
+      )
+      await loginUseCase.executeResetPassword(re, passwordToken, newPassword)
+      res.json({ message: 'Password reset successfully.' })
+    } catch (error) {
+      next(error)
+    }
+  },
 }

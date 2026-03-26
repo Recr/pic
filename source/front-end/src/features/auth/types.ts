@@ -13,6 +13,13 @@ export interface ChangePasswordRequest {
   confirmPassword: string
 }
 
+export interface ResetPasswordRequest {
+  re: number
+  passwordToken: number
+  newPassword: string
+  confirmPassword: string
+}
+
 type Role =
   | 'OPERATOR'
   | 'TEAM_LEADER'

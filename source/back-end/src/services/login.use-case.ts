@@ -5,6 +5,7 @@ import { LoginInput } from '../utils/types/login.types'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { RefreshTokenRepository } from '../repositories/refresh-token.repository'
+import { passwordResetTokenVault } from '../lib/password-reset-token-vault'
 
 class LoginUseCase {
   constructor(
@@ -162,7 +163,26 @@ class LoginUseCase {
     const user = await this.employeeRepository.findByRe(re)
     if (!user) throw new AppError('User not found.', StatusCodes.NOT_FOUND)
     const passwordToken = Math.floor(100000 + Math.random() * 900000)
-    await this.employeeRepository.update(user.id, { passwordToken })
+    const tokenHash = await bcrypt.hash(String(passwordToken), 10)
+
+    await this.employeeRepository.update(user.id, { passwordToken: tokenHash })
+    passwordResetTokenVault.set(user.id, String(passwordToken))
+  }
+
+  public async executeResetPassword(re: number, passwordToken: number, newPassword: string) {
+    const user = await this.employeeRepository.findByReWithToken(re)
+    if (!user) throw new AppError('User not found.', StatusCodes.NOT_FOUND)
+
+    const isTokenValid = await bcrypt.compare(String(passwordToken), user.passwordToken || '')
+    if (!isTokenValid) throw new AppError('Invalid password token.', StatusCodes.UNAUTHORIZED)
+
+    const passwordHash = await bcrypt.hash(newPassword, 10)
+    await this.employeeRepository.update(user.id, {
+      passwordHash,
+      mustChangePassword: false,
+      passwordToken: null,
+    })
+    passwordResetTokenVault.delete(user.id)
   }
 }
 

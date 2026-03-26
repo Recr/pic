@@ -6,6 +6,7 @@ import { AppError } from '../errors/AppError'
 import { StatusCodes } from 'http-status-codes'
 import { PrismaSuggestionRepository } from '../repositories/suggestion.repository'
 import { prisma } from '../lib/prisma'
+import { passwordResetTokenVault } from '../lib/password-reset-token-vault'
 
 const SALT_ROUNDS = 12
 
@@ -35,6 +36,22 @@ class EmployeesUseCase {
   public async executeFindUnregisteredEmployees() {
     const employees = await this.employeeRepository.findUnregisteredEmployees()
     return employees
+  }
+
+  public async executeFindAllPasswordResetRequesters() {
+    const employees = await this.employeeRepository.findAllWithToken()
+
+    return employees
+      .map((employee) => {
+        const resetToken = passwordResetTokenVault.get(employee.id)
+        if (!resetToken) return null
+
+        return {
+          ...employee,
+          passwordToken: resetToken,
+        }
+      })
+      .filter((employee): employee is NonNullable<typeof employee> => employee !== null)
   }
 
   public async executeCreate({ password, ...data }: CreateEmployeeInput) {

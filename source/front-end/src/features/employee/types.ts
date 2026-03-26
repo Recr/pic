@@ -14,3 +14,8 @@ export interface UnregisteredEmployee {
 export interface CreateEmployee extends Employee {
   password: string
 }
+
+export interface PasswordResetRequester extends Employee {
+  id: number
+  passwordToken: string
+}

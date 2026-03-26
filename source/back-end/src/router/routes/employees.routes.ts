@@ -22,6 +22,12 @@ employeeRoutes.get(
   EmployeesController.handleFindUnregistered,
 )
 employeeRoutes.get(
+  '/password-reset-requests',
+  authMiddleware,
+  checkRole([Role.ADMIN]),
+  EmployeesController.handleFindAllPasswordResetRequesters,
+)
+employeeRoutes.get(
   '/:id',
   authMiddleware,
   validate(getEmployeeByIdSchema),

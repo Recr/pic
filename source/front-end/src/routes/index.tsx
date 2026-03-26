@@ -15,6 +15,7 @@ import { authAPI } from '../features/auth/auth-api'
 import Profile from '../pages/profile/Profile'
 import PasswordChangePage from '../pages/password-change/PasswordChangePage'
 import PayoutList from '../pages/payout-list'
+import PasswordResetPage from '../pages/password-reset/PasswordResetPage'
 
 const AppShell: React.FC = () => {
   const isLoggedin = useSelector((state: RootState) => state.auth.isLoggedin)
@@ -97,6 +98,7 @@ const AppShell: React.FC = () => {
           />
           <Route path="/logout" element={<Logout />} />
           <Route path="*" element={<div>404 Not Found</div>} />
+          <Route path="/password-reset" element={<PasswordResetPage />} />
         </Routes>
       </main>
     </div>

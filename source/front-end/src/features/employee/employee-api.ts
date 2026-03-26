@@ -1,4 +1,4 @@
-import type { Employee, CreateEmployee, UnregisteredEmployee } from './types'
+import type { Employee, CreateEmployee, UnregisteredEmployee, PasswordResetRequester } from './types'
 import { api } from '../../services/api'
 
 export const employeeAPI = api.injectEndpoints({
@@ -9,6 +9,10 @@ export const employeeAPI = api.injectEndpoints({
     }),
     getUnregisteredEmployees: builder.query<UnregisteredEmployee[], void>({
       query: () => '/employees/unregistered',
+      providesTags: ['Employee'],
+    }),
+    getPasswordResetRequesters: builder.query<PasswordResetRequester[], void>({
+      query: () => '/employees/password-reset-requests',
       providesTags: ['Employee'],
     }),
     createEmployee: builder.mutation<CreateEmployee, Employee>({

@@ -75,6 +75,19 @@ export const EmployeesController = {
     }
   },
 
+  async handleFindAllPasswordResetRequesters(req: Request, res: Response, next: NextFunction) {
+    try {
+      const employeeUseCase = new EmployeesUseCase(
+        new PrismaEmployeeRepository(),
+        new PrismaSuggestionRepository(),
+      )
+      const employees = await employeeUseCase.executeFindAllPasswordResetRequesters()
+      res.send(employees)
+    } catch (error) {
+      next(error)
+    }
+  },
+
   async handleCreate(req: Request, res: Response, next: NextFunction) {
     try {
       const data: CreateEmployeeInput = req.body

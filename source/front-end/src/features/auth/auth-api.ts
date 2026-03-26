@@ -1,5 +1,5 @@
 import { logout, setAuthInitialized, setCredentials } from './auth-slice'
-import type { ChangePasswordRequest, User } from './types'
+import type { ChangePasswordRequest, ResetPasswordRequest, User } from './types'
 import { api } from '../../services/api'
 
 interface LoginRequest {
@@ -76,6 +76,27 @@ export const authAPI = api.injectEndpoints({
           console.error('Failed to logout:', error)
         }
       },
+    }),
+    resetPassword: builder.mutation<undefined, ResetPasswordRequest>({
+      query: (resetPasswordData) => ({
+        url: '/auth/reset-password',
+        method: 'POST',
+        body: resetPasswordData,
+      }),
+      // async onQueryStarted(_, { dispatch, queryFulfilled }) {
+      //   try {
+      //     await queryFulfilled
+      //   } catch (error) {
+      //     console.error('Failed to reset password:', error)
+      //   }
+      // },
+    }),
+    requestPasswordResetToken: builder.mutation<void, { re: number }>({
+      query: ({ re }) => ({
+        url: '/auth/request-password-reset-token',
+        method: 'POST',
+        body: { re },
+      }),
     }),
   }),
 })

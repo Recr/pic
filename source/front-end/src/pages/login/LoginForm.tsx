@@ -103,6 +103,12 @@ const LoginForm: React.FC = () => {
             <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
           )}
         </div>
+        <p
+          className="text-left mr-auto ml-8 text-sm text-blue-500 hover:underline cursor-pointer -m-2.5"
+          onClick={() => navigate('/password-reset')}
+        >
+          Esqueci a senha.
+        </p>
         <button
           type="submit"
           className="w-3xs bg-blue-500 text-white hover:bg-blue-800 text-lg font-semibold rounded-md transition-all hover:cursor-pointer hover:animate-pulse py-2 mt-2"

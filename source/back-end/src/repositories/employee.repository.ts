@@ -11,6 +11,17 @@ class PrismaEmployeeRepository {
     return employees
   }
 
+  public async findAllWithToken() {
+    const employees = await prisma.employee.findMany({
+      where: {
+        passwordToken: {
+          not: null,
+        },
+      },
+    })
+    return employees
+  }
+
   public async findById(employeeId: number) {
     const employee = await prisma.employee.findUnique({
       where: {
@@ -36,6 +47,18 @@ class PrismaEmployeeRepository {
       },
       omit: {
         passwordHash: false,
+      },
+    })
+    return employee
+  }
+
+  public async findByReWithToken(employeeRe: number) {
+    const employee = await prisma.employee.findUnique({
+      where: {
+        re: employeeRe,
+      },
+      omit: {
+        passwordToken: false,
       },
     })
     return employee

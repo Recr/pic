@@ -24,11 +24,13 @@ export const requestPasswordResetTokenSchema = z.object({
 
 export const resetPasswordSchema = z.object({
   body: z.object({
+    re: z.number().int().positive('RE must be a positive integer'),
     passwordToken: z
       .number()
       .int()
       .positive('Password token must be a positive integer.')
-      .max(999999, 'Password token must be a 6-digit number.'),
+      .max(999999, 'Password token must be a 6-digit number.')
+      .min(100000, 'Password token must be a 6-digit number.'),
     newPassword: z.string().min(8, 'New password must be at least 8 characters long.'),
   }),
 })

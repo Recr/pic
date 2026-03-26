@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { changePasswordSchema } from '../../validation/schemas/employee-schemas'
+import { changePasswordSchema } from '../../validation/schemas/login-schemas'
 import { zodResolver } from '@hookform/resolvers/zod/src/zod.js'
 import type z from 'zod'
 import { toast, ToastContainer } from 'react-toastify/unstyled'

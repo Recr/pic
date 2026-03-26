@@ -1,5 +1,5 @@
 import { useForm, type SubmitHandler } from 'react-hook-form'
-import type { Employee as EmployeeType, UnregisteredEmployee } from '../../features/employee/types'
+import type { Employee as EmployeeType, UnregisteredEmployee, PasswordResetRequester } from '../../features/employee/types'
 import { employeeAPI } from '../../features/employee/employee-api'
 import Modal from '../../components/modal/Modal'
 import { useState } from 'react'
@@ -23,6 +23,7 @@ const Employee: React.FC = () => {
   })
   const { data: registeredEmployees } = employeeAPI.useGetEmployeesQuery()
   const { data: unregisteredEmployees } = employeeAPI.useGetUnregisteredEmployeesQuery()
+  const { data: passwordResetRequesters } = employeeAPI.useGetPasswordResetRequestersQuery()
   const [createEmployee, { isLoading }] = employeeAPI.useCreateEmployeeMutation()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -116,6 +117,36 @@ const Employee: React.FC = () => {
           </div>
         )}
       </div>
+      {passwordResetRequesters && passwordResetRequesters.length > 0 && (
+        <div className="mt-8 mb-8">
+          <h2 className="font-inter font-light text-2xl py-10 text-center">
+            Solicitações de Recuperação de Senha
+          </h2>
+          <div className="max-w-2xl mx-auto rounded-lg p-4 bg-yellow-50">
+            <div className="flex flex-col gap-3">
+              {passwordResetRequesters.map((requester: PasswordResetRequester) => (
+                <div
+                  key={requester.id}
+                  className="bg-white px-4 py-3 rounded-lg border-l-4 border-yellow-400 shadow-sm"
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-800">{requester.name}</p>
+                      <p className="text-sm text-gray-600">RE: {requester.re}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-gray-500 mb-1">Token de Recuperação:</p>
+                      <p className="font-mono text-lg font-bold text-yellow-600 bg-yellow-100 px-3 py-2 rounded">
+                        {requester.passwordToken}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       <div className="flex my-5">
         <button
           className="bg-blue-400 text-white py-2 px-4 rounded-2xl m-auto hover:bg-blue-700 transition-all hover:cursor-pointer"

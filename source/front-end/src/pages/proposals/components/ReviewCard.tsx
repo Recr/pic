@@ -8,6 +8,7 @@ import { useState } from 'react'
 const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
   const [proposalChampionReview] = proposalAPI.useProposalChampionReviewMutation()
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
 
   const handleStatusUpdate = async (newStatus: string) => {
     try {
@@ -19,6 +20,17 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
       console.log(error)
     }
   }
+
+  type StatusOption = 'TO_IMPLEMENT' | 'NOT_VIABLE' | 'REJECTED' | 'IMPLEMENTED'
+
+  const possibleStatus: Record<StatusOption, string> = {
+    TO_IMPLEMENT: 'Aprovada',
+    NOT_VIABLE: 'Não viável',
+    REJECTED: 'Rejeitada',
+    IMPLEMENTED: 'Implementada',
+  }
+
+  const [newStatus, setNewStatus] = useState<StatusOption | ''>('')
 
   return (
     <div className="border border-[#ccc] rounded-md p-4 m-2.5 w-87.5 bg-white flex flex-col">
@@ -74,19 +86,28 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
           onClick={(e) => e.stopPropagation()}
         >
           <button
-            onClick={() => handleStatusUpdate('TO_IMPLEMENT')}
+            onClick={() => {
+              setNewStatus('TO_IMPLEMENT')
+              setIsConfirmationModalOpen(true)
+            }}
             className="py-2 px-2 cursor-pointer rounded border border-green-800 bg-green-500 text-white w-1/3 hover:w-1/2 transition-all"
           >
             Aprovar
           </button>
           <button
-            onClick={() => handleStatusUpdate('NOT_VIABLE')}
+            onClick={() => {
+              setNewStatus('NOT_VIABLE')
+              setIsConfirmationModalOpen(true)
+            }}
             className="py-2 px-2 cursor-pointer rounded border border-orange-600 bg-orange-400 text-white w-1/3 hover:w-1/2 transition-all min-w-24"
           >
             Não viável
           </button>
           <button
-            onClick={() => handleStatusUpdate('REJECTED')}
+            onClick={() => {
+              setNewStatus('REJECTED')
+              setIsConfirmationModalOpen(true)
+            }}
             className="py-2 px-3 cursor-pointer rounded border border-[#c0392b] bg-[#e74c3c] text-white w-1/3 hover:w-1/2 transition-all"
           >
             Rejeitar
@@ -135,6 +156,32 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
                 </span>
               ))}
             </div>
+          </div>
+        </div>
+      </Modal>
+      <Modal isOpen={isConfirmationModalOpen} onClose={() => setIsConfirmationModalOpen(false)}>
+        <div className="w-80 max-w-[95vw] p-6 space-y-4">
+          <h2 className="text-lg font-semibold">Confirmar conclusão</h2>
+          <p className="text-gray-700">
+            Tem certeza que deseja marcar esta proposta como{' '}
+            {newStatus && possibleStatus[newStatus]}?
+          </p>
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={() => setIsConfirmationModalOpen(false)}
+              className="py-2 px-4 cursor-pointer rounded border border-gray-300 bg-gray-100 hover:bg-gray-200 text-gray-800 transition-all"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={() => {
+                handleStatusUpdate(newStatus)
+                setIsConfirmationModalOpen(false)
+              }}
+              className="py-2 px-4 cursor-pointer rounded border border-green-800 bg-green-500 hover:bg-green-700 text-white transition-all"
+            >
+              Confirmar
+            </button>
           </div>
         </div>
       </Modal>
