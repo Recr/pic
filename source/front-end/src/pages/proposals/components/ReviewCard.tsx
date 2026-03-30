@@ -148,12 +148,20 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
             <p className="text-sm font-semibold mb-2">Funcionários</p>
             <div className="flex flex-wrap gap-2">
               {proposal.suggestions.map((suggestion, index) => (
-                <span
+                <p
                   key={`${proposal.id}-${suggestion.employee?.name || suggestion.employeeName}-${index}`}
-                  className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm"
+                  className="bg-gray-100 px-2 py-1 rounded text-sm"
                 >
-                  {suggestion.employee ? suggestion.employee.name : suggestion.employeeName}
-                </span>
+                  <span className="text-gray-700 font-bold">
+                    {suggestion.employee ? suggestion.employee.name : suggestion.employeeName}
+                  </span>
+                  <span className="text-xs text-gray-500 ml-1">
+                    {suggestion.employee ? suggestion.employee.re : suggestion.employeeRe}
+                    {' - '}
+                    Turno:{' '}
+                    {suggestion.employee ? suggestion.employee.shift : suggestion.employeeShift}
+                  </span>
+                </p>
               ))}
             </div>
           </div>
