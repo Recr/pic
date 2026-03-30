@@ -128,6 +128,7 @@ class PrismaProposalRepository {
       where: {
         championId: null,
         status: 'DEFINE_CHAMPION',
+        managerId: null,
       },
       select: {
         id: true,

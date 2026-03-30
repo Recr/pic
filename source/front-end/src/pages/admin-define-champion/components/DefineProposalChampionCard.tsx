@@ -85,7 +85,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
     resolver: zodResolver(updateProposalSchema),
   })
 
-  const [updateProposal, { isLoading }] = proposalAPI.useUpdateProposalWithChampionMutation()
+  const [updateProposal, { isLoading }] = proposalAPI.useAdminUpdateProposalWithChampionMutation()
   const [rejectProposal, { isLoading: isRejecting }] =
     proposalAPI.useRejectProposalAsAdminMutation()
 
