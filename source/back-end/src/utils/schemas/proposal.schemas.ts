@@ -18,7 +18,12 @@ export const createProposalSchema = z.object({
         })
         .array()
         .max(3, 'The max employees per proposal is 3.')
-        .nonempty(),
+        .nonempty()
+        .refine(
+          (employees) =>
+            new Set(employees.map((employee) => employee.re)).size === employees.length,
+          { message: 'Employees list contains duplicated RE.' },
+        ),
       areaId: z.number(),
     })
     .strict(),

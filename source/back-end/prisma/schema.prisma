@@ -92,7 +92,7 @@ model Suggestion {
   employee Employee? @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@unique([employeeId, proposalId])
+  @@unique([employeeRe, proposalId])
   @@map("suggestion")
 }
 
