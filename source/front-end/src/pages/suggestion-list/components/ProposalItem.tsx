@@ -9,19 +9,27 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   return (
     <>
       <div
-        className="border-t-2 border-gray-200 px-4 py-2 mx-4 grid grid-cols-[56px_2fr_2fr_1fr_1fr] text-left hover:bg-blue-100 hover:cursor-pointer"
+        className="text-sm border-t-2 border-gray-200 px-4 py-2 mx-4 grid grid-cols-[56px_2fr_2fr_1fr_1fr_1fr] text-left hover:bg-blue-100 hover:cursor-pointer"
         onClick={() => setIsModalOpen(true)}
       >
         <p>{proposal.id}</p>
         <p>
-          {proposal.description.length > 50
-            ? `${proposal.description.substring(0, 50)}...`
+          {proposal.description.length > 45
+            ? `${proposal.description.substring(0, 45)}...`
             : proposal.description}
         </p>
         <p>
           {proposal.suggestions
             .map((suggestion) =>
               suggestion.employee ? suggestion.employee.name : suggestion.employeeName,
+            )
+            .join(', ')
+            .substring(0, 45)}
+        </p>
+        <p>
+          {proposal.suggestions
+            .map((suggestion) =>
+              suggestion.employee ? suggestion.employee.re : suggestion.employeeRe,
             )
             .join(', ')}
         </p>
@@ -62,12 +70,20 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
             <p className="text-sm font-semibold mb-2">Funcionários</p>
             <div className="flex flex-wrap gap-2">
               {proposal.suggestions.map((suggestion, index) => (
-                <span
+                <p
                   key={`${proposal.id}-${suggestion.employee?.name || suggestion.employeeName}-${index}`}
-                  className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm"
+                  className="bg-gray-100 px-2 py-1 rounded text-sm"
                 >
-                  {suggestion.employee ? suggestion.employee.name : suggestion.employeeName}
-                </span>
+                  <span className="text-gray-700 font-bold">
+                    {suggestion.employee ? suggestion.employee.name : suggestion.employeeName}
+                  </span>
+                  <span className="text-xs text-gray-500 ml-1">
+                    {suggestion.employee ? suggestion.employee.re : suggestion.employeeRe}
+                    {' - '}
+                    Turno:{' '}
+                    {suggestion.employee ? suggestion.employee.shift : suggestion.employeeShift}
+                  </span>
+                </p>
               ))}
             </div>
           </div>

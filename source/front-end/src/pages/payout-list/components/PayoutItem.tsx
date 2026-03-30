@@ -12,7 +12,7 @@ type PayoutItemProps = {
 const PayoutItem: React.FC<PayoutItemProps> = ({ payout, isSelected, onToggleSelect }) => {
   return (
     <>
-      <div className="border-t-2 border-gray-200 px-4 py-2 mx-4 grid grid-cols-[40px_56px_2fr_2fr_1fr_1fr_1fr] text-left hover:bg-blue-100 hover:cursor-pointer">
+      <div className="border-t-2 border-gray-200 px-4 py-2 mx-4 grid grid-cols-[40px_56px_2fr_2fr_1fr_1fr_1fr_1fr] hover:bg-blue-100 hover:cursor-pointer">
         <div className="flex items-center" onClick={(event) => event.stopPropagation()}>
           <input
             type="checkbox"
@@ -32,6 +32,11 @@ const PayoutItem: React.FC<PayoutItemProps> = ({ payout, isSelected, onToggleSel
           {payout.suggestion.employee
             ? payout.suggestion.employee.name
             : payout.suggestion.employeeName}
+        </p>
+        <p>
+          {payout.suggestion.employee
+            ? payout.suggestion.employee.re
+            : payout.suggestion.employeeRe}
         </p>
         <p>{new Date(payout.createdAt).toLocaleDateString()}</p>
         <p>R$ {Number(payout.value).toFixed(2)}</p>

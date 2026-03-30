@@ -66,7 +66,7 @@ const PayoutList: React.FC = () => {
         </button>
       </div>
       <div className="flex justify-center flex-col">
-        <div className="grid grid-cols-[40px_56px_2fr_2fr_1fr_1fr_1fr] gap-4 px-4 py-2 border-b-2 border-gray-200 font-semibold mx-4 text-left">
+        <div className="grid grid-cols-[40px_56px_2fr_2fr_1fr_1fr_1fr_1fr] px-4 py-2 border-b-2 border-gray-200 font-semibold mx-4">
           <input
             type="checkbox"
             checked={
@@ -81,6 +81,7 @@ const PayoutList: React.FC = () => {
           <p>ID</p>
           <p>Proposta</p>
           <p>Colaborador</p>
+          <p>RE</p>
           <p>Data</p>
           <p>Valor</p>
           <p>Status</p>
