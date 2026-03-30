@@ -37,6 +37,7 @@ model Employee {
   passwordToken String? @map("password_token") @db.NVarChar(100)
 
   proposalsChampion Proposal[]   @relation("ChampionReviewProposal")
+  proposalsManager  Proposal[]   @relation("ManagerReviewProposal")
   suggestions       Suggestion[]
   refreshTokens     RefreshToken[]
 
@@ -52,16 +53,20 @@ model Proposal {
   areaId                  Int       @map("area_id")
   createdAt               DateTime  @default(now()) @map("created_at") @db.DateTime2
   adminReviewedAt         DateTime? @map("admin_reviewed_at") @db.DateTime2
+  managerReviewedAt       DateTime? @map("manager_reviewed_at") @db.DateTime2
   championReviewedAt      DateTime? @map("champion_reviewed_at") @db.DateTime2
   implementationStartedAt DateTime? @map("implementation_started_at") @db.DateTime2
   completedAt             DateTime? @map("completed_at") @db.DateTime2
   championId              Int?      @map("champion_id")
   notes                   String?   @db.NVarChar(1000)
+  managerId               Int?      @map("manager_id")
+  managerNotes            String?   @map("manager_notes") @db.NVarChar(1000)
   rejectionNote           String?   @map("rejection_note") @db.NVarChar(1000)
 
   area        Area         @relation(fields: [areaId], references: [id])
   category    Category?    @relation(fields: [categoryId], references: [id])
   champion    Employee?    @relation("ChampionReviewProposal", fields: [championId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  manager     Employee?    @relation("ManagerReviewProposal", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   suggestions Suggestion[]
 
   @@map("proposal")

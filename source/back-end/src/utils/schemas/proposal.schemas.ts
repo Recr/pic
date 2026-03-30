@@ -31,8 +31,28 @@ export const createProposalSchema = z.object({
 
 export const updateProposalWithChampion = z.object({
   body: z.object({
+    championRe: z.number(),
+  }),
+  params: z.object({
+    id: z.coerce.number(),
+  }),
+})
+
+export const adminUpdateProposalWithChampion = z.object({
+  body: z.object({
     areaId: z.number(),
     championRe: z.number(),
+    categoryId: z.number(),
+  }),
+  params: z.object({
+    id: z.coerce.number(),
+  }),
+})
+
+export const updateProposalWithManager = z.object({
+  body: z.object({
+    areaId: z.number(),
+    managerRe: z.number(),
     categoryId: z.number(),
   }),
   params: z.object({

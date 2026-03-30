@@ -1,7 +1,7 @@
 import { Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom'
 import SuggestionForm from '../pages/suggestion-form'
 import SuggestionList from '../pages/suggestion-list'
-import DefineChampion from '../pages/define-champion'
+import AdminDefineChampion from '../pages/admin-define-champion'
 import Areas from '../pages/areas'
 import Sidebar from '../components/Sidebar/Sidebar'
 import Proposals from '../pages/proposals'
@@ -16,6 +16,8 @@ import Profile from '../pages/profile/Profile'
 import PasswordChangePage from '../pages/password-change/PasswordChangePage'
 import PayoutList from '../pages/payout-list'
 import PasswordResetPage from '../pages/password-reset/PasswordResetPage'
+import DefineManager from '../pages/define-manager'
+import DefineChampion from '../pages/define-champion'
 
 const AppShell: React.FC = () => {
   const isLoggedin = useSelector((state: RootState) => state.auth.isLoggedin)
@@ -52,7 +54,23 @@ const AppShell: React.FC = () => {
             path="/admin/define-champion"
             element={
               <PrivateRoute allowedRoles={['ADMIN']}>
+                <AdminDefineChampion />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/define-champion"
+            element={
+              <PrivateRoute blockedRoles={['ADMIN']}>
                 <DefineChampion />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/define-manager"
+            element={
+              <PrivateRoute allowedRoles={['ADMIN']}>
+                <DefineManager />
               </PrivateRoute>
             }
           />

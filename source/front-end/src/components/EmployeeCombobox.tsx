@@ -85,6 +85,7 @@ const EmployeeCombobox = ({
           required={required}
           onFocus={() => setIsOpen(true)}
           onChange={(e) => handleInputChange(e.target.value)}
+          autoComplete={'off'}
           className="w-full p-2.5 pr-9 my-1.5 rounded-[5px] border border-[#ccc] bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <span

@@ -6,11 +6,13 @@ import {
   CreateProposalWithSuggestions,
   EmployeeInfo,
   UpdateProposalWithChampion,
+  UpdateProposalWithManager,
 } from '../utils/types/proposals.types'
 import { PrismaEmployeeRepository } from '../repositories/employee.repository'
 import { Prisma } from '../../prisma/client/client'
 import { PrismaCategoryRepository } from '../repositories/category.repository'
 import { PrismaSuggestionRepository } from '../repositories/suggestion.repository'
+import { Role } from '../utils/types/employees.types'
 
 class ProposalsUseCase {
   constructor(
@@ -35,9 +37,15 @@ class ProposalsUseCase {
     return proposals
   }
 
-  public async executeFindAllWithoutChampion() {
-    const proposals = await this.proposalRepository.findAllWithoutChampion()
-    return proposals
+  public async executeFindAllWithoutChampion(role: Role, userId: number) {
+    if (role === Role.ADMIN) {
+      return await this.proposalRepository.findAllWithoutChampion()
+    }
+    return await this.proposalRepository.findAllWithoutChampionFromManager(userId)
+  }
+
+  public async executeFindAllWithoutManager() {
+    return await this.proposalRepository.findAllWithoutManager()
   }
 
   public async executeFindById(proposalId: number) {
@@ -76,16 +84,62 @@ class ProposalsUseCase {
     return proposal
   }
 
-  public async executeDefineChampion(proposalId: number, data: UpdateProposalWithChampion) {
+  public async executeDefineChampion(
+    proposalId: number,
+    data: UpdateProposalWithChampion,
+    userId: number,
+  ) {
     const proposal = await this.proposalRepository.findById(proposalId)
     if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+
+    if (proposal.managerId !== userId) {
+      throw new AppError(
+        'Unauthorized to define champion for this proposal.',
+        StatusCodes.FORBIDDEN,
+      )
+    }
+
     const champion = await this.employeeRepository.findByRe(data.championRe)
     if (!champion) throw new AppError('Champion not found', StatusCodes.NOT_FOUND)
+
+    const updatedData: Prisma.ProposalUpdateInput = {
+      champion: { connect: { id: champion.id } },
+      status: 'UNDER_VALIDATION',
+      adminReviewedAt: new Date(),
+    }
+
+    const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
+    return updatedProposal
+  }
+
+  public async executeAdminDefineChampion(proposalId: number, data: UpdateProposalWithChampion) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+
+    const champion = await this.employeeRepository.findByRe(data.championRe)
+    if (!champion) throw new AppError('Champion not found', StatusCodes.NOT_FOUND)
+
     const updatedData: Prisma.ProposalUpdateInput = {
       area: { connect: { id: data.areaId } },
       category: { connect: { id: data.categoryId } },
       champion: { connect: { id: champion.id } },
       status: 'UNDER_VALIDATION',
+      adminReviewedAt: new Date(),
+    }
+
+    const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
+    return updatedProposal
+  }
+
+  public async executeDefineManager(proposalId: number, data: UpdateProposalWithManager) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+    const manager = await this.employeeRepository.findByRe(data.managerRe)
+    if (!manager) throw new AppError('Manager not found', StatusCodes.NOT_FOUND)
+    const updatedData: Prisma.ProposalUpdateInput = {
+      area: { connect: { id: data.areaId } },
+      category: { connect: { id: data.categoryId } },
+      manager: { connect: { id: manager.id } },
       adminReviewedAt: new Date(),
     }
     const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)

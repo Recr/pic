@@ -15,10 +15,17 @@ export interface CreateProposalWithSuggestions {
   employees: (EmployeeInfo & { id: number })[]
 }
 
-export interface UpdateProposalWithChampion {
-  championRe: number
+interface UpdateProposal {
   areaId: number
   categoryId: number
+}
+
+export interface UpdateProposalWithChampion extends UpdateProposal {
+  championRe: number
+}
+
+export interface UpdateProposalWithManager extends UpdateProposal {
+  managerRe: number
 }
 
 export interface UpdateProposalStatus {

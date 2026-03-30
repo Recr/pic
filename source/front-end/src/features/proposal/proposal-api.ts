@@ -1,9 +1,11 @@
 import type {
+  AdminUpdateProposalWithChampionRequest,
   CreateProposalRequest,
   Proposal,
   ProposalDetailed,
   ProposalWithSuggestions,
   UpdateProposalRequest,
+  UpdateProposalWithChampionRequest,
 } from './types'
 import { api } from '../../services/api'
 
@@ -56,12 +58,53 @@ export const proposalAPI = api.injectEndpoints({
             ]
           : [{ type: 'Proposal', id: 'LIST' }],
     }),
+    getProposalsWithoutManager: builder.query<ProposalWithSuggestions[], void>({
+      query: () => ({
+        url: '/proposals/to-define-manager',
+        method: 'GET',
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ id }) => ({ type: 'Proposal' as const, id })),
+              { type: 'Proposal', id: 'LIST' },
+            ]
+          : [{ type: 'Proposal', id: 'LIST' }],
+    }),
+    adminUpdateProposalWithChampion: builder.mutation<
+      Proposal,
+      { body: AdminUpdateProposalWithChampionRequest; proposalId: string }
+    >({
+      query: ({ body, proposalId }) => ({
+        url: `/proposals/${proposalId}/admin-define-champion`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
     updateProposalWithChampion: builder.mutation<
+      Proposal,
+      { body: UpdateProposalWithChampionRequest; proposalId: string }
+    >({
+      query: ({ body, proposalId }) => ({
+        url: `/proposals/${proposalId}/define-champion`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
+    updateProposalWithManager: builder.mutation<
       Proposal,
       { body: UpdateProposalRequest; proposalId: string }
     >({
       query: ({ body, proposalId }) => ({
-        url: `/proposals/${proposalId}/define-champion`,
+        url: `/proposals/${proposalId}/define-manager`,
         method: 'PUT',
         body,
       }),

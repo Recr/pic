@@ -163,6 +163,87 @@ class PrismaProposalRepository {
     return proposals
   }
 
+  public async findAllWithoutManager() {
+    const proposals = await prisma.proposal.findMany({
+      where: {
+        managerId: null,
+        championId: null,
+        status: 'DEFINE_CHAMPION',
+      },
+      select: {
+        id: true,
+        description: true,
+        status: true,
+        createdAt: true,
+        suggestions: {
+          select: {
+            id: false,
+            employeeId: false,
+            proposalId: false,
+            employeeName: true,
+            employeeRe: true,
+            employeeShift: true,
+            employee: {
+              select: {
+                re: true,
+                name: true,
+                role: true,
+                shift: true,
+              },
+            },
+          },
+        },
+        area: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    })
+    return proposals
+  }
+  public async findAllWithoutChampionFromManager(userId: number) {
+    const proposals = await prisma.proposal.findMany({
+      where: {
+        championId: null,
+        managerId: userId,
+        status: 'DEFINE_CHAMPION',
+      },
+      select: {
+        id: true,
+        description: true,
+        status: true,
+        createdAt: true,
+        suggestions: {
+          select: {
+            id: false,
+            employeeId: false,
+            proposalId: false,
+            employeeName: true,
+            employeeRe: true,
+            employeeShift: true,
+            employee: {
+              select: {
+                re: true,
+                name: true,
+                role: true,
+                shift: true,
+              },
+            },
+          },
+        },
+        area: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    })
+    return proposals
+  }
+
   public async findById(proposalId: number) {
     const proposal = await prisma.proposal.findUnique({
       where: {

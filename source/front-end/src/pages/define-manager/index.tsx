@@ -1,15 +1,19 @@
 import { employeeAPI } from '../../features/employee/employee-api'
+import { areaAPI } from '../../features/area/area-api'
 import { proposalAPI } from '../../features/proposal/proposal-api'
-import { ProposalCard } from './components/DefineProposalChampionCard'
+import { categoryAPI } from '../../features/category/category-api'
+import { ProposalCard } from './components/DefineProposalManagerCard'
 
-const DefineChampion: React.FC = () => {
-  const { data: championList } = employeeAPI.useGetEmployeesQuery()
-  const { data: proposalsList } = proposalAPI.useGetProposalsWithoutChampionQuery()
+const DefineManager: React.FC = () => {
+  const { data: managerList } = employeeAPI.useGetEmployeesQuery()
+  const { data: areas } = areaAPI.useGetAreasQuery()
+  const { data: proposalsList } = proposalAPI.useGetProposalsWithoutManagerQuery()
+  const { data: categories } = categoryAPI.useGetCategoriesQuery()
 
   return (
     <div className="bg-[#eee] min-h-screen font-sans">
       <div className="flex justify-between items-center py-2.5 px-5 bg-white shadow-md mb-2.5">
-        <h2 className="ml-8 text-xl">Definir Executor</h2>
+        <h2 className="ml-8 text-xl">Definir Gerente</h2>
       </div>
       <div className="flex flex-wrap">
         {!proposalsList || proposalsList.length === 0 ? (
@@ -21,7 +25,9 @@ const DefineChampion: React.FC = () => {
               <ProposalCard
                 key={proposal.id}
                 proposal={proposal}
-                availableChampions={championList}
+                availableManagers={managerList}
+                availableAreas={areas}
+                categories={categories}
               />
             ))
         )}
@@ -30,4 +36,4 @@ const DefineChampion: React.FC = () => {
   )
 }
 
-export default DefineChampion
+export default DefineManager

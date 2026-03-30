@@ -86,3 +86,12 @@ export interface UpdateProposalRequest {
   areaId: number
   categoryId: number
 }
+
+export interface UpdateProposalWithChampionRequest {
+  championRe: number
+}
+
+export interface AdminUpdateProposalWithChampionRequest extends UpdateProposalWithChampionRequest {
+  areaId: number
+  categoryId: number
+}

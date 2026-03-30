@@ -10,9 +10,10 @@ type Role = User['role']
 type PrivateRouteProps = {
   children: ReactNode
   allowedRoles?: Role[]
+  blockedRoles?: Role[]
 }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) => {
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles, blockedRoles }) => {
   const location = useLocation()
   const isLoggedin = useSelector((state: RootState) => state.auth.isLoggedin)
   const isAuthInitialized = useSelector((state: RootState) => state.auth.isAuthInitialized)
@@ -27,6 +28,10 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) =
 
   if (mustChangePassword && location.pathname !== '/change-password') {
     return <Navigate to="/change-password" replace />
+  }
+
+  if (blockedRoles?.length && userRole && blockedRoles.includes(userRole)) {
+    return <Navigate to="/" />
   }
 
   if (allowedRoles?.length && (!userRole || !allowedRoles.includes(userRole)))

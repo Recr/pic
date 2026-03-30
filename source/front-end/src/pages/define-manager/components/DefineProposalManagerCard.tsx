@@ -9,7 +9,9 @@ import { useState } from 'react'
 import Modal from '../../../components/modal/Modal'
 
 const updateProposalSchema = z.object({
-  championRe: z.coerce.number().int().positive('Selecione um RE valido para o executor.'),
+  managerRe: z.coerce.number().int().positive('Selecione um RE valido para o gestor.'),
+  areaId: z.coerce.number().int().positive('Selecione uma area.'),
+  categoryId: z.coerce.number().int().positive('Selecione uma categoria.'),
 })
 
 interface ProposalWithEmployees {
@@ -38,16 +40,39 @@ interface ProposalWithEmployees {
 
 interface ProposalCardProps {
   proposal: ProposalWithEmployees
-  availableChampions:
+  availableManagers:
     | {
         re: number
         name: string
         shift?: string
       }[]
     | undefined
+  availableAreas:
+    | {
+        id: number
+        name: string
+      }[]
+    | undefined
+  categories:
+    | {
+        id: number
+        name: string
+        categoryReward: number
+      }[]
+    | undefined
 }
 
-export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableChampions }) => {
+interface Area {
+  id: number
+  name: string
+}
+
+export const ProposalCard: React.FC<ProposalCardProps> = ({
+  proposal,
+  availableManagers,
+  availableAreas,
+  categories,
+}) => {
   type UpdateProposalFormInput = z.input<typeof updateProposalSchema>
   type UpdateProposalFormOutput = z.output<typeof updateProposalSchema>
 
@@ -60,7 +85,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableC
     resolver: zodResolver(updateProposalSchema),
   })
 
-  const [updateProposal, { isLoading }] = proposalAPI.useUpdateProposalWithChampionMutation()
+  const [updateProposal, { isLoading }] = proposalAPI.useUpdateProposalWithManagerMutation()
   const [rejectProposal, { isLoading: isRejecting }] =
     proposalAPI.useRejectProposalAsAdminMutation()
 
@@ -130,21 +155,65 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableC
         </div>
 
         <div className="flex flex-col gap-2 items-start my-5 pt-2.5 border-t border-[#eee]">
-          <label htmlFor={`champion-input-${proposal.id}`}>
-            <strong>Defina o Executor:</strong>
+          <label htmlFor={`area-input-${proposal.id}`}>
+            <strong>Área:</strong>
+          </label>
+          <select
+            id={`area-input-${proposal.id}`}
+            defaultValue={proposal.area?.id || ''}
+            className="p-2.5 w-full border border-[#ccc] rounded bg-white"
+            {...register('areaId', { valueAsNumber: true })}
+          >
+            <option value="" disabled>
+              Selecione uma área
+            </option>
+            {availableAreas?.map((area: Area) => (
+              <option key={area.id} value={area.id}>
+                {area.name}
+              </option>
+            ))}
+          </select>
+          {errors.areaId && <p className="text-sm text-red-600">{errors.areaId.message}</p>}
+          <p className="text-xs text-gray-500 mt-0.5">
+            Mantenha a seleção do colaborador ou escolha na lista
+          </p>
+
+          <label htmlFor={`category-input-${proposal.id}`}>
+            <strong>Categoria:</strong>
+          </label>
+          <select
+            id={`category-input-${proposal.id}`}
+            defaultValue=""
+            className="p-2.5 w-full border border-[#ccc] rounded bg-white"
+            {...register('categoryId', { valueAsNumber: true })}
+          >
+            <option value="" disabled>
+              Selecione uma categoria
+            </option>
+            {categories?.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name} - Recompensa: R$ {Number(category.categoryReward).toFixed(2)}
+              </option>
+            ))}
+          </select>
+          {errors.categoryId && <p className="text-sm text-red-600">{errors.categoryId.message}</p>}
+          <p className="text-xs text-gray-500 mt-0.5">Selecione a categoria da sugestão.</p>
+
+          <label htmlFor={`manager-input-${proposal.id}`}>
+            <strong>Defina o Gestor:</strong>
           </label>
           <EmployeeCombobox
-            name={`champion-input-${proposal.id}`}
+            name={`manager-input-${proposal.id}`}
             listId={`employees-list-${proposal.id}`}
-            employees={availableChampions || []}
+            employees={availableManagers || []}
             required
             placeholder="Digite ou selecione o RE"
             onSelect={(value) => {
-              setValue('championRe', Number(value), { shouldValidate: true })
+              setValue('managerRe', Number(value), { shouldValidate: true })
             }}
           />
-          <input type="hidden" {...register('championRe', { valueAsNumber: true })} />
-          {errors.championRe && <p className="text-sm text-red-600">{errors.championRe.message}</p>}
+          <input type="hidden" {...register('managerRe', { valueAsNumber: true })} />
+          {errors.managerRe && <p className="text-sm text-red-600">{errors.managerRe.message}</p>}
           <div className="w-full">
             <button
               type="submit"

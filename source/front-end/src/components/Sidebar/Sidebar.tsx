@@ -8,6 +8,8 @@ import {
   PersonStandingIcon,
   UserIcon,
   Coins,
+  UserStar,
+  UserPen,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -38,9 +40,21 @@ const Sidebar: React.FC = () => {
       allowedRoles: ['ADMIN'],
     },
     {
-      icon: <BoxSelectIcon />,
+      icon: <UserPen />,
       label: 'Definir Campeão',
       path: '/admin/define-champion',
+      allowedRoles: ['ADMIN'],
+    },
+    {
+      icon: <BoxSelectIcon />,
+      label: 'Definir Campeão',
+      path: '/define-champion',
+      blockedRoles: ['ADMIN'],
+    },
+    {
+      icon: <UserStar />,
+      label: 'Definir Gestor',
+      path: '/admin/define-manager',
       allowedRoles: ['ADMIN'],
     },
     {
@@ -81,6 +95,10 @@ const Sidebar: React.FC = () => {
         .filter(
           (item) =>
             !item.allowedRoles || (userRole ? item.allowedRoles?.includes(userRole) : false),
+        )
+        .filter(
+          (item) =>
+            !item.blockedRoles || (userRole ? !item.blockedRoles?.includes(userRole) : false),
         )
         .map((item) => (
           <SideBarItem

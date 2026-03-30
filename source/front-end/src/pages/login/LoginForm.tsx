@@ -84,6 +84,7 @@ const LoginForm: React.FC = () => {
             id="re"
             className="border-gray-300 border w-3xs p-2 rounded-md [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-moz-number-spin-button]:hidden"
             placeholder="Digite seu RE (Matrícula)"
+            autoComplete={'off'}
             {...register('re', { valueAsNumber: true })}
           />
           {errors.re?.message && <p className="text-xs text-red-500 mt-1">{errors.re.message}</p>}

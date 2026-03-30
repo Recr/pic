@@ -2,10 +2,12 @@ import { Router } from 'express'
 import { ProposalsController } from '../../controllers/proposals.controller'
 import { validate } from '../../middlewares/validation.middleware'
 import {
+  adminUpdateProposalWithChampion,
   createProposalSchema,
   proposalIdSchema,
   updateProposalStatusByChampionSchema,
   updateProposalWithChampion,
+  updateProposalWithManager,
 } from '../../utils/schemas/proposal.schemas'
 import { authMiddleware } from '../../middlewares/auth.middeware'
 import { checkRole } from '../../middlewares/role.middleware'
@@ -28,8 +30,13 @@ proposalsRoutes.get(
 proposalsRoutes.get(
   '/to-define-champion',
   authMiddleware,
-  checkRole([Role.ADMIN]),
   ProposalsController.handleFindAllWithoutChampion,
+)
+proposalsRoutes.get(
+  '/to-define-manager',
+  authMiddleware,
+  checkRole([Role.ADMIN]),
+  ProposalsController.handleFindAllWithoutManager,
 )
 proposalsRoutes.get(
   '/:id',
@@ -39,11 +46,24 @@ proposalsRoutes.get(
 )
 proposalsRoutes.post('/', validate(createProposalSchema), ProposalsController.handleCreate)
 proposalsRoutes.put(
+  '/:id/admin-define-champion',
+  validate(adminUpdateProposalWithChampion),
+  authMiddleware,
+  checkRole([Role.ADMIN]),
+  ProposalsController.handleAdminDefineChampion,
+)
+proposalsRoutes.put(
   '/:id/define-champion',
   validate(updateProposalWithChampion),
   authMiddleware,
-  checkRole([Role.ADMIN]),
   ProposalsController.handleDefineChampion,
+)
+proposalsRoutes.put(
+  '/:id/define-manager',
+  validate(updateProposalWithManager),
+  authMiddleware,
+  checkRole([Role.ADMIN]),
+  ProposalsController.handleDefineManager,
 )
 proposalsRoutes.put(
   '/:id/champion-review',

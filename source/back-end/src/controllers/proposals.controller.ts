@@ -69,7 +69,24 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
       )
-      const proposals = await proposalUseCase.executeFindAllWithoutChampion()
+      const role = req.user?.role
+      const userId = Number(req.user?.sub)
+      const proposals = await proposalUseCase.executeFindAllWithoutChampion(role, userId)
+      res.send(proposals)
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  async handleFindAllWithoutManager(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
+      )
+      const proposals = await proposalUseCase.executeFindAllWithoutManager()
       res.send(proposals)
     } catch (error) {
       next(error)
@@ -112,13 +129,50 @@ export const ProposalsController = {
     try {
       const data = req.body
       const proposalId = Number(req.params.id)
+      const userId = Number(req.user?.sub)
+
       const proposalUseCase = new ProposalsUseCase(
         new PrismaProposalRepository(),
         new PrismaEmployeeRepository(),
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
       )
-      const updatedProposal = await proposalUseCase.executeDefineChampion(proposalId, data)
+      const updatedProposal = await proposalUseCase.executeDefineChampion(proposalId, data, userId)
+      res.send(updatedProposal)
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  async handleAdminDefineChampion(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = req.body
+      const proposalId = Number(req.params.id)
+
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
+      )
+      const updatedProposal = await proposalUseCase.executeAdminDefineChampion(proposalId, data)
+      res.send(updatedProposal)
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  async handleDefineManager(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = req.body
+      const proposalId = Number(req.params.id)
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
+      )
+      const updatedProposal = await proposalUseCase.executeDefineManager(proposalId, data)
       res.send(updatedProposal)
     } catch (error) {
       next(error)
