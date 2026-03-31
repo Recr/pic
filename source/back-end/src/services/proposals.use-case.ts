@@ -39,7 +39,7 @@ class ProposalsUseCase {
 
   public async executeFindAllWithoutChampion(role: Role, userId: number) {
     if (role === Role.ADMIN) {
-      return await this.proposalRepository.findAllWithoutChampion()
+      return await this.proposalRepository.findAllWithoutChampion(userId)
     }
     return await this.proposalRepository.findAllWithoutChampionFromManager(userId)
   }

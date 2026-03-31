@@ -123,12 +123,19 @@ class PrismaProposalRepository {
     return proposals
   }
 
-  public async findAllWithoutChampion() {
+  public async findAllWithoutChampion(userId: number) {
     const proposals = await prisma.proposal.findMany({
       where: {
         championId: null,
         status: 'DEFINE_CHAMPION',
-        managerId: null,
+        OR: [
+          {
+            managerId: null,
+          },
+          {
+            managerId: userId,
+          },
+        ],
       },
       select: {
         id: true,
