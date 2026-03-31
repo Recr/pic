@@ -43,6 +43,14 @@ class PrismaProposalRepository {
             shift: true,
           },
         },
+        manager: {
+          select: {
+            re: true,
+            name: true,
+            role: true,
+            shift: true,
+          },
+        },
         suggestions: {
           select: {
             employeeName: true,

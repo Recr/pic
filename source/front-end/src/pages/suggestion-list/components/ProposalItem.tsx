@@ -87,13 +87,33 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
               ))}
             </div>
           </div>
+          {proposal.manager && (
+            <div>
+              <p className="text-sm font-semibold mb-2">Gestor</p>
+              <div className="flex flex-wrap gap-2">
+                <p className="bg-gray-100 px-2 py-1 rounded text-sm">
+                  <span className="text-gray-700 font-bold">{proposal.manager.name}</span>
+                  <span className="text-xs text-gray-500 ml-1">
+                    {proposal.manager.re}
+                    {' - '}
+                    Turno: {proposal.manager.shift}
+                  </span>
+                </p>
+              </div>
+            </div>
+          )}
           {proposal.champion && (
             <div>
               <p className="text-sm font-semibold mb-2">Executor</p>
               <div className="flex flex-wrap gap-2">
-                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">
-                  {proposal.champion.name}
-                </span>
+                <p className="bg-gray-100 px-2 py-1 rounded text-sm">
+                  <span className="text-gray-700 font-bold">{proposal.champion.name}</span>
+                  <span className="text-xs text-gray-500 ml-1">
+                    {proposal.champion.re}
+                    {' - '}
+                    Turno: {proposal.champion.shift}
+                  </span>
+                </p>
               </div>
             </div>
           )}

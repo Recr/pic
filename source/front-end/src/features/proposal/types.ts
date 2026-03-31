@@ -73,6 +73,7 @@ export interface ProposalDetailed {
     categoryReward: number
   }
   champion: Employee | null
+  manager: Employee | null
 }
 
 export interface CreateProposalRequest {
