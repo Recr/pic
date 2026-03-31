@@ -48,10 +48,10 @@ const Profile: React.FC = () => {
     }
   }
   return (
-    <>
+    <div className="bg-gray-100 min-h-screen py-8">
       <ToastContainer />
       <form
-        className="bg-gray-50 flex flex-col items-center w-90 shadow-custom py-5 px-7.5 mx-auto mb-7.5 rounded-[20px] mt-20"
+        className="bg-white flex flex-col items-center w-90 shadow-custom py-5 px-7.5 mx-auto mb-7.5 rounded-[20px]"
         action=""
       >
         <h1 className="text-2xl font-semibold text-gray-800 mb-4">Meu Perfil</h1>
@@ -100,14 +100,14 @@ const Profile: React.FC = () => {
       </form>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer transition-colors m-auto block"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer transition-colors m-auto block mt-4"
       >
         Alterar Senha
       </button>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <form action="" onSubmit={handleSubmit(onSubmit)}>
+        <form action="" onSubmit={handleSubmit(onSubmit)} className="w-70 px-4">
           <h1 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Alterar Senha</h1>
-          <div className="w-full">
+          <div className="">
             <label htmlFor="currentPassword">Senha Atual: </label>
             <input
               className="w-full p-2.5 pr-9 my-1.5 rounded-[5px] border border-[#ccc] bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -143,13 +143,13 @@ const Profile: React.FC = () => {
           </div>
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer transition-colors m-auto block"
+            className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer transition-colors m-auto block"
           >
             Alterar Senha
           </button>
         </form>
       </Modal>
-    </>
+    </div>
   )
 }
 

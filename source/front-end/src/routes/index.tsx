@@ -28,9 +28,9 @@ const AppShell: React.FC = () => {
   })
 
   return (
-    <div className="flex min-h-screen">
+    <div className="min-h-screen">
       {isLoggedin && <Sidebar />}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 ">
         <Routes>
           <Route path="/" element={<SuggestionForm />} />
           <Route path="/login" element={<LoginForm />} />
