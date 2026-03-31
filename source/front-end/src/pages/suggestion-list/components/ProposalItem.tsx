@@ -9,7 +9,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   return (
     <>
       <div
-        className="text-sm border-t-2 border-gray-200 px-4 py-2 mx-4 grid grid-cols-[56px_2fr_2fr_1fr_1fr_1fr] text-left hover:bg-blue-100 hover:cursor-pointer"
+        className="text-sm border-t-2 border-gray-200 px-4 py-2 grid grid-cols-[56px_2fr_2fr_1fr_1fr_1fr] text-left hover:bg-blue-100 hover:cursor-pointer"
         onClick={() => setIsModalOpen(true)}
       >
         <p>{proposal.id}</p>

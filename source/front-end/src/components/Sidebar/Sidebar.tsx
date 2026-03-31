@@ -43,13 +43,13 @@ const Sidebar: React.FC = () => {
     },
     {
       icon: <UserPen />,
-      label: 'Definir Campeão',
+      label: 'Definir Executor',
       path: '/admin/define-champion',
       allowedRoles: ['ADMIN'],
     },
     {
       icon: <BoxSelectIcon />,
-      label: 'Definir Campeão',
+      label: 'Definir Executor',
       path: '/define-champion',
       blockedRoles: ['ADMIN'],
     },
@@ -116,7 +116,7 @@ const Sidebar: React.FC = () => {
       )}
 
       <nav
-        className={`${isMobileMenuOpen ? 'flex' : 'hidden'} absolute left-2 right-2 top-full z-30 mt-1 flex-col gap-2 rounded-xl border border-gray-200 bg-gray-100 p-2 shadow-md transition-all duration-300 ease-in-out md:static md:mt-0 md:flex md:flex-row md:items-center md:justify-center md:gap-4 md:overflow-x-auto md:rounded-none md:border-0 md:bg-transparent md:p-4 md:shadow-none`}
+        className={`${isMobileMenuOpen ? 'flex' : 'hidden'} absolute left-2 right-2 top-full z-30 mt-1 flex-col gap-2 rounded-xl border border-gray-200 bg-gray-100 p-2 shadow-md transition-all duration-300 ease-in-out md:static md:mt-0 md:flex md:flex-row md:items-center md:justify-center md:gap-4 md:overflow-x-auto md:rounded-none md:border-0 md:bg-transparent md:p-2 md:shadow-none`}
       >
         {visibleItems.map((item) => (
           <SideBarItem
