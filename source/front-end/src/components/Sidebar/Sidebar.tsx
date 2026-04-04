@@ -12,6 +12,7 @@ import {
   UserPen,
   Menu,
   X,
+  Blocks,
 } from 'lucide-react'
 import { useNavigate } from 'react-router'
 import SideBarItem from './SidebarItem'
@@ -69,6 +70,12 @@ const Sidebar: React.FC = () => {
       icon: <LandPlotIcon />,
       label: 'Áreas',
       path: '/areas',
+      allowedRoles: ['ADMIN'],
+    },
+    {
+      icon: <Blocks />,
+      label: 'Categorias',
+      path: '/categories',
       allowedRoles: ['ADMIN'],
     },
     {

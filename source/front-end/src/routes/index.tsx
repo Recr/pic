@@ -18,6 +18,7 @@ import PayoutList from '../pages/payout-list'
 import PasswordResetPage from '../pages/password-reset/PasswordResetPage'
 import DefineManager from '../pages/define-manager'
 import DefineChampion from '../pages/define-champion'
+import Categories from '../pages/categories'
 
 const AppShell: React.FC = () => {
   const isLoggedin = useSelector((state: RootState) => state.auth.isLoggedin)
@@ -87,6 +88,14 @@ const AppShell: React.FC = () => {
             element={
               <PrivateRoute allowedRoles={['ADMIN']}>
                 <Areas />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/categories"
+            element={
+              <PrivateRoute allowedRoles={['ADMIN']}>
+                <Categories />
               </PrivateRoute>
             }
           />

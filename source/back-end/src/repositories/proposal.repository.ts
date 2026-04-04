@@ -269,6 +269,15 @@ class PrismaProposalRepository {
     return proposal
   }
 
+  public async findByCategoryId(categoryId: number) {
+    const proposals = await prisma.proposal.findMany({
+      where: {
+        categoryId: categoryId,
+      },
+    })
+    return proposals
+  }
+
   public async createWithSuggestions({ employees, ...newProposal }: CreateProposalWithSuggestions) {
     const proposal = await prisma.proposal.create({
       data: {

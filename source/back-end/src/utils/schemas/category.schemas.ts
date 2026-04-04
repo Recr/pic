@@ -2,7 +2,7 @@ import z from 'zod'
 
 export const createCategory = z.object({
   body: z.object({
-    name: z.string(),
+    name: z.string().min(3).max(50, 'O nome da categoria deve ter no máximo 50 caracteres.'),
     categoryReward: z.number().optional(),
   }),
 })
