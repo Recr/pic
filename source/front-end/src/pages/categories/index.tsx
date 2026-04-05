@@ -1,9 +1,9 @@
-import { Box, Check, Pen, X } from 'lucide-react'
+import { Pen, X } from 'lucide-react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import Modal from '../../components/modal/Modal'
 import { useState } from 'react'
 import { categoryAPI } from '../../features/category/category-api'
-import type { Category, CategoryRequests } from '../../features/category/types'
+import type { Category } from '../../features/category/types'
 import type z from 'zod'
 import {
   createCategorySchema,

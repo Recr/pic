@@ -24,6 +24,7 @@ export interface ProposalWithSuggestions {
   description: string
   status: string
   createdAt: Date
+  isCustomReward: boolean
   suggestions: [
     {
       employeeName: string
@@ -55,6 +56,7 @@ export interface ProposalDetailed {
   notes: string | null
   rejectionNote: string | null
   rewardAmount: number | null
+  isCustomReward: boolean
   suggestions: [
     {
       employeeName: string
@@ -82,8 +84,8 @@ export interface CreateProposalRequest {
   areaId: number
 }
 
-export interface UpdateProposalRequest {
-  championRe: number
+export interface UpdateProposalWithManagerRequest {
+  managerRe: number
   areaId: number
   categoryId: number
 }
@@ -95,4 +97,9 @@ export interface UpdateProposalWithChampionRequest {
 export interface AdminUpdateProposalWithChampionRequest extends UpdateProposalWithChampionRequest {
   areaId: number
   categoryId: number
+}
+
+export interface FinishProposalRequest {
+  status: string
+  customRewardAmount?: number
 }

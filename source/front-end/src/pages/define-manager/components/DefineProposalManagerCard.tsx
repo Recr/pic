@@ -7,11 +7,13 @@ import { getStatusColor } from '../../../helpers/getStatusColor'
 import EmployeeCombobox from '../../../components/EmployeeCombobox'
 import { useState } from 'react'
 import Modal from '../../../components/modal/Modal'
+import type { Category } from '../../../features/category/types'
 
 const updateProposalSchema = z.object({
   managerRe: z.coerce.number().int().positive('Selecione um RE valido para o gestor.'),
   areaId: z.coerce.number().int().positive('Selecione uma area.'),
   categoryId: z.coerce.number().int().positive('Selecione uma categoria.'),
+  isCustomReward: z.boolean(),
 })
 
 interface ProposalWithEmployees {
@@ -53,13 +55,7 @@ interface ProposalCardProps {
         name: string
       }[]
     | undefined
-  categories:
-    | {
-        id: number
-        name: string
-        categoryReward: number
-      }[]
-    | undefined
+  categories: Category[] | undefined
 }
 
 interface Area {
@@ -198,7 +194,14 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           </select>
           {errors.categoryId && <p className="text-sm text-red-600">{errors.categoryId.message}</p>}
           <p className="text-xs text-gray-500 mt-0.5">Selecione a categoria da sugestão.</p>
-
+          <div className="flex gap-4 bg-gray-100 py-2 px-4 rounded-2xl border border-gray-200">
+            <input
+              {...register('isCustomReward')}
+              type="checkbox"
+              className="w-4 h-6 hover:cursor-pointer"
+            />
+            <span>Prêmio a definir</span>
+          </div>
           <label htmlFor={`manager-input-${proposal.id}`}>
             <strong>Defina o Gestor:</strong>
           </label>

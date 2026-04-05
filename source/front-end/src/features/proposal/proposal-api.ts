@@ -4,8 +4,9 @@ import type {
   Proposal,
   ProposalDetailed,
   ProposalWithSuggestions,
-  UpdateProposalRequest,
+  UpdateProposalWithManagerRequest,
   UpdateProposalWithChampionRequest,
+  FinishProposalRequest,
 } from './types'
 import { api } from '../../services/api'
 
@@ -101,7 +102,7 @@ export const proposalAPI = api.injectEndpoints({
     }),
     updateProposalWithManager: builder.mutation<
       Proposal,
-      { body: UpdateProposalRequest; proposalId: string }
+      { body: UpdateProposalWithManagerRequest; proposalId: string }
     >({
       query: ({ body, proposalId }) => ({
         url: `/proposals/${proposalId}/define-manager`,
@@ -113,11 +114,14 @@ export const proposalAPI = api.injectEndpoints({
         { type: 'Proposal', id: 'LIST' },
       ],
     }),
-    proposalChampionReview: builder.mutation<Proposal, { proposalId: string; status: string }>({
-      query: ({ proposalId, status }) => ({
+    proposalChampionReview: builder.mutation<
+      Proposal,
+      { proposalId: string; data: FinishProposalRequest }
+    >({
+      query: ({ proposalId, data }) => ({
         url: `/proposals/${proposalId}/champion-review`,
         method: 'PUT',
-        body: { status },
+        body: data,
       }),
       invalidatesTags: (_result, _error, { proposalId }) => [
         { type: 'Proposal', id: Number(proposalId) },

@@ -54,6 +54,11 @@ class ProposalsUseCase {
     return proposal
   }
 
+  public async executeFindByCategoryId(categoryId: number) {
+    const proposals = await this.proposalRepository.findByCategoryId(categoryId)
+    return proposals
+  }
+
   public async executeCreate({
     employees: employeeWithoutIds,
     ...newProposal
@@ -125,6 +130,7 @@ class ProposalsUseCase {
       champion: { connect: { id: champion.id } },
       status: 'UNDER_VALIDATION',
       adminReviewedAt: new Date(),
+      isCustomReward: await this.verifyIsCustomReward(data),
     }
 
     const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
@@ -141,12 +147,17 @@ class ProposalsUseCase {
       category: { connect: { id: data.categoryId } },
       manager: { connect: { id: manager.id } },
       adminReviewedAt: new Date(),
+      isCustomReward: await this.verifyIsCustomReward(data),
     }
     const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
     return updatedProposal
   }
 
-  public async executeChampionReview(proposalId: number, newStatus: string) {
+  public async executeChampionReview(
+    proposalId: number,
+    newStatus: string,
+    customRewardAmount?: number,
+  ) {
     const proposal = await this.proposalRepository.findById(proposalId)
     if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
     const updatedData: Prisma.ProposalUpdateInput = { status: newStatus }
@@ -158,11 +169,20 @@ class ProposalsUseCase {
     } else if (newStatus == 'IMPLEMENTED') {
       updatedData.completedAt = new Date()
 
-      if (!proposal.categoryId) throw new AppError('Category not defined.', StatusCodes.BAD_REQUEST)
-      const category = await this.categoryRepository.findById(proposal.categoryId)
-      if (category?.categoryReward == null)
-        throw new AppError('Category reward not defined.', StatusCodes.BAD_REQUEST)
-      updatedData.rewardAmount = category?.categoryReward
+      // Reward calculation
+
+      if (proposal.isCustomReward) {
+        if (!customRewardAmount || customRewardAmount <= 0)
+          throw new AppError('Invalid or missing custom reward amount.', StatusCodes.BAD_REQUEST)
+        updatedData.rewardAmount = customRewardAmount
+      } else {
+        if (!proposal.categoryId)
+          throw new AppError('Category not defined.', StatusCodes.BAD_REQUEST)
+        const category = await this.categoryRepository.findById(proposal.categoryId)
+        if (category?.categoryReward == null)
+          throw new AppError('Category reward not defined.', StatusCodes.BAD_REQUEST)
+        updatedData.rewardAmount = category?.categoryReward
+      }
 
       const suggestionIdList = (await this.suggestionRepository.findByProposalId(proposal.id)).map(
         (suggestion) => {
@@ -176,7 +196,7 @@ class ProposalsUseCase {
       const payoutData: Prisma.PayoutCreateManyInput[] = suggestionIdList.map((id) => {
         return {
           status: 'PENDING',
-          value: Number(category.categoryReward) / suggestionIdList.length,
+          value: Number(updatedData.rewardAmount) / suggestionIdList.length,
           suggestionId: id,
         }
       })
@@ -203,6 +223,20 @@ class ProposalsUseCase {
     }
     const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
     return updatedProposal
+  }
+
+  // Helper methods
+
+  private async verifyIsCustomReward(data: UpdateProposalWithChampion | UpdateProposalWithManager) {
+    if (data.isCustomReward) return true
+
+    const category = await this.categoryRepository.findById(data.categoryId)
+    if (!category) throw new AppError('Category not found.', StatusCodes.NOT_FOUND)
+    return (
+      category.categoryReward == null ||
+      category.categoryReward === undefined ||
+      Number(category.categoryReward) === 0.0
+    )
   }
 }
 

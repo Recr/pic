@@ -18,6 +18,7 @@ export interface CreateProposalWithSuggestions {
 interface UpdateProposal {
   areaId: number
   categoryId: number
+  isCustomReward: boolean
 }
 
 export interface UpdateProposalWithChampion extends UpdateProposal {

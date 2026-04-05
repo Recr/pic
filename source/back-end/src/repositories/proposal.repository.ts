@@ -83,9 +83,20 @@ class PrismaProposalRepository {
   public async findAllWithEmployees(userId?: number) {
     const where: Prisma.ProposalWhereInput =
       userId === undefined
-        ? {}
+        ? {
+            OR: [
+              { status: 'UNDER_VALIDATION' },
+              { status: 'TO_IMPLEMENT' },
+              { status: 'IMPLEMENTATION' },
+            ],
+          }
         : {
             championId: userId,
+            OR: [
+              { status: 'UNDER_VALIDATION' },
+              { status: 'TO_IMPLEMENT' },
+              { status: 'IMPLEMENTATION' },
+            ],
           }
 
     const proposals = await prisma.proposal.findMany({
@@ -95,6 +106,7 @@ class PrismaProposalRepository {
         description: true,
         status: true,
         createdAt: true,
+        isCustomReward: true,
         suggestions: {
           select: {
             id: false,

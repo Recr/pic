@@ -12,9 +12,10 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
 
   const handleStatusUpdate = async (newStatus: string) => {
     try {
+      const data = { status: newStatus }
       await proposalChampionReview({
         proposalId: proposal.id.toString(),
-        status: newStatus,
+        data,
       }).unwrap()
     } catch (error) {
       console.log(error)

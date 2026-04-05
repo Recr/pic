@@ -43,6 +43,7 @@ export const adminUpdateProposalWithChampion = z.object({
     areaId: z.number(),
     championRe: z.number(),
     categoryId: z.number(),
+    isCustomReward: z.boolean(),
   }),
   params: z.object({
     id: z.coerce.number(),
@@ -54,6 +55,7 @@ export const updateProposalWithManager = z.object({
     areaId: z.number(),
     managerRe: z.number(),
     categoryId: z.number(),
+    isCustomReward: z.boolean(),
   }),
   params: z.object({
     id: z.coerce.number(),
@@ -73,5 +75,6 @@ export const updateProposalStatusByChampionSchema = z.object({
       'IMPLEMENTATION',
       'IMPLEMENTED',
     ]),
+    customRewardAmount: z.number().positive().optional(),
   }),
 })

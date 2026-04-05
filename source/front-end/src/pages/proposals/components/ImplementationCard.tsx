@@ -2,26 +2,51 @@ import { useState } from 'react'
 import Modal from '../../../components/modal/Modal'
 import StatusBadge from '../../../components/StatusBadge'
 import { proposalAPI } from '../../../features/proposal/proposal-api'
-import type { ProposalWithSuggestions } from '../../../features/proposal/types'
+import type {
+  FinishProposalRequest,
+  ProposalWithSuggestions,
+} from '../../../features/proposal/types'
 import { getStatusColor } from '../../../helpers/getStatusColor'
+import { useForm, type SubmitHandler } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import type z from 'zod'
+import { finishProposalSchema } from '../../../validation/schemas/proposal-schemas'
 
 const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
   const [proposalChampionReview] = proposalAPI.useProposalChampionReviewMutation()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
-  const handleStatusUpdate = async (newStatus: string) => {
+
+  type FinishProposalImplementationInputSchema = z.input<typeof finishProposalSchema>
+  type FinishProposalImplementationOutputSchema = z.output<typeof finishProposalSchema>
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<
+    FinishProposalImplementationInputSchema,
+    undefined,
+    FinishProposalImplementationOutputSchema
+  >({
+    resolver: zodResolver(finishProposalSchema),
+  })
+
+  const onSubmit: SubmitHandler<FinishProposalImplementationOutputSchema> = async ({
+    customRewardAmount,
+  }) => {
     try {
+      const data: FinishProposalRequest = { status: 'IMPLEMENTED' }
+      if (customRewardAmount !== undefined) data.customRewardAmount = customRewardAmount
+
       await proposalChampionReview({
         proposalId: proposal.id.toString(),
-        status: newStatus,
+        data,
       }).unwrap()
       setIsConfirmationModalOpen(false)
     } catch (error) {
       console.log(error)
     }
-  }
-  const handleConfirmConcluir = async () => {
-    await handleStatusUpdate('IMPLEMENTED')
   }
 
   return (
@@ -74,17 +99,32 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
               : proposal.description}
           </span>
         </p>
-        <div
-          className="flex gap-2 items-center pt-4 bottom-1 absolute"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <button
-            onClick={() => setIsConfirmationModalOpen(true)}
-            className="py-2 px-2 cursor-pointer rounded border border-green-800 bg-green-500 hover:bg-green-700 text-white transition-all"
-          >
-            Concluir
-          </button>
-        </div>
+        <form>
+          {proposal.isCustomReward && (
+            <div className="flex flex-col">
+              <label htmlFor="">Valor do prêmio</label>
+              <input
+                type="text"
+                inputMode="decimal"
+                onClick={(e) => e.stopPropagation()}
+                className="bg-gray-100 border border-gray-400 rounded-2xl px-4 py-2"
+                {...register('customRewardAmount')}
+              />
+            </div>
+          )}
+          <div className="flex gap-2 items-center pt-4 " onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              onClick={() => setIsConfirmationModalOpen(true)}
+              className="py-2 px-2 cursor-pointer rounded border border-green-800 bg-green-500 hover:bg-green-700 text-white transition-all"
+            >
+              Concluir
+            </button>
+          </div>
+          {errors.customRewardAmount && (
+            <span className="text-xs text-red-600">{errors.customRewardAmount.message}</span>
+          )}
+        </form>
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div className="w-160 max-w-[95vw] p-6 space-y-5">
@@ -147,18 +187,23 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
           </p>
           <div className="flex gap-3 justify-end">
             <button
+              type="button"
               onClick={() => setIsConfirmationModalOpen(false)}
               className="py-2 px-4 cursor-pointer rounded border border-gray-300 bg-gray-100 hover:bg-gray-200 text-gray-800 transition-all"
             >
               Cancelar
             </button>
             <button
-              onClick={handleConfirmConcluir}
+              type="button"
+              onClick={handleSubmit(onSubmit)}
               className="py-2 px-4 cursor-pointer rounded border border-green-800 bg-green-500 hover:bg-green-700 text-white transition-all"
             >
               Confirmar
             </button>
           </div>
+          {errors.customRewardAmount && (
+            <span className="text-xs text-red-600">{errors.customRewardAmount.message}</span>
+          )}
         </div>
       </Modal>
     </div>

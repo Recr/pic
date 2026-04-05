@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { ProposalsUseCase } from '../services/proposals.use-case'
 import { PrismaProposalRepository } from '../repositories/proposal.repository'
-import { CreateProposalInput, UpdateProposalStatus } from '../utils/types/proposals.types'
+import { CreateProposalInput } from '../utils/types/proposals.types'
 import { PrismaEmployeeRepository } from '../repositories/employee.repository'
 import { AppError } from '../errors/AppError'
 import { StatusCodes } from 'http-status-codes'
@@ -198,14 +198,18 @@ export const ProposalsController = {
   async handleStatusUpdate(req: Request, res: Response, next: NextFunction) {
     try {
       const proposalId = Number(req.params.id)
-      const data: UpdateProposalStatus = req.body
+      const data = req.body
       const proposalUseCase = new ProposalsUseCase(
         new PrismaProposalRepository(),
         new PrismaEmployeeRepository(),
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
       )
-      const updatedProposal = await proposalUseCase.executeChampionReview(proposalId, data.status)
+      const updatedProposal = await proposalUseCase.executeChampionReview(
+        proposalId,
+        data.status,
+        data.customRewardAmount,
+      )
       res.send(updatedProposal)
     } catch (error) {
       next(error)
