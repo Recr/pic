@@ -113,6 +113,7 @@ class ProposalsUseCase {
       champion: { connect: { id: champion.id } },
       status: 'UNDER_VALIDATION',
       adminReviewedAt: new Date(),
+      managerNotes: data.managerNotes?.trim() || null,
     }
 
     const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)

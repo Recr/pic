@@ -115,6 +115,7 @@ class PrismaProposalRepository {
         description: true,
         status: true,
         createdAt: true,
+        managerNotes: true,
         isCustomReward: true,
         suggestions: {
           select: {
@@ -171,6 +172,7 @@ class PrismaProposalRepository {
         description: true,
         status: true,
         createdAt: true,
+        managerNotes: true,
         suggestions: {
           select: {
             id: false,
@@ -212,6 +214,7 @@ class PrismaProposalRepository {
         description: true,
         status: true,
         createdAt: true,
+        managerNotes: true,
         suggestions: {
           select: {
             id: false,
@@ -252,6 +255,7 @@ class PrismaProposalRepository {
         description: true,
         status: true,
         createdAt: true,
+        managerNotes: true,
         suggestions: {
           select: {
             id: false,

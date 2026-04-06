@@ -73,6 +73,14 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
             <span>{proposal.category.name}</span>
           </div>
         </div>
+        {proposal.managerNotes && (
+          <p className="mt-2 text-sm text-gray-700 ">
+            <strong>Obs. Gestor:</strong>{' '}
+            {proposal.managerNotes.length > 100
+              ? proposal.managerNotes.substring(0, 100).concat('...')
+              : proposal.managerNotes}
+          </p>
+        )}
         <p className="mt-2 h-50 text-justify overflow-clip">
           <strong>Sugestão:</strong>
           <br />
@@ -144,6 +152,15 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
             <p className="text-sm font-semibold mb-1">Descrição</p>
             <p className="text-gray-700 leading-relaxed">{proposal.description}</p>
           </div>
+
+          {proposal.managerNotes && (
+            <div>
+              <p className="text-sm font-semibold mb-1">Observações do Gestor</p>
+              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                {proposal.managerNotes}
+              </p>
+            </div>
+          )}
 
           <div>
             <p className="text-sm font-semibold mb-2">Funcionários</p>

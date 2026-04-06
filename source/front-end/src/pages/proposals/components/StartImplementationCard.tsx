@@ -71,6 +71,11 @@ const StartImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) =>
               : proposal.description}
           </span>
         </p>
+        {proposal.managerNotes && (
+          <p className="mt-2 text-sm text-gray-700 line-clamp-2">
+            <strong>Obs. Gestor:</strong> {proposal.managerNotes}
+          </p>
+        )}
         <div
           className="mt-auto flex gap-2 items-center pt-4"
           onClick={(event) => event.stopPropagation()}
@@ -112,6 +117,15 @@ const StartImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) =>
             <p className="text-sm font-semibold mb-1">Descrição</p>
             <p className="text-gray-700 leading-relaxed">{proposal.description}</p>
           </div>
+
+          {proposal.managerNotes && (
+            <div>
+              <p className="text-sm font-semibold mb-1">Observações do Gestor</p>
+              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                {proposal.managerNotes}
+              </p>
+            </div>
+          )}
 
           <div>
             <p className="text-sm font-semibold mb-2">Funcionários</p>

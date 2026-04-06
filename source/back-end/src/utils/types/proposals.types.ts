@@ -23,6 +23,7 @@ interface UpdateProposal {
 
 export interface UpdateProposalWithChampion extends UpdateProposal {
   championRe: number
+  managerNotes?: string
 }
 
 export interface UpdateProposalWithManager extends UpdateProposal {

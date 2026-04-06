@@ -10,6 +10,11 @@ import Modal from '../../../components/modal/Modal'
 
 const updateProposalSchema = z.object({
   championRe: z.coerce.number().int().positive('Selecione um RE valido para o executor.'),
+  managerNotes: z
+    .string()
+    .trim()
+    .max(1000, 'As Observações do gestor devem ter no maximo 1000 caracteres.')
+    .optional(),
 })
 
 interface ProposalWithEmployees {
@@ -17,6 +22,7 @@ interface ProposalWithEmployees {
   description: string
   status: string
   createdAt: Date
+  managerNotes?: string | null
   suggestions: [
     {
       employeeName: string
@@ -145,6 +151,20 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableC
           />
           <input type="hidden" {...register('championRe', { valueAsNumber: true })} />
           {errors.championRe && <p className="text-sm text-red-600">{errors.championRe.message}</p>}
+          <label htmlFor={`manager-notes-${proposal.id}`}>
+            <strong>Observações do Gestor:</strong>
+          </label>
+          <textarea
+            id={`manager-notes-${proposal.id}`}
+            rows={4}
+            placeholder="Digite Observações para o champion"
+            className="w-full rounded border border-[#ccc] p-2"
+            defaultValue={proposal.managerNotes ?? ''}
+            {...register('managerNotes')}
+          />
+          {errors.managerNotes && (
+            <p className="text-sm text-red-600">{errors.managerNotes.message}</p>
+          )}
           <div className="w-full">
             <button
               type="submit"
@@ -187,6 +207,15 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableC
             <p className="text-sm font-semibold mb-1">Descrição</p>
             <p className="text-gray-700 leading-relaxed">{proposal.description}</p>
           </div>
+
+          {proposal.managerNotes && (
+            <div>
+              <p className="text-sm font-semibold mb-1">Observações do Gestor</p>
+              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                {proposal.managerNotes}
+              </p>
+            </div>
+          )}
 
           <div>
             <p className="text-sm font-semibold mb-2">Funcionários</p>

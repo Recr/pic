@@ -32,6 +32,7 @@ export const createProposalSchema = z.object({
 export const updateProposalWithChampion = z.object({
   body: z.object({
     championRe: z.number(),
+    managerNotes: z.string().max(1000).optional(),
   }),
   params: z.object({
     id: z.coerce.number(),

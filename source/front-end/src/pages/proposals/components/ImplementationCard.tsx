@@ -21,6 +21,7 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
   const {
     handleSubmit,
     register,
+    getValues,
     formState: { errors },
   } = useForm<
     FinishProposalImplementationInputSchema,
@@ -109,10 +110,15 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
               : proposal.description}
           </span>
         </p>
+        {proposal.managerNotes && (
+          <p className="mt-2 mb-2 text-sm text-gray-700 line-clamp-2">
+            <strong>Obs. Gestor:</strong> {proposal.managerNotes}
+          </p>
+        )}
         <form>
           {proposal.isCustomReward && (
             <div className="flex flex-col">
-              <label htmlFor="customRewardAmount">Valor do prêmio</label>
+              <label htmlFor="customRewardAmount">Valor da recompensa</label>
               <input
                 id="customRewardAmount"
                 type="text"
@@ -179,6 +185,15 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
             <p className="text-gray-700 leading-relaxed">{proposal.description}</p>
           </div>
 
+          {proposal.managerNotes && (
+            <div>
+              <p className="text-sm font-semibold mb-1">Observações do Gestor</p>
+              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                {proposal.managerNotes}
+              </p>
+            </div>
+          )}
+
           <div>
             <p className="text-sm font-semibold mb-2">Funcionários</p>
             <div className="flex flex-wrap gap-2">
@@ -206,8 +221,22 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
         <div className="w-80 max-w-[95vw] p-6 space-y-4">
           <h2 className="text-lg font-semibold">Confirmar conclusão</h2>
           <p className="text-gray-700">
-            Tem certeza que deseja marcar esta proposta como concluída?
+            Tem <strong>certeza</strong> que deseja marcar esta proposta como concluída?
           </p>
+          <div className="text-gray-700 border p-2 rounded-xl border-gray-200 hover:shadow-md transition-all">
+            <span>Confira os detalhes:</span>
+            <p className="text-xs mt-2 bg-gray-100 rounded p-2">
+              Valor da recompensa: R$ {Number(getValues('customRewardAmount')).toFixed(2)}
+            </p>
+            <p className="text-xs mt-2 bg-gray-100 rounded p-2">
+              Evidências:{' '}
+              {getValues('evidenceFiles') && (getValues('evidenceFiles') as FileList).length > 0 ? (
+                <span>{(getValues('evidenceFiles') as FileList).length} arquivo(s)</span>
+              ) : (
+                <span>Nenhuma evidência adicionada</span>
+              )}
+            </p>
+          </div>
           <div className="flex gap-3 justify-end">
             <button
               type="button"
