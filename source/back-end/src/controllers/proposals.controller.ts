@@ -7,6 +7,10 @@ import { AppError } from '../errors/AppError'
 import { StatusCodes } from 'http-status-codes'
 import { PrismaCategoryRepository } from '../repositories/category.repository'
 import { PrismaSuggestionRepository } from '../repositories/suggestion.repository'
+import { PrismaProposalAttachmentRepository } from '../repositories/proposal-attachment.repository'
+import path from 'node:path'
+import { createReadStream } from 'node:fs'
+import fs from 'node:fs/promises'
 
 export const ProposalsController = {
   async handleFindAll(req: Request, res: Response, next: NextFunction) {
@@ -16,6 +20,7 @@ export const ProposalsController = {
         new PrismaEmployeeRepository(),
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
       )
       const proposals = await proposalUseCase.executeFindAll()
       res.send(proposals)
@@ -31,6 +36,7 @@ export const ProposalsController = {
         new PrismaEmployeeRepository(),
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
       )
 
       const proposals = await proposalUseCase.executeFindAllDetailed()
@@ -47,6 +53,7 @@ export const ProposalsController = {
         new PrismaEmployeeRepository(),
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
       )
 
       const userId = Number(req.user?.sub)
@@ -68,6 +75,7 @@ export const ProposalsController = {
         new PrismaEmployeeRepository(),
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
       )
       const role = req.user?.role
       const userId = Number(req.user?.sub)
@@ -85,6 +93,7 @@ export const ProposalsController = {
         new PrismaEmployeeRepository(),
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
       )
       const proposals = await proposalUseCase.executeFindAllWithoutManager()
       res.send(proposals)
@@ -101,6 +110,7 @@ export const ProposalsController = {
         new PrismaEmployeeRepository(),
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
       )
       const proposals = await proposalUseCase.executeFindById(proposalId)
       res.send(proposals)
@@ -117,6 +127,7 @@ export const ProposalsController = {
         new PrismaEmployeeRepository(),
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
       )
       const proposal = await proposalUseCase.executeCreate(data)
       res.send(proposal)
@@ -136,6 +147,7 @@ export const ProposalsController = {
         new PrismaEmployeeRepository(),
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
       )
       const updatedProposal = await proposalUseCase.executeDefineChampion(proposalId, data, userId)
       res.send(updatedProposal)
@@ -154,6 +166,7 @@ export const ProposalsController = {
         new PrismaEmployeeRepository(),
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
       )
       const updatedProposal = await proposalUseCase.executeAdminDefineChampion(proposalId, data)
       res.send(updatedProposal)
@@ -171,6 +184,7 @@ export const ProposalsController = {
         new PrismaEmployeeRepository(),
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
       )
       const updatedProposal = await proposalUseCase.executeDefineManager(proposalId, data)
       res.send(updatedProposal)
@@ -187,6 +201,7 @@ export const ProposalsController = {
         new PrismaEmployeeRepository(),
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
       )
       const updatedProposal = await proposalUseCase.executeAdminRejection(proposalId)
       res.send(updatedProposal)
@@ -199,19 +214,97 @@ export const ProposalsController = {
     try {
       const proposalId = Number(req.params.id)
       const data = req.body
+      const evidenceFiles = Array.isArray(req.files) ? req.files : undefined
       const proposalUseCase = new ProposalsUseCase(
         new PrismaProposalRepository(),
         new PrismaEmployeeRepository(),
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
       )
       const updatedProposal = await proposalUseCase.executeChampionReview(
         proposalId,
         data.status,
         data.customRewardAmount,
+        evidenceFiles,
       )
       res.send(updatedProposal)
     } catch (error) {
+      next(error)
+    }
+  },
+
+  async handleDownloadAttachment(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { proposalId, attachmentId } = req.params
+
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
+      )
+
+      const attachment = await proposalUseCase.executeGetAttachment(
+        Number(proposalId),
+        Number(attachmentId),
+      )
+
+      if (!attachment) {
+        return next(new AppError('Attachment not found', StatusCodes.NOT_FOUND))
+      }
+
+      const uploadDir = path.resolve(process.cwd(), 'uploads', 'proposal-attachments')
+      const filePath = path.resolve(uploadDir, attachment.relativePath)
+
+      // Verify file exists and get actual file size
+      const stats = await fs.stat(filePath)
+
+      // Set proper headers for file download
+      res.setHeader('Content-Type', 'application/octet-stream')
+      res.setHeader('Content-Length', stats.size)
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${attachment.originalName.replace(/"/g, '\\"')}"`,
+      )
+
+      const fileStream = createReadStream(filePath, { highWaterMark: 64 * 1024 })
+
+      fileStream.on('error', (error) => {
+        console.error('[DOWNLOAD] File stream error:', {
+          message: error.message,
+          code: (error as NodeJS.ErrnoException).code,
+          path: filePath,
+        })
+        if (!res.headersSent) {
+          res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: 'Failed to read file',
+          })
+        } else {
+          res.end()
+        }
+      })
+
+      res.on('error', (error) => {
+        console.error('[DOWNLOAD] Response error:', {
+          message: error.message,
+          code: (error as NodeJS.ErrnoException).code,
+        })
+        fileStream.destroy()
+      })
+
+      fileStream.on('close', () => {
+        console.log('[DOWNLOAD] Stream closed for:', {
+          filename: attachment.originalName,
+          fileSize: stats.size,
+        })
+      })
+
+      fileStream.pipe(res)
+    } catch (error) {
+      console.error('[DOWNLOAD] Caught error:', error)
       next(error)
     }
   },

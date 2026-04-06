@@ -6,6 +6,62 @@ import { getStatusColor } from '../../../helpers/getStatusColor'
 
 const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) => {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
+
+  const handleDownloadAttachment = async (
+    proposalId: number,
+    attachmentId: number,
+    filename: string,
+  ) => {
+    try {
+      console.log('Starting download:', { proposalId, attachmentId, filename })
+
+      const response = await fetch(
+        `/api/proposals/${proposalId}/attachments/${attachmentId}/download`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            Accept: 'application/octet-stream',
+          },
+        },
+      )
+
+      // console.log('Response received:', {
+      //   status: response.status,
+      //   statusText: response.statusText,
+      //   contentType: response.headers.get('content-type'),
+      //   contentLength: response.headers.get('content-length'),
+      // })
+      {
+        /* TODO: refactor to use toast */
+      }
+      if (!response.ok) {
+        const text = await response.text()
+        // console.error('Download failed with response not ok:', response.status, text)
+        // alert(`Erro ao baixar: ${response.status} - ${text}`)
+        /* TODO: refactor to use toast */
+        return
+      }
+
+      const blob = await response.blob()
+      console.log('Blob received:', { size: blob.size, type: blob.type })
+
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
+      // console.log('Download triggered successfully')
+    } catch (error) {
+      /* TODO: refactor to use toast */
+      console.error('Download error:', error)
+      alert(`Erro ao baixar arquivo: ${error instanceof Error ? error.message : String(error)}`)
+    }
+  }
   return (
     <>
       <div
@@ -114,6 +170,42 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
                     Turno: {proposal.champion.shift}
                   </span>
                 </p>
+              </div>
+            </div>
+          )}
+          {proposal.attachments && proposal.attachments.length > 0 && (
+            <div>
+              <p className="text-sm font-semibold mb-2">Arquivos Anexados</p>
+              <div className="space-y-2">
+                {proposal.attachments.map((attachment) => (
+                  <div
+                    key={attachment.id}
+                    className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded p-3"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {attachment.originalName}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {(attachment.sizeBytes / 1024).toFixed(2)} KB •{' '}
+                        {new Date(attachment.uploadedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    {/* TODO: Possible Refactor */}
+                    <button
+                      onClick={() =>
+                        handleDownloadAttachment(
+                          proposal.id,
+                          attachment.id,
+                          attachment.originalName,
+                        )
+                      }
+                      className="ml-3 px-3 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors whitespace-nowrap hover:cursor-pointer"
+                    >
+                      Baixar
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           )}

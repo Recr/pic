@@ -75,6 +75,15 @@ class PrismaProposalRepository {
             // },
           },
         },
+        attachments: {
+          select: {
+            id: true,
+            storedName: true,
+            originalName: true,
+            sizeBytes: true,
+            uploadedAt: true,
+          },
+        },
       },
     })
     return proposals

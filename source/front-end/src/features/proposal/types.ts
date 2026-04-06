@@ -44,6 +44,14 @@ export interface ProposalWithSuggestions {
   }
 }
 
+export interface ProposalAttachment {
+  id: number
+  storedName: string
+  originalName: string
+  sizeBytes: number
+  uploadedAt: Date
+}
+
 export interface ProposalDetailed {
   id: number
   description: string
@@ -76,6 +84,7 @@ export interface ProposalDetailed {
   }
   champion: Employee | null
   manager: Employee | null
+  attachments: ProposalAttachment[]
 }
 
 export interface CreateProposalRequest {

@@ -10,6 +10,12 @@ export default defineConfig(({ mode }) => {
     plugins: [react(), tailwindcss()],
     server: {
       port: env.PORT ? Number(env.PORT) : 5173,
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3030',
+          changeOrigin: true,
+        },
+      },
     },
   }
 })

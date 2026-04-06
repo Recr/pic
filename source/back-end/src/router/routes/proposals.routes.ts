@@ -12,6 +12,7 @@ import {
 import { authMiddleware } from '../../middlewares/auth.middeware'
 import { checkRole } from '../../middlewares/role.middleware'
 import { Role } from '../../utils/types/employees.types'
+import { uploadProposalAttachment } from '../../middlewares/upload.middleware'
 
 const proposalsRoutes = Router()
 
@@ -38,6 +39,16 @@ proposalsRoutes.get(
   checkRole([Role.ADMIN]),
   ProposalsController.handleFindAllWithoutManager,
 )
+
+proposalsRoutes.get(
+  '/:proposalId/attachments/:attachmentId/download',
+  (req, res, next) => {
+    next()
+  },
+  authMiddleware,
+  ProposalsController.handleDownloadAttachment,
+)
+
 proposalsRoutes.get(
   '/:id',
   validate(proposalIdSchema),
@@ -67,8 +78,9 @@ proposalsRoutes.put(
 )
 proposalsRoutes.put(
   '/:id/champion-review',
-  validate(updateProposalStatusByChampionSchema),
   authMiddleware,
+  uploadProposalAttachment.array('evidenceFiles', 5),
+  validate(updateProposalStatusByChampionSchema),
   ProposalsController.handleStatusUpdate,
 )
 

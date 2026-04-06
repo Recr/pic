@@ -2,20 +2,18 @@ import { useState } from 'react'
 import Modal from '../../../components/modal/Modal'
 import StatusBadge from '../../../components/StatusBadge'
 import { proposalAPI } from '../../../features/proposal/proposal-api'
-import type {
-  FinishProposalRequest,
-  ProposalWithSuggestions,
-} from '../../../features/proposal/types'
+import type { ProposalWithSuggestions } from '../../../features/proposal/types'
 import { getStatusColor } from '../../../helpers/getStatusColor'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type z from 'zod'
-import { finishProposalSchema } from '../../../validation/schemas/proposal-schemas'
+import { getFinishProposalSchema } from '../../../validation/schemas/proposal-schemas'
 
 const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
   const [proposalChampionReview] = proposalAPI.useProposalChampionReviewMutation()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
+  const finishProposalSchema = getFinishProposalSchema(proposal.isCustomReward)
 
   type FinishProposalImplementationInputSchema = z.input<typeof finishProposalSchema>
   type FinishProposalImplementationOutputSchema = z.output<typeof finishProposalSchema>
@@ -34,14 +32,26 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
 
   const onSubmit: SubmitHandler<FinishProposalImplementationOutputSchema> = async ({
     customRewardAmount,
+    evidenceFiles,
   }) => {
     try {
-      const data: FinishProposalRequest = { status: 'IMPLEMENTED' }
-      if (customRewardAmount !== undefined) data.customRewardAmount = customRewardAmount
+      const formData = new FormData()
+      formData.append('status', 'IMPLEMENTED')
+
+      if (customRewardAmount !== undefined) {
+        formData.append('customRewardAmount', String(customRewardAmount))
+      }
+
+      if (evidenceFiles && evidenceFiles.length > 0) {
+        evidenceFiles.forEach((file) => {
+          formData.append('evidenceFiles', file)
+        })
+      }
+      console.log(formData.getAll('evidenceFiles'))
 
       await proposalChampionReview({
         proposalId: proposal.id.toString(),
-        data,
+        data: formData as any,
       }).unwrap()
       setIsConfirmationModalOpen(false)
     } catch (error) {
@@ -102,8 +112,9 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
         <form>
           {proposal.isCustomReward && (
             <div className="flex flex-col">
-              <label htmlFor="">Valor do prêmio</label>
+              <label htmlFor="customRewardAmount">Valor do prêmio</label>
               <input
+                id="customRewardAmount"
                 type="text"
                 inputMode="decimal"
                 onClick={(e) => e.stopPropagation()}
@@ -112,6 +123,18 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
               />
             </div>
           )}
+          <div className="flex flex-col mt-3">
+            <label htmlFor="rewardAttachment">A3 ou (e) Antes e Depois</label>
+            <input
+              id="rewardAttachment"
+              type="file"
+              accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xlsx,.xls"
+              onClick={(e) => e.stopPropagation()}
+              className="bg-gray-100 border border-gray-400 rounded-2xl px-4 py-2"
+              multiple={true}
+              {...register('evidenceFiles')}
+            />
+          </div>
           <div className="flex gap-2 items-center pt-4 " onClick={(e) => e.stopPropagation()}>
             <button
               type="button"
@@ -203,6 +226,9 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
           </div>
           {errors.customRewardAmount && (
             <span className="text-xs text-red-600">{errors.customRewardAmount.message}</span>
+          )}
+          {errors.evidenceFiles && (
+            <span className="text-xs text-red-600">{errors.evidenceFiles.message}</span>
           )}
         </div>
       </Modal>

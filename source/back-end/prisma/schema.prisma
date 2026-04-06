@@ -69,6 +69,7 @@ model Proposal {
   champion    Employee?    @relation("ChampionReviewProposal", fields: [championId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   manager     Employee?    @relation("ManagerReviewProposal", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   suggestions Suggestion[]
+  attachments ProposalAttachment[]
 
   @@map("proposal")
 }
@@ -113,4 +114,18 @@ model RefreshToken {
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("refresh_token")
+}
+
+model ProposalAttachment {
+  id          Int      @id @default(autoincrement())
+  proposalId  Int      @map("proposal_id")
+  relativePath    String   @map("relative_path") @db.NVarChar(255)
+  storedName    String   @map("stored_name") @db.NVarChar(255)
+  originalName String   @map("original_name") @db.NVarChar(255)
+  sizeBytes   Int      @map("size_bytes")
+  uploadedAt  DateTime @default(now()) @map("uploaded_at") @db.DateTime2
+
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("proposal_attachment")
 }

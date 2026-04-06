@@ -75,6 +75,6 @@ export const updateProposalStatusByChampionSchema = z.object({
       'IMPLEMENTATION',
       'IMPLEMENTED',
     ]),
-    customRewardAmount: z.number().positive().optional(),
+    customRewardAmount: z.coerce.number().positive().optional(),
   }),
 })
