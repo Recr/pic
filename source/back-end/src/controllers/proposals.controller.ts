@@ -196,6 +196,7 @@ export const ProposalsController = {
   async handleAdminRejection(req: Request, res: Response, next: NextFunction) {
     try {
       const proposalId = Number(req.params.id)
+      const rejectionNote = String(req.query.rejectionNote ?? '')
       const proposalUseCase = new ProposalsUseCase(
         new PrismaProposalRepository(),
         new PrismaEmployeeRepository(),
@@ -203,7 +204,32 @@ export const ProposalsController = {
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
       )
-      const updatedProposal = await proposalUseCase.executeAdminRejection(proposalId)
+      const updatedProposal = await proposalUseCase.executeAdminRejection(proposalId, rejectionNote)
+      res.send(updatedProposal)
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  async handleRejectProposal(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalId = Number(req.params.id)
+      const userId = Number(req.user?.sub)
+      const rejectionNote = String(req.query.rejectionNote ?? '')
+
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
+      )
+
+      const updatedProposal = await proposalUseCase.executeRejectProposal(
+        proposalId,
+        userId,
+        rejectionNote,
+      )
       res.send(updatedProposal)
     } catch (error) {
       next(error)
@@ -226,6 +252,7 @@ export const ProposalsController = {
         proposalId,
         data.status,
         data.customRewardAmount,
+        data.rejectionNote,
         evidenceFiles,
       )
       res.send(updatedProposal)

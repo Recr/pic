@@ -114,6 +114,7 @@ export interface AdminUpdateProposalWithChampionRequest extends UpdateProposalWi
 export interface FinishProposalRequest {
   status: string
   customRewardAmount?: number
+  rejectionNote?: string
 }
 
 export interface UpdateProposalNotesRequest {

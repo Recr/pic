@@ -3,6 +3,7 @@ import { ProposalsController } from '../../controllers/proposals.controller'
 import { validate } from '../../middlewares/validation.middleware'
 import {
   adminUpdateProposalWithChampion,
+  adminRejectionSchema,
   createProposalSchema,
   proposalIdSchema,
   updateProposalNotesByChampionSchema,
@@ -71,6 +72,12 @@ proposalsRoutes.put(
   ProposalsController.handleDefineChampion,
 )
 proposalsRoutes.put(
+  '/:id/reject',
+  validate(adminRejectionSchema),
+  authMiddleware,
+  ProposalsController.handleRejectProposal,
+)
+proposalsRoutes.put(
   '/:id/define-manager',
   validate(updateProposalWithManager),
   authMiddleware,
@@ -94,7 +101,7 @@ proposalsRoutes.put(
 
 proposalsRoutes.put(
   '/:id/admin-rejection',
-  validate(proposalIdSchema),
+  validate(adminRejectionSchema),
   authMiddleware,
   checkRole([Role.ADMIN]),
   ProposalsController.handleAdminRejection,

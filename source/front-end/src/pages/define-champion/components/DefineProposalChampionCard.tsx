@@ -68,9 +68,12 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableC
 
   const [updateProposal, { isLoading }] = proposalAPI.useUpdateProposalWithChampionMutation()
   const [rejectProposal, { isLoading: isRejecting }] =
-    proposalAPI.useRejectProposalAsAdminMutation()
+    proposalAPI.useRejectProposalAsManagerMutation()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isRejectionModalOpen, setIsRejectionModalOpen] = useState(false)
+  const [rejectionNote, setRejectionNote] = useState('')
+  const [rejectionNoteError, setRejectionNoteError] = useState<string | null>(null)
 
   const onSubmit = async (data: UpdateProposalFormOutput) => {
     try {
@@ -87,9 +90,12 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableC
     shift: suggestion.employee ? suggestion.employee.shift : suggestion.employeeShift,
   }))
 
-  const handleReject = async () => {
+  const handleReject = async (note: string) => {
     try {
-      await rejectProposal({ proposalId: proposal.id.toString() }).unwrap()
+      await rejectProposal({
+        proposalId: proposal.id.toString(),
+        rejectionNote: note,
+      }).unwrap()
       console.log('Proposal rejected:', proposal.id)
     } catch (error) {
       console.error('Failed to reject proposal:', error)
@@ -175,7 +181,11 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableC
             </button>
             <button
               type="button"
-              onClick={handleReject}
+              onClick={() => {
+                setRejectionNote('')
+                setRejectionNoteError(null)
+                setIsRejectionModalOpen(true)
+              }}
               disabled={isLoading || isRejecting}
               className="py-2 px-3 cursor-pointer rounded border bg-red-500 text-white w-1/2 hover:cursor-pointer hover:bg-red-700 transition-colors"
             >
@@ -237,6 +247,49 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableC
                 </p>
               ))}
             </div>
+          </div>
+        </div>
+      </Modal>
+      <Modal isOpen={isRejectionModalOpen} onClose={() => setIsRejectionModalOpen(false)}>
+        <div className="w-100 max-w-[95vw] p-6 space-y-4">
+          <h2 className="text-lg font-semibold">Informar motivo da rejeicao</h2>
+          <p className="text-gray-700">Descreva o motivo para rejeitar esta proposta.</p>
+          <textarea
+            value={rejectionNote}
+            onChange={(event) => {
+              setRejectionNote(event.target.value)
+              if (rejectionNoteError) setRejectionNoteError(null)
+            }}
+            rows={4}
+            maxLength={1000}
+            className="w-full rounded border border-gray-300 p-3"
+            placeholder="Digite o motivo da rejeicao"
+          />
+          {rejectionNoteError && <p className="text-sm text-red-600">{rejectionNoteError}</p>}
+          <div className="flex gap-3 justify-end">
+            <button
+              type="button"
+              onClick={() => setIsRejectionModalOpen(false)}
+              className="py-2 px-4 cursor-pointer rounded border border-gray-300 bg-gray-100 hover:bg-gray-200 text-gray-800 transition-all"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={async () => {
+                const normalizedRejectionNote = rejectionNote.trim()
+                if (!normalizedRejectionNote) {
+                  setRejectionNoteError('Informe o motivo da rejeicao.')
+                  return
+                }
+
+                await handleReject(normalizedRejectionNote)
+                setIsRejectionModalOpen(false)
+              }}
+              className="py-2 px-4 cursor-pointer rounded border border-[#c0392b] bg-[#e74c3c] hover:bg-[#c0392b] text-white transition-all"
+            >
+              Confirmar rejeicao
+            </button>
           </div>
         </div>
       </Modal>

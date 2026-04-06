@@ -63,22 +63,36 @@ export const updateProposalWithManager = z.object({
   }),
 })
 
-export const updateProposalStatusByChampionSchema = z.object({
-  params: z.object({
-    id: z.coerce.number(),
-  }),
-  body: z.object({
-    status: z.enum([
-      'TO_IMPLEMENT',
-      'REJECTED',
-      'UNDER_VALIDATION',
-      'NOT_VIABLE',
-      'IMPLEMENTATION',
-      'IMPLEMENTED',
-    ]),
-    customRewardAmount: z.coerce.number().positive().optional(),
-  }),
-})
+export const updateProposalStatusByChampionSchema = z
+  .object({
+    params: z.object({
+      id: z.coerce.number(),
+    }),
+    body: z.object({
+      status: z.enum([
+        'TO_IMPLEMENT',
+        'REJECTED',
+        'UNDER_VALIDATION',
+        'NOT_VIABLE',
+        'IMPLEMENTATION',
+        'IMPLEMENTED',
+      ]),
+      customRewardAmount: z.coerce.number().positive().optional(),
+      rejectionNote: z.string().max(1000).optional(),
+    }),
+  })
+  .superRefine(({ body }, ctx) => {
+    if (
+      (body.status === 'REJECTED' || body.status === 'NOT_VIABLE') &&
+      !body.rejectionNote?.trim()
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['body', 'rejectionNote'],
+        message: 'Rejection note is required when status is REJECTED or NOT_VIABLE.',
+      })
+    }
+  })
 
 export const updateProposalNotesByChampionSchema = z.object({
   params: z.object({
@@ -86,5 +100,14 @@ export const updateProposalNotesByChampionSchema = z.object({
   }),
   body: z.object({
     notes: z.string().max(1000).optional(),
+  }),
+})
+
+export const adminRejectionSchema = z.object({
+  params: z.object({
+    id: z.coerce.number(),
+  }),
+  query: z.object({
+    rejectionNote: z.string().trim().min(1, 'Rejection note is required.').max(1000),
   }),
 })

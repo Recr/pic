@@ -143,9 +143,27 @@ export const proposalAPI = api.injectEndpoints({
         { type: 'Proposal', id: 'LIST' },
       ],
     }),
-    rejectProposalAsAdmin: builder.mutation<Proposal, { proposalId: string }>({
-      query: ({ proposalId }) => ({
-        url: `/proposals/${proposalId}/admin-rejection`,
+    rejectProposalAsAdmin: builder.mutation<
+      Proposal,
+      { proposalId: string; rejectionNote: string }
+    >({
+      query: ({ proposalId, rejectionNote }) => ({
+        url: `/proposals/${proposalId}/admin-rejection?rejectionNote=${encodeURIComponent(
+          rejectionNote,
+        )}`,
+        method: 'PUT',
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
+    rejectProposalAsManager: builder.mutation<
+      Proposal,
+      { proposalId: string; rejectionNote: string }
+    >({
+      query: ({ proposalId, rejectionNote }) => ({
+        url: `/proposals/${proposalId}/reject?rejectionNote=${encodeURIComponent(rejectionNote)}`,
         method: 'PUT',
       }),
       invalidatesTags: (_result, _error, { proposalId }) => [

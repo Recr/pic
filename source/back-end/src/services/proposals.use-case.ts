@@ -161,6 +161,7 @@ class ProposalsUseCase {
     proposalId: number,
     newStatus: string,
     customRewardAmount?: number,
+    rejectionNote?: string,
     files?: Express.Multer.File[],
   ) {
     const proposal = await this.proposalRepository.findById(proposalId)
@@ -169,6 +170,17 @@ class ProposalsUseCase {
 
     if (newStatus == 'TO_IMPLEMENT' || newStatus == 'NOT_VIABLE' || newStatus == 'REJECTED') {
       updatedData.championReviewedAt = new Date()
+
+      if (newStatus === 'REJECTED' || newStatus === 'NOT_VIABLE') {
+        const normalizedRejectionNote = rejectionNote?.trim()
+        if (!normalizedRejectionNote) {
+          throw new AppError(
+            'Rejection note is required for rejected or not viable proposals.',
+            StatusCodes.BAD_REQUEST,
+          )
+        }
+        updatedData.rejectionNote = normalizedRejectionNote
+      }
     } else if (newStatus == 'IMPLEMENTATION') {
       updatedData.implementationStartedAt = new Date()
     } else if (newStatus == 'IMPLEMENTED') {
@@ -248,13 +260,32 @@ class ProposalsUseCase {
     return updatedProposal
   }
 
-  public async executeAdminRejection(proposalId: number) {
+  public async executeAdminRejection(proposalId: number, rejectionNote: string) {
     const proposal = await this.proposalRepository.findById(proposalId)
     if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
     const updatedData: Prisma.ProposalUpdateInput = {
       adminReviewedAt: new Date(),
       status: 'REJECTED',
+      rejectionNote: rejectionNote.trim(),
     }
+    const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
+    return updatedProposal
+  }
+
+  public async executeRejectProposal(proposalId: number, userId: number, rejectionNote: string) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+
+    if (proposal.managerId !== userId) {
+      throw new AppError('Unauthorized to reject this proposal.', StatusCodes.FORBIDDEN)
+    }
+
+    const updatedData: Prisma.ProposalUpdateInput = {
+      adminReviewedAt: new Date(),
+      status: 'REJECTED',
+      rejectionNote: rejectionNote.trim(),
+    }
+
     const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
     return updatedProposal
   }
