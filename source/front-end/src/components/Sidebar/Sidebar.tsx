@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   Blocks,
+  ChartArea,
 } from 'lucide-react'
 import { useNavigate } from 'react-router'
 import SideBarItem from './SidebarItem'
@@ -88,6 +89,12 @@ const Sidebar: React.FC = () => {
       label: 'Pagamentos',
       path: '/payouts',
       allowedRoles: ['ADMIN', 'HUMAN_RESOURCES'],
+    },
+    {
+      icon: <ChartArea />,
+      label: 'Relatórios',
+      path: '/analytics',
+      allowedRoles: ['ADMIN'],
     },
     { icon: <LogOut />, label: 'Sair', path: '/logout' },
   ]

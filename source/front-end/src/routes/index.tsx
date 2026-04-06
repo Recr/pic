@@ -19,6 +19,7 @@ import PasswordResetPage from '../pages/password-reset/PasswordResetPage'
 import DefineManager from '../pages/define-manager'
 import DefineChampion from '../pages/define-champion'
 import Categories from '../pages/categories'
+import AnalyticsPage from '../pages/analytics'
 
 const AppShell: React.FC = () => {
   const isLoggedin = useSelector((state: RootState) => state.auth.isLoggedin)
@@ -120,6 +121,14 @@ const AppShell: React.FC = () => {
             element={
               <PrivateRoute>
                 <PasswordChangePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/analytics"
+            element={
+              <PrivateRoute>
+                <AnalyticsPage />
               </PrivateRoute>
             }
           />
