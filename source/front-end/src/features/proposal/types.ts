@@ -24,6 +24,7 @@ export interface ProposalWithSuggestions {
   description: string
   status: string
   createdAt: Date
+  notes?: string | null
   managerNotes?: string | null
   isCustomReward: boolean
   suggestions: [
@@ -113,4 +114,8 @@ export interface AdminUpdateProposalWithChampionRequest extends UpdateProposalWi
 export interface FinishProposalRequest {
   status: string
   customRewardAmount?: number
+}
+
+export interface UpdateProposalNotesRequest {
+  notes?: string
 }

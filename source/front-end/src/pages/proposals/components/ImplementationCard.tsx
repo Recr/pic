@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Modal from '../../../components/modal/Modal'
 import StatusBadge from '../../../components/StatusBadge'
 import { proposalAPI } from '../../../features/proposal/proposal-api'
@@ -11,8 +11,13 @@ import { getFinishProposalSchema } from '../../../validation/schemas/proposal-sc
 
 const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
   const [proposalChampionReview] = proposalAPI.useProposalChampionReviewMutation()
+  const [updateChampionNotes] = proposalAPI.useUpdateChampionNotesMutation()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
+  const [note, setNote] = useState(proposal.notes ?? '')
+  const [isSavingNote, setIsSavingNote] = useState(false)
+  const [noteSaveError, setNoteSaveError] = useState<string | null>(null)
+  const lastSavedNoteRef = useRef(proposal.notes ?? '')
   const finishProposalSchema = getFinishProposalSchema(proposal.isCustomReward)
 
   type FinishProposalImplementationInputSchema = z.input<typeof finishProposalSchema>
@@ -21,7 +26,7 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
   const {
     handleSubmit,
     register,
-    getValues,
+    watch,
     formState: { errors },
   } = useForm<
     FinishProposalImplementationInputSchema,
@@ -30,6 +35,38 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
   >({
     resolver: zodResolver(finishProposalSchema),
   })
+
+  const watchedCustomRewardAmount = watch('customRewardAmount')
+  const watchedEvidenceFiles = watch('evidenceFiles') as FileList | undefined
+
+  useEffect(() => {
+    setNote(proposal.notes ?? '')
+    lastSavedNoteRef.current = proposal.notes ?? ''
+  }, [proposal.id, proposal.notes])
+
+  useEffect(() => {
+    if (note === lastSavedNoteRef.current) {
+      return
+    }
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        setIsSavingNote(true)
+        setNoteSaveError(null)
+        await updateChampionNotes({
+          proposalId: proposal.id.toString(),
+          body: { notes: note },
+        }).unwrap()
+        lastSavedNoteRef.current = note
+      } catch (_error) {
+        setNoteSaveError('Nao foi possivel salvar a nota automaticamente.')
+      } finally {
+        setIsSavingNote(false)
+      }
+    }, 700)
+
+    return () => clearTimeout(timeoutId)
+  }, [note, proposal.id, updateChampionNotes])
 
   const onSubmit: SubmitHandler<FinishProposalImplementationOutputSchema> = async ({
     customRewardAmount,
@@ -141,6 +178,22 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
               {...register('evidenceFiles')}
             />
           </div>
+          <div className="flex flex-col mt-3" onClick={(e) => e.stopPropagation()}>
+            <label htmlFor={`proposal-note-${proposal.id}`}>Notas da implementacao</label>
+            <textarea
+              id={`proposal-note-${proposal.id}`}
+              rows={4}
+              value={note}
+              onChange={(event) => setNote(event.target.value)}
+              className="bg-gray-100 border border-gray-400 rounded-2xl px-4 py-2"
+              placeholder="Digite observacoes da implementacao"
+              maxLength={1000}
+            />
+            <span className="text-xs text-gray-500 mt-1">
+              {isSavingNote ? 'Salvando nota...' : 'A nota e salva automaticamente.'}
+            </span>
+            {noteSaveError && <span className="text-xs text-red-600">{noteSaveError}</span>}
+          </div>
           <div className="flex gap-2 items-center pt-4 " onClick={(e) => e.stopPropagation()}>
             <button
               type="button"
@@ -223,20 +276,24 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
           <p className="text-gray-700">
             Tem <strong>certeza</strong> que deseja marcar esta proposta como concluída?
           </p>
-          <div className="text-gray-700 border p-2 rounded-xl border-gray-200 hover:shadow-md transition-all">
-            <span>Confira os detalhes:</span>
-            <p className="text-xs mt-2 bg-gray-100 rounded p-2">
-              Valor da recompensa: R$ {Number(getValues('customRewardAmount')).toFixed(2)}
-            </p>
-            <p className="text-xs mt-2 bg-gray-100 rounded p-2">
-              Evidências:{' '}
-              {getValues('evidenceFiles') && (getValues('evidenceFiles') as FileList).length > 0 ? (
-                <span>{(getValues('evidenceFiles') as FileList).length} arquivo(s)</span>
-              ) : (
-                <span>Nenhuma evidência adicionada</span>
+          {(watchedCustomRewardAmount || (watchedEvidenceFiles?.length ?? 0) > 0) && (
+            <div className="text-gray-700 border p-2 rounded-xl border-gray-200 hover:shadow-md transition-all">
+              <span>Confira os detalhes:</span>
+              {watchedCustomRewardAmount !== undefined && (
+                <p className="text-xs mt-2 bg-gray-100 rounded p-2">
+                  Valor da recompensa: R$ {Number(watchedCustomRewardAmount ?? 0).toFixed(2)}
+                </p>
               )}
-            </p>
-          </div>
+              <p className="text-xs mt-2 bg-gray-100 rounded p-2">
+                Evidências:{' '}
+                {(watchedEvidenceFiles?.length ?? 0) > 0 ? (
+                  <span>{watchedEvidenceFiles?.length} arquivo(s)</span>
+                ) : (
+                  <span>Nenhuma evidência adicionada</span>
+                )}
+              </p>
+            </div>
+          )}
           <div className="flex gap-3 justify-end">
             <button
               type="button"

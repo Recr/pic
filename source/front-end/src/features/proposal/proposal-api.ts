@@ -1,6 +1,7 @@
 import type {
   AdminUpdateProposalWithChampionRequest,
   CreateProposalRequest,
+  UpdateProposalNotesRequest,
   Proposal,
   ProposalDetailed,
   ProposalWithSuggestions,
@@ -122,6 +123,20 @@ export const proposalAPI = api.injectEndpoints({
         url: `/proposals/${proposalId}/champion-review`,
         method: 'PUT',
         body: data,
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
+    updateChampionNotes: builder.mutation<
+      Proposal,
+      { proposalId: string; body: UpdateProposalNotesRequest }
+    >({
+      query: ({ proposalId, body }) => ({
+        url: `/proposals/${proposalId}/champion-notes`,
+        method: 'PUT',
+        body,
       }),
       invalidatesTags: (_result, _error, { proposalId }) => [
         { type: 'Proposal', id: Number(proposalId) },

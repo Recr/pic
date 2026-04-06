@@ -234,6 +234,31 @@ export const ProposalsController = {
     }
   },
 
+  async handleUpdateChampionNotes(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalId = Number(req.params.id)
+      const userId = Number(req.user?.sub)
+      const data = req.body
+
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
+      )
+
+      const updatedProposal = await proposalUseCase.executeUpdateChampionNotes(
+        proposalId,
+        data,
+        userId,
+      )
+      res.send(updatedProposal)
+    } catch (error) {
+      next(error)
+    }
+  },
+
   async handleDownloadAttachment(req: Request, res: Response, next: NextFunction) {
     try {
       const { proposalId, attachmentId } = req.params

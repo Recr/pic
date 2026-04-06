@@ -33,3 +33,7 @@ export interface UpdateProposalWithManager extends UpdateProposal {
 export interface UpdateProposalStatus {
   status: 'TO_IMPLEMENT' | 'REJECTED' | 'UNDER_VALIDATION' | 'NOT_VIABLE'
 }
+
+export interface UpdateProposalNotes {
+  notes?: string
+}

@@ -5,6 +5,7 @@ import {
   adminUpdateProposalWithChampion,
   createProposalSchema,
   proposalIdSchema,
+  updateProposalNotesByChampionSchema,
   updateProposalStatusByChampionSchema,
   updateProposalWithChampion,
   updateProposalWithManager,
@@ -82,6 +83,13 @@ proposalsRoutes.put(
   uploadProposalAttachment.array('evidenceFiles', 5),
   validate(updateProposalStatusByChampionSchema),
   ProposalsController.handleStatusUpdate,
+)
+
+proposalsRoutes.put(
+  '/:id/champion-notes',
+  authMiddleware,
+  validate(updateProposalNotesByChampionSchema),
+  ProposalsController.handleUpdateChampionNotes,
 )
 
 proposalsRoutes.put(

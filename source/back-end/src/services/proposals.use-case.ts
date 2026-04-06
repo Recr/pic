@@ -5,6 +5,7 @@ import {
   CreateProposalInput,
   CreateProposalWithSuggestions,
   EmployeeInfo,
+  UpdateProposalNotes,
   UpdateProposalWithChampion,
   UpdateProposalWithManager,
 } from '../utils/types/proposals.types'
@@ -223,6 +224,26 @@ class ProposalsUseCase {
     } else {
       throw new AppError('Invalid Status.', StatusCodes.BAD_REQUEST)
     }
+    const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
+    return updatedProposal
+  }
+
+  public async executeUpdateChampionNotes(
+    proposalId: number,
+    data: UpdateProposalNotes,
+    userId: number,
+  ) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+
+    if (proposal.championId !== userId) {
+      throw new AppError('Unauthorized to update notes for this proposal.', StatusCodes.FORBIDDEN)
+    }
+
+    const updatedData: Prisma.ProposalUpdateInput = {
+      notes: data.notes?.trim() || null,
+    }
+
     const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
     return updatedProposal
   }

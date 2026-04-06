@@ -79,3 +79,12 @@ export const updateProposalStatusByChampionSchema = z.object({
     customRewardAmount: z.coerce.number().positive().optional(),
   }),
 })
+
+export const updateProposalNotesByChampionSchema = z.object({
+  params: z.object({
+    id: z.coerce.number(),
+  }),
+  body: z.object({
+    notes: z.string().max(1000).optional(),
+  }),
+})

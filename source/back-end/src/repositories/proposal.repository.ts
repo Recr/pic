@@ -115,6 +115,7 @@ class PrismaProposalRepository {
         description: true,
         status: true,
         createdAt: true,
+        notes: true,
         managerNotes: true,
         isCustomReward: true,
         suggestions: {
