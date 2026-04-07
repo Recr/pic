@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import * as XLSX from 'xlsx'
 import { payoutAPI } from '../../features/payout/payout-api'
 import type { PayoutStatus } from '../../features/payout/types'
 import PayoutItem from './components/PayoutItem'
@@ -37,6 +38,30 @@ const PayoutList: React.FC = () => {
 
   const canUpdate = selectedPayoutIds.length > 0 && !isUpdatingStatus
 
+  const handleExportExcel = () => {
+    if (!payoutData || payoutData.length === 0) return
+
+    const rows = payoutData.map((payout) => ({
+      ID: payout.id,
+      PropostaID: payout.suggestion.proposal.id,
+      Proposta: payout.suggestion.proposal.description,
+      Colaborador: payout.suggestion.employeeName,
+      RE: payout.suggestion.employeeRe,
+      Turno: payout.suggestion.employeeShift,
+      DataCriacao: new Date(payout.createdAt).toLocaleDateString('pt-BR'),
+      Valor: payout.value,
+      Status: payout.status,
+      DataPagamento: payout.payedAt ? new Date(payout.payedAt).toLocaleDateString('pt-BR') : '',
+    }))
+
+    const worksheet = XLSX.utils.json_to_sheet(rows)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pagamentos')
+
+    const dateTag = new Date().toISOString().slice(0, 10)
+    XLSX.writeFile(workbook, `pagamentos-${dateTag}.xlsx`)
+  }
+
   return (
     <>
       <div className="text-left text-2xl font-semibold my-4 mx-4">Lista de Pagamentos</div>
@@ -63,6 +88,14 @@ const PayoutList: React.FC = () => {
           {isUpdatingStatus
             ? 'Atualizando...'
             : `Atualizar selecionados (${selectedPayoutIds.length})`}
+        </button>
+        <button
+          type="button"
+          onClick={handleExportExcel}
+          disabled={!payoutData || payoutData.length === 0}
+          className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white rounded px-3 py-1.5 text-sm cursor-pointer disabled:cursor-not-allowed"
+        >
+          Exportar Excel
         </button>
       </div>
       <div className="flex justify-center flex-col">
