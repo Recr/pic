@@ -129,3 +129,14 @@ model ProposalAttachment {
 
   @@map("proposal_attachment")
 }
+
+model AnnualTarget {
+  id Int @id @default(autoincrement())
+  annualSubmittedProposalsTarget Int @map("annual_submited_proposals_target")
+  annualImplementedProposalsTarget Int @map("annual_implemented_proposals_target")
+  annualHeadCount Int @map("annual_head_count")
+  communicationDaysTarget Int @map("communication_days_target")
+  year Int @map("year") @unique
+
+  @@map("annual_target")
+}

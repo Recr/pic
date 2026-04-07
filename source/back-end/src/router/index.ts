@@ -8,6 +8,7 @@ import { authRoutes } from './routes/auth.routes'
 import { authMiddleware } from '../middlewares/auth.middeware'
 import { payoutRoutes } from './routes/payout.routes'
 import { analyticsRoutes } from './routes/analytics.routes'
+import { annualTargetRoutes } from './routes/annual-targets.routes'
 
 const appRoutes = Router()
 
@@ -18,6 +19,7 @@ appRoutes.use('/proposals', proposalsRoutes)
 appRoutes.use('/auth', authRoutes)
 appRoutes.use('/payouts', payoutRoutes)
 appRoutes.use('/analytics', analyticsRoutes)
+appRoutes.use('/annual-targets', annualTargetRoutes)
 appRoutes.use(errorHandler)
 
 export { appRoutes }
