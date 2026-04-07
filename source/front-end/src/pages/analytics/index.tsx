@@ -1,32 +1,10 @@
 import { useState } from 'react'
-import {
-  CategoryScale,
-  Chart as ChartJS,
-  Filler,
-  Legend,
-  LineElement,
-  LinearScale,
-  PointElement,
-  Title,
-  Tooltip,
-} from 'chart.js'
 import { Pen, Trash2 } from 'lucide-react'
 import { annualTargetAPI } from '../../features/annual-target/annual-target-api'
 import Modal from '../../components/modal/Modal'
 import AnnualSubmissionAndTarget from './components/AnnualSubmissionAndTarget'
 import AnnualImplementationAndTarget from './components/AnnualImplementationAndTarget'
 import SubmittedProposalsFiltered from './components/SubmittedProposalsFiltered'
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-)
 
 const currentYear = new Date().getFullYear()
 
@@ -114,7 +92,7 @@ const AnalyticsPage: React.FC = () => {
 
   return (
     <div className="bg-gray-100 pt-8 min-h-screen">
-      <div className="p-4 w-2xl mx-auto bg-white rounded">
+      <div className="mx-auto w-full max-w-7xl rounded bg-white p-4">
         <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
         <p>Métrica e KPIs do PIC.</p>
         <div className="mt-4 rounded border border-gray-200 bg-gray-50 p-3">
@@ -144,9 +122,17 @@ const AnalyticsPage: React.FC = () => {
             </button>
           </div>
         </div>
-        <AnnualSubmissionAndTarget />
-        <AnnualImplementationAndTarget />
-        <SubmittedProposalsFiltered />
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="rounded border border-gray-200 bg-gray-50 p-4 shadow-sm">
+            <AnnualSubmissionAndTarget />
+          </div>
+          <div className="rounded border border-gray-200 bg-gray-50 p-4 shadow-sm">
+            <AnnualImplementationAndTarget />
+          </div>
+          <div className="rounded border border-gray-200 bg-gray-50 p-4 shadow-sm lg:col-span-2">
+            <SubmittedProposalsFiltered />
+          </div>
+        </div>
       </div>
       <Modal isOpen={isAnnualTargetModalOpen} onClose={() => setIsAnnualTargetModalOpen(false)}>
         <div className="w-[90vw] max-w-4xl rounded-lg bg-white p-2">

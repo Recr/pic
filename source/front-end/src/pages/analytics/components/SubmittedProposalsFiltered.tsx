@@ -9,13 +9,13 @@ const DEFAULT_START_DATE = `${currentYear}-01-01`
 const DEFAULT_END_DATE = `${currentYear}-12-31`
 
 const STATUS_OPTIONS = [
-  'DEFINE_CHAMPION',
-  'UNDER_VALIDATION',
-  'TO_IMPLEMENT',
-  'IMPLEMENTATION',
-  'IMPLEMENTED',
-  'REJECTED',
-  'NOT_VIABLE',
+  { value: 'DEFINE_CHAMPION', label: 'Definir Executor' },
+  { value: 'UNDER_VALIDATION', label: 'Em validação' },
+  { value: 'TO_IMPLEMENT', label: 'Para implementar' },
+  { value: 'IMPLEMENTATION', label: 'Em implementação' },
+  { value: 'IMPLEMENTED', label: 'Implementada' },
+  { value: 'REJECTED', label: 'Rejeitada' },
+  { value: 'NOT_VIABLE', label: 'Inviável' },
 ]
 
 const SubmittedProposalsFiltered: React.FC = () => {
@@ -54,8 +54,8 @@ const SubmittedProposalsFiltered: React.FC = () => {
           >
             <option value="">Tudo</option>
             {STATUS_OPTIONS.map((statusOption) => (
-              <option key={statusOption} value={statusOption}>
-                {statusOption}
+              <option key={statusOption.value} value={statusOption.value}>
+                {statusOption.label}
               </option>
             ))}
           </select>
