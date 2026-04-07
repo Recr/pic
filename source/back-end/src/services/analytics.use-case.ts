@@ -8,6 +8,9 @@ interface GetProposalAnalyticsFilters {
   statuses?: string[]
   startDate?: Date
   endDate?: Date
+  category?: string
+  categoryId?: number
+  areaId?: number
 }
 
 interface ProposalAnalyticsResponse {
@@ -123,6 +126,9 @@ class AnalyticsUseCase {
       filters?.statuses,
       filters?.startDate,
       filters?.endDate,
+      filters?.category,
+      filters?.categoryId,
+      filters?.areaId,
     )
 
     const proposalDates = proposals.map((proposal) => proposal.createdAt)

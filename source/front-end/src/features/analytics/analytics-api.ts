@@ -4,6 +4,9 @@ export interface GetProposalAnalyticsFilters {
   status?: string
   startDate?: string
   endDate?: string
+  category?: string
+  categoryId?: number
+  areaId?: number
 }
 
 export interface ProposalAnalyticsResponse {
@@ -31,6 +34,18 @@ export const analyticsAPI = api.injectEndpoints({
 
         if (filters?.endDate) {
           params.set('endDate', filters.endDate)
+        }
+
+        if (filters?.category) {
+          params.set('category', filters.category)
+        }
+
+        if (filters?.categoryId) {
+          params.set('categoryId', String(filters.categoryId))
+        }
+
+        if (filters?.areaId) {
+          params.set('areaId', String(filters.areaId))
         }
 
         const queryString = params.toString()

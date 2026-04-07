@@ -46,10 +46,37 @@ export const AnalyticsController = {
       const statuses = getQueryStringArray(req.query.status)
       const startDate = parseDateQuery(req.query.startDate, 'startDate')
       const endDate = parseDateQuery(req.query.endDate, 'endDate')
+      const category = typeof req.query.category === 'string' ? req.query.category.trim() : ''
+      const categoryId =
+        typeof req.query.categoryId === 'string' && req.query.categoryId.trim() !== ''
+          ? Number(req.query.categoryId)
+          : undefined
+      const areaId =
+        typeof req.query.areaId === 'string' && req.query.areaId.trim() !== ''
+          ? Number(req.query.areaId)
+          : undefined
+
+      if (categoryId !== undefined && Number.isNaN(categoryId)) {
+        throw new AppError(
+          'Invalid categoryId query parameter. Use a valid number.',
+          StatusCodes.BAD_REQUEST,
+        )
+      }
+
+      if (areaId !== undefined && Number.isNaN(areaId)) {
+        throw new AppError(
+          'Invalid areaId query parameter. Use a valid number.',
+          StatusCodes.BAD_REQUEST,
+        )
+      }
+
       const filters = {
         ...(statuses.length > 0 ? { statuses } : {}),
         ...(startDate ? { startDate } : {}),
         ...(endDate ? { endDate } : {}),
+        ...(category ? { category } : {}),
+        ...(categoryId !== undefined ? { categoryId } : {}),
+        ...(areaId !== undefined ? { areaId } : {}),
       }
 
       const analytics = await analyticsUseCase.executeGetProposalAnalytics(filters)

@@ -8,10 +8,32 @@ class PrismaProposalRepository {
     return proposals
   }
 
-  public async findAllFiltered(statuses?: string[], startDate?: Date, endDate?: Date) {
+  public async findAllFiltered(
+    statuses?: string[],
+    startDate?: Date,
+    endDate?: Date,
+    category?: string,
+    categoryId?: number,
+    areaId?: number,
+  ) {
     const where: Prisma.ProposalWhereInput = {}
     if (statuses) {
       where.status = { in: statuses }
+    }
+    if (categoryId !== undefined) {
+      where.categoryId = categoryId
+    }
+    if (category) {
+      where.category = {
+        is: {
+          name: {
+            equals: category,
+          },
+        },
+      }
+    }
+    if (areaId !== undefined) {
+      where.areaId = areaId
     }
     if (startDate || endDate) {
       where.createdAt = {}
