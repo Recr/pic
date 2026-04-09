@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { Pen, Trash2 } from 'lucide-react'
 import { annualTargetAPI } from '../../features/annual-target/annual-target-api'
 import Modal from '../../components/modal/Modal'
-import AnnualSubmissionAndTarget from './components/AnnualSubmissionAndTarget'
 import AnnualImplementationAndTarget from './components/AnnualImplementationAndTarget'
 import SubmittedProposalsFiltered from './components/SubmittedProposalsFiltered'
+import AnnualAccumulatedSubmissionsAndTarget from './components/AnnualAccumulatedSubmissionsAndTarget'
+import MonthlySubmissionAccumulatedAndTarget from './components/MonthlySubmissionAccumulatedAndTarget'
 
 const currentYear = new Date().getFullYear()
 
@@ -124,13 +125,16 @@ const AnalyticsPage: React.FC = () => {
         </div>
         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="rounded border border-gray-200 bg-gray-50 p-4 shadow-sm">
-            <AnnualSubmissionAndTarget />
+            <MonthlySubmissionAccumulatedAndTarget />
           </div>
           <div className="rounded border border-gray-200 bg-gray-50 p-4 shadow-sm">
             <AnnualImplementationAndTarget />
           </div>
           <div className="rounded border border-gray-200 bg-gray-50 p-4 shadow-sm lg:col-span-2">
             <SubmittedProposalsFiltered />
+          </div>
+          <div className="rounded border border-gray-200 bg-gray-50 p-4 shadow-sm lg:col-span-2">
+            <AnnualAccumulatedSubmissionsAndTarget />
           </div>
         </div>
       </div>

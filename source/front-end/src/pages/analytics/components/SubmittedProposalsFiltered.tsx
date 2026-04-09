@@ -3,6 +3,18 @@ import { analyticsAPI } from '../../../features/analytics/analytics-api'
 import { useMemo, useState } from 'react'
 import { categoryAPI } from '../../../features/category/category-api'
 import { areaAPI } from '../../../features/area/area-api'
+import {
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LineElement,
+  LinearScale,
+  PointElement,
+  Title,
+  Tooltip,
+} from 'chart.js'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 
 const currentYear = new Date().getFullYear()
 const DEFAULT_START_DATE = `${currentYear}-01-01`
@@ -17,6 +29,18 @@ const STATUS_OPTIONS = [
   { value: 'REJECTED', label: 'Rejeitada' },
   { value: 'NOT_VIABLE', label: 'Inviável' },
 ]
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  ChartDataLabels,
+)
 
 const SubmittedProposalsFiltered: React.FC = () => {
   const [status, setStatus] = useState('')
@@ -143,6 +167,13 @@ const SubmittedProposalsFiltered: React.FC = () => {
           plugins: {
             legend: {
               position: 'top',
+            },
+            datalabels: {
+              display: true,
+              align: 'top',
+              font: {
+                size: 16,
+              }
             },
             title: {
               display: true,

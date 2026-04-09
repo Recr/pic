@@ -11,11 +11,15 @@ import {
   Tooltip,
 } from 'chart.js'
 import type { ChartDataset } from 'chart.js'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 import { analyticsAPI } from '../../../features/analytics/analytics-api'
 import { useMemo, useState } from 'react'
 import { annualTargetAPI } from '../../../features/annual-target/annual-target-api'
+import { Circle, X } from 'lucide-react'
 
 const currentYear = new Date().getFullYear()
+const currentMonth = new Date().getMonth()
+
 type MixedChartType = 'bar' | 'line'
 
 ChartJS.register(
@@ -27,9 +31,10 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
+  ChartDataLabels,
 )
 
-const AnnualSubmissionAndTarget: React.FC = () => {
+const AnnualAccumulatedSubmissionsAndTarget: React.FC = () => {
   const [year, setYear] = useState(currentYear)
   const [startDate, setStartDate] = useState<string>(`${year}-01-01`)
   const [endDate, setEndDate] = useState<string>(`${year}-12-31`)
@@ -71,124 +76,88 @@ const AnnualSubmissionAndTarget: React.FC = () => {
     )
   }, [proposalAnalytics?.labels])
 
-  const datasets = useMemo<ChartDataset<MixedChartType, number[]>[]>(() => {
-    const dataset: ChartDataset<MixedChartType, number[]>[] = []
+  const accumalatedTargetData: number[] = []
+  const accumulatedData: number[] = []
 
-    if (!proposalAnalytics?.labels.length || !proposalAnalytics.data?.length) {
-      return dataset
-    }
+  const datasets: ChartDataset<MixedChartType, number[]>[] = []
 
+  if (proposalAnalytics?.labels.length && proposalAnalytics.data?.length) {
     const monthlyTarget =
       currentYearTarget?.annualSubmittedProposalsTarget !== undefined
         ? currentYearTarget.annualSubmittedProposalsTarget / 12
         : undefined
 
-    // Build tendency only until the last month with real values to avoid a fake downtrend at year end.
-    const lastInfoIndex = proposalAnalytics.data.reduce(
-      (lastIndex, value, index) => (value > 0 ? index : lastIndex),
-      -1,
-    )
-    const trendBaseData =
-      lastInfoIndex >= 0
-        ? proposalAnalytics.data.slice(0, lastInfoIndex + 1)
-        : proposalAnalytics.data
-
-    const n = trendBaseData.length
-    const sumX = trendBaseData.reduce((acc, _, index) => acc + index, 0)
-    const sumY = trendBaseData.reduce((acc, value) => acc + value, 0)
-    const sumXY = trendBaseData.reduce((acc, value, index) => acc + index * value, 0)
-    const sumXX = trendBaseData.reduce((acc, _, index) => acc + index * index, 0)
-
-    const denominator = n * sumXX - sumX * sumX
-    const slope = denominator === 0 ? 0 : (n * sumXY - sumX * sumY) / denominator
-    const intercept = (sumY - slope * sumX) / n
-
-    const trendLineData = proposalAnalytics.data.map((_, index) => {
-      if (lastInfoIndex >= 0 && index > lastInfoIndex) {
-        return Number.NaN
-      }
-
-      const value = slope * index + intercept
-      return value > 0 ? value : 0
-    })
-
-    dataset.push({
-      label: 'Tendencia',
-      type: 'line',
-      yAxisID: 'yBars',
-      data: trendLineData,
-      borderColor: 'rgb(245, 158, 11)',
-      backgroundColor: 'rgba(245, 158, 11, 0.2)',
-      borderDash: [6, 4],
-      pointRadius: 0,
-      tension: 0,
-      spanGaps: false,
-    })
-
-    const accumulatedData: number[] = []
     proposalAnalytics.data.forEach((value, index) => {
-      accumulatedData[index] = value + (accumulatedData[index - 1] || 0)
+      accumulatedData[index] = Math.round((value + (accumulatedData[index - 1] || 0)) * 100) / 100
     })
 
-    dataset.push({
+    datasets.push({
       label: 'Acumulado',
       type: 'line',
-      yAxisID: 'y',
       data: accumulatedData,
       borderColor: 'rgb(36, 227, 18)',
       backgroundColor: 'rgba(36, 227, 18, 0.2)',
-    })
-
-    dataset.push({
-      label: 'Propostas',
-      type: 'bar',
-      yAxisID: 'yBars',
-      data: proposalAnalytics.data,
-      borderColor: proposalAnalytics.data.map((value) =>
-        monthlyTarget !== undefined && value < monthlyTarget
-          ? 'rgb(220, 38, 38)'
-          : 'rgb(75, 192, 192)',
-      ),
-      backgroundColor: proposalAnalytics.data.map((value) =>
-        monthlyTarget !== undefined && value < monthlyTarget
-          ? 'rgba(220, 38, 38, 0.4)'
-          : 'rgba(75, 192, 192, 0.4)',
-      ),
+      pointRadius: 5,
+      pointHoverRadius: 8,
+      pointBackgroundColor: 'rgb(36, 227, 18)',
+      pointBorderColor: '#ffffff',
+      pointBorderWidth: 2,
     })
 
     if (monthlyTarget !== undefined) {
-      const accumalatedTargetData: number[] = []
       proposalAnalytics.labels.forEach((_, index) => {
-        accumalatedTargetData[index] = monthlyTarget * (index + 1)
+        accumalatedTargetData[index] = Math.round(monthlyTarget * (index + 1) * 100) / 100
       })
 
-      dataset.push({
+      datasets.push({
         label: 'Meta',
         type: 'line',
-        yAxisID: 'y',
         data: accumalatedTargetData,
         borderColor: 'rgb(255, 231, 0)',
         backgroundColor: 'rgba(255, 231, 0, 0.2)',
+        pointRadius: 5,
+        pointHoverRadius: 8,
+        pointBackgroundColor: 'rgb(255, 231, 0)',
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 2,
       })
     }
+  }
 
-    return dataset
-  }, [proposalAnalytics, currentYearTarget])
+  const isBelowTarget =
+    new Date().getFullYear() === year
+      ? accumulatedData[currentMonth] < accumalatedTargetData[currentMonth]
+      : accumulatedData[11] < accumalatedTargetData[11]
 
   return (
     <div>
-      <div>
-        <label className="mb-1 block text-sm font-medium" htmlFor="year-filter">
-          Ano
-        </label>
-        <input
-          type="number"
-          min={2021}
-          max={currentYear}
-          className="w-full rounded border px-3 py-2"
-          value={year}
-          onChange={(e) => handleYearChange(Number(e.target.value))}
-        />
+      <div className="flex justify-between">
+        <div>
+          <label className="mb-1 block text-md font-medium" htmlFor="year-filter">
+            Ano
+          </label>
+          <input
+            type="number"
+            min={2021}
+            max={currentYear}
+            className="w-full rounded border px-3 py-2"
+            value={year}
+            onChange={(e) => handleYearChange(Number(e.target.value))}
+          />
+        </div>
+        <div className="mr-4">
+          {isBelowTarget ? (
+            <div className="flex items-center gap-4 border p-2 pr-4 w-fit border-red-500 bg-red-50 rounded-md shadow-sm hover:shadow-lg transition hover:-translate-0.5 hover:scale-[1.02]">
+              <X size={50} color="rgb(255, 60, 50)" />
+              <p className="text-2xl">Abaixo da meta</p>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4 border p-2 pr-4 w-fit border-green-500 bg-green-50 rounded-md shadow-sm hover:shadow-lg transition hover:-translate-0.5 hover:scale-[1.02]">
+              <Circle size={50} color="rgb(32, 209, 91)" />
+              <p className="text-2xl">Acima da meta</p>
+            </div>
+          )}
+        </div>
       </div>
       <ReactChart
         key={`annual-submission-${year}`}
@@ -224,33 +193,34 @@ const AnnualSubmissionAndTarget: React.FC = () => {
               },
             },
           },
-          scales: {
-            yBars: {
-              type: 'linear',
-              position: 'left',
-              grid: {
-                drawOnChartArea: false,
-              },
-              title: {
-                display: true,
-                text: 'Propostas',
-              },
-            },
-            y: {
-              type: 'linear',
-              position: 'right',
-              title: {
-                display: true,
-              },
-            },
-          },
           plugins: {
             legend: {
               position: 'top',
+              labels: {
+                usePointStyle: true,
+                pointStyle: 'circle',
+              },
+            },
+            datalabels: {
+              anchor: 'end',
+              align: (ctx: any) => {
+                const index = ctx.dataIndex
+                const isNear = Math.abs(accumulatedData[index] - accumalatedTargetData[index]) < 15
+                return !isNear ? 'start' : ctx.datasetIndex === 0 ? 'top' : 'bottom'
+              },
+              offset: 8,
+              color: '#374151',
+              font: {
+                weight: 'bolder',
+                size: 16,
+              },
             },
             title: {
               display: true,
               text: `Propostas Submetidas em ${year}`,
+              font: {
+                size: 24,
+              },
             },
           },
         }}
@@ -259,4 +229,4 @@ const AnnualSubmissionAndTarget: React.FC = () => {
   )
 }
 
-export default AnnualSubmissionAndTarget
+export default AnnualAccumulatedSubmissionsAndTarget
