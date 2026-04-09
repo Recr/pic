@@ -198,12 +198,12 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
       </Modal>
       <Modal isOpen={isConfirmationModalOpen} onClose={() => setIsConfirmationModalOpen(false)}>
         <div className="w-80 max-w-[95vw] p-6 space-y-4">
-          <h2 className="text-lg font-semibold">Confirmar conclusão</h2>
-          <p className="text-gray-700">
+          <h2 className="text-lg font-semibold text-center">Confirmar conclusão</h2>
+          <p className="text-gray-700 text-center">
             Tem certeza que deseja marcar esta proposta como{' '}
             {newStatus && possibleStatus[newStatus]}?
           </p>
-          <div className="flex gap-3 justify-end">
+          <div className="flex gap-3 justify-center">
             <button
               onClick={() => setIsConfirmationModalOpen(false)}
               className="py-2 px-4 cursor-pointer rounded border border-gray-300 bg-gray-100 hover:bg-gray-200 text-gray-800 transition-all"

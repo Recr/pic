@@ -164,6 +164,9 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
                 className="bg-gray-100 border border-gray-400 rounded-2xl px-4 py-2"
                 {...register('customRewardAmount')}
               />
+              {errors.customRewardAmount && (
+                <span className="text-xs text-red-600">{errors.customRewardAmount.message}</span>
+              )}
             </div>
           )}
           <div className="flex flex-col mt-3">
@@ -177,6 +180,9 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
               multiple={true}
               {...register('evidenceFiles')}
             />
+            {errors.evidenceFiles && (
+              <span className="text-xs text-red-600">{errors.evidenceFiles.message}</span>
+            )}
           </div>
           <div className="flex flex-col mt-3" onClick={(e) => e.stopPropagation()}>
             <label htmlFor={`proposal-note-${proposal.id}`}>Notas da implementacao</label>
@@ -203,9 +209,6 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
               Concluir
             </button>
           </div>
-          {errors.customRewardAmount && (
-            <span className="text-xs text-red-600">{errors.customRewardAmount.message}</span>
-          )}
         </form>
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
@@ -272,8 +275,8 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
       </Modal>
       <Modal isOpen={isConfirmationModalOpen} onClose={() => setIsConfirmationModalOpen(false)}>
         <div className="w-80 max-w-[95vw] p-6 space-y-4">
-          <h2 className="text-lg font-semibold">Confirmar conclusão</h2>
-          <p className="text-gray-700">
+          <h2 className="text-lg font-semibold text-center">Confirmar conclusão</h2>
+          <p className="text-gray-700 text-center">
             Tem <strong>certeza</strong> que deseja marcar esta proposta como concluída?
           </p>
           {(watchedCustomRewardAmount || (watchedEvidenceFiles?.length ?? 0) > 0) && (
@@ -294,7 +297,7 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
               </p>
             </div>
           )}
-          <div className="flex gap-3 justify-end">
+          <div className="flex gap-3 justify-center">
             <button
               type="button"
               onClick={() => setIsConfirmationModalOpen(false)}
@@ -310,12 +313,14 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
               Confirmar
             </button>
           </div>
-          {errors.customRewardAmount && (
-            <span className="text-xs text-red-600">{errors.customRewardAmount.message}</span>
-          )}
-          {errors.evidenceFiles && (
-            <span className="text-xs text-red-600">{errors.evidenceFiles.message}</span>
-          )}
+          <div className="flex flex-col gap-2 text-center">
+            {errors.customRewardAmount && (
+              <span className="text-xs text-red-600">{errors.customRewardAmount.message}</span>
+            )}
+            {errors.evidenceFiles && (
+              <span className="text-xs text-red-600">{errors.evidenceFiles.message}</span>
+            )}
+          </div>
         </div>
       </Modal>
     </div>
