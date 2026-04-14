@@ -1,4 +1,4 @@
-import { Box, Check, Pen, X } from 'lucide-react'
+import { Check, Pen, X } from 'lucide-react'
 import { areaAPI } from '../../features/area/area-api'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import Modal from '../../components/modal/Modal'
@@ -58,12 +58,15 @@ const Areas: React.FC = () => {
   }
 
   return (
-    <>
-      <div className="flex flex-col gap-4 m-auto mt-5 w-xs">
+    <div className="bg-gray-100 min-h-screen py-5">
+      <div className="flex flex-col gap-4 m-auto mt-5 w-xs bg-white sm:w-sm md:w-md p-8 rounded-xl">
+        <h1 className="text-2xl pt-5 pb-10">Áreas</h1>
         {data?.map((area) => (
-          <div key={area.id} className="bg-gray-100 flex p-2 rounded-2xl justify-between">
+          <div
+            key={area.id}
+            className="flex p-2 rounded-2xl justify-between py-2 px-4 border border-gray-200 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
+          >
             <div className="flex gap-4">
-              <Box />
               <h2>{area.name}</h2>
             </div>
             <div className="flex gap-2 items-center">
@@ -78,13 +81,11 @@ const Areas: React.FC = () => {
             </div>
           </div>
         ))}
-      </div>
-      <div>
         <form
-          className="flex flex-col w-1/3 mx-auto mt-10 items-center"
+          className="flex flex-col w-1/3 mx-auto mt-5 items-center"
           onSubmit={handleSubmit(onCreateFormSubmit)}
         >
-          <div className="">
+          <div>
             <label htmlFor="areaName">Adicionar Área</label>
             <div className="relative">
               {areaNameValue && (
@@ -131,7 +132,7 @@ const Areas: React.FC = () => {
           </div>
         </form>
       </Modal>
-    </>
+    </div>
   )
 }
 

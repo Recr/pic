@@ -81,8 +81,8 @@ const Categories: React.FC = () => {
   }
 
   return (
-    <div className="bg-gray-100 min-h-screen pt-10">
-      <div className="flex flex-col gap-4 m-auto bg-white w-md p-8 rounded-xl">
+    <div className="bg-gray-100 min-h-screen py-5">
+      <div className="flex flex-col gap-4 m-auto bg-white w-xs sm:w-sm md:w-md lg:w-xl p-8 rounded-xl">
         <h1 className="text-2xl pt-5 pb-10">Categorias</h1>
         {categoriesList?.map((category) => (
           <div
@@ -90,7 +90,7 @@ const Categories: React.FC = () => {
             className="bg-white flex py-2 px-4 rounded-2xl justify-between border border-gray-200 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
           >
             <div className="flex gap-4">
-              <h2 className="">{category.name}</h2>
+              <h2>{category.name}</h2>
               {category.categoryReward && (
                 <p className="text-gray-500 text-xs items-center flex">
                   R$ {category.categoryReward}
@@ -113,7 +113,7 @@ const Categories: React.FC = () => {
           className="flex flex-col w-1/3 mx-auto mt-10 items-center"
           onSubmit={handleSubmitCreate(onCreateFormSubmit)}
         >
-          <div className="">
+          <div>
             <label htmlFor="categoryName">Adicionar Categoria</label>
             <input
               {...registerCreate('name', { required: true })}
