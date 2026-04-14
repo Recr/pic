@@ -1,6 +1,8 @@
 import multer from 'multer'
 import fs from 'node:fs'
 import path from 'node:path'
+import { AppError } from '../errors/AppError'
+import { StatusCodes } from 'http-status-codes'
 
 const uploadDir = path.resolve(process.cwd(), 'uploads', 'proposal-attachments')
 fs.mkdirSync(uploadDir, { recursive: true })
@@ -25,8 +27,18 @@ export const uploadProposalAttachment = multer({
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'application/vnd.ms-excel',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     ]
     const isAllowed = allowed.includes(file.mimetype)
+    if (!isAllowed) {
+      return cb(
+        new AppError(
+          'Unsupported file type. Allowed types: PDF, PNG, JPEG, DOC, DOCX, XLS, XLSX, PPT, PPTX',
+          StatusCodes.BAD_REQUEST,
+        ),
+      )
+    }
     cb(null, isAllowed)
   },
 })

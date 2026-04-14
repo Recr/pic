@@ -8,6 +8,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type z from 'zod'
 import { getFinishProposalSchema } from '../../../validation/schemas/proposal-schemas'
+import { ToastContainer, toast } from 'react-toastify'
 
 const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
   const [proposalChampionReview] = proposalAPI.useProposalChampionReviewMutation()
@@ -91,14 +92,17 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
         proposalId: proposal.id.toString(),
         data: formData as any,
       }).unwrap()
+      toast.success('Proposta enviada para implementação com sucesso.')
       setIsConfirmationModalOpen(false)
     } catch (error) {
       console.log(error)
+      toast.error('Erro ao enviar a proposta para implementação.')
     }
   }
 
   return (
     <div className="border border-[#ccc] rounded-md p-4 m-2.5 w-87.5 bg-white flex flex-col justify-between">
+      <ToastContainer />
       <div onClick={() => setIsModalOpen(true)} className="relative">
         <div className="flex justify-between items-center mb-2">
           <h3 className="text-lg m-0">Sugestão #{proposal.id}</h3>
@@ -174,7 +178,7 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
             <input
               id="rewardAttachment"
               type="file"
-              accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xlsx,.xls"
+              accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xlsx,.xls,.ppt,.pptx"
               onClick={(e) => e.stopPropagation()}
               className="bg-gray-100 border border-gray-400 rounded-2xl px-4 py-2"
               multiple={true}
