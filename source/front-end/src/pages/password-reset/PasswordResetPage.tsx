@@ -45,7 +45,7 @@ const PasswordResetPage: React.FC = () => {
     }
   }
   return (
-    <>
+    <div className="bg-gray-100 h-screen">
       <ToastContainer />
       <button
         onClick={() => navigate('/login')}
@@ -53,7 +53,7 @@ const PasswordResetPage: React.FC = () => {
       >
         Voltar
       </button>
-      <div className="w-md mx-auto mt-10">
+      <div className="w-xs mx-auto p-5 bg-white rounded-2xl shadow-lg absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <form action="" onSubmit={handleSubmit(onSubmit)}>
           <h1 className="text-2xl font-semibold text-gray-800 mb-4 text-center">
             Recuperação de senha
@@ -103,7 +103,7 @@ const PasswordResetPage: React.FC = () => {
             />
             <span className="text-sm text-red-600">{errors.confirmPassword?.message}</span>
           </div>
-          <div className="flex">
+          <div className="flex gap-4 mt-2">
             <button
               type="button"
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer transition-colors m-auto block"
@@ -128,7 +128,7 @@ const PasswordResetPage: React.FC = () => {
           <RequestTokenForm />
         </Modal>
       </div>
-    </>
+    </div>
   )
 }
 

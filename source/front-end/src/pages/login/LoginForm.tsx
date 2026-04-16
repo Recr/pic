@@ -70,7 +70,7 @@ const LoginForm: React.FC = () => {
       </button>
       <ToastContainer />
       <form
-        className="mx-auto flex justify-center flex-col w-xs py-12 bg-white  rounded-lg items-center gap-4 shadow-xl drop-shadow-black"
+        className="mx-auto flex justify-center flex-col w-xs py-12 bg-white  rounded-lg items-center gap-4 shadow-xl drop-shadow-black absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
         onSubmit={handleSubmit(onSubmit, onInvalid)}
         noValidate
       >
