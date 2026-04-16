@@ -11,10 +11,13 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
 
   return (
     <div
-      className="fixed inset-0 z-1000 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-1000 flex items-start justify-center overflow-y-auto bg-black/50 p-3 sm:items-center sm:p-4"
       onClick={onClose}
     >
-      <div className="relative z-1001 bg-white p-4 rounded-lg" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="relative z-1001 w-full max-h-[calc(100vh-1.5rem)] overflow-y-auto rounded-lg bg-white p-4 sm:w-auto sm:max-h-[calc(100vh-2rem)]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {children}
       </div>
     </div>

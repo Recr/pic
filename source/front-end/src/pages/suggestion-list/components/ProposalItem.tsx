@@ -36,7 +36,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
         /* TODO: refactor to use toast */
       }
       if (!response.ok) {
-        const text = await response.text()
+        await response.text()
         // console.error('Download failed with response not ok:', response.status, text)
         // alert(`Erro ao baixar: ${response.status} - ${text}`)
         /* TODO: refactor to use toast */
@@ -65,16 +65,21 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   return (
     <>
       <div
-        className="text-sm border-t-2 border-gray-200 px-4 py-2 grid grid-cols-[56px_2fr_2fr_1fr_1fr_1fr] text-left hover:bg-blue-100 hover:cursor-pointer"
+        className="grid grid-cols-1 gap-2 border-t-2 border-gray-200 px-3 py-3 text-left text-sm hover:cursor-pointer hover:bg-blue-100 sm:px-4 md:grid-cols-[56px_2fr_2fr_1fr_1fr_1fr] md:gap-0 md:py-2"
         onClick={() => setIsModalOpen(true)}
       >
-        <p>{proposal.id}</p>
         <p>
+          <span className="font-semibold md:hidden">ID: </span>
+          {proposal.id}
+        </p>
+        <p>
+          <span className="font-semibold md:hidden">Proposta: </span>
           {proposal.description.length > 45
             ? `${proposal.description.substring(0, 45)}...`
             : proposal.description}
         </p>
         <p>
+          <span className="font-semibold md:hidden">Funcionários: </span>
           {proposal.suggestions
             .map((suggestion) =>
               suggestion.employee ? suggestion.employee.name : suggestion.employeeName,
@@ -83,18 +88,25 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
             .substring(0, 45)}
         </p>
         <p>
+          <span className="font-semibold md:hidden">RE: </span>
           {proposal.suggestions
             .map((suggestion) =>
               suggestion.employee ? suggestion.employee.re : suggestion.employeeRe,
             )
             .join(', ')}
         </p>
-        <p>{new Date(proposal.createdAt).toLocaleDateString()}</p>
-        <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
+        <p>
+          <span className="font-semibold md:hidden">Criado em: </span>
+          {new Date(proposal.createdAt).toLocaleDateString()}
+        </p>
+        <div>
+          <span className="font-semibold md:hidden">Status: </span>
+          <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
+        </div>
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div className="w-160 max-w-[95vw] p-6 space-y-5">
-          <div className="flex items-start justify-between gap-4">
+        <div className="w-full max-w-[95vw] space-y-4 p-4 sm:max-w-[90vw] sm:p-6 lg:w-152">
+          <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:gap-4">
             <div>
               <h2 className="text-xl font-semibold">Proposta #{proposal.id}</h2>
               <p className="text-sm text-gray-600 mt-1">
@@ -104,7 +116,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
             <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             <div className="bg-gray-50 rounded p-3">
               <p className="text-xs text-gray-500">Area</p>
               <p className="font-medium">{proposal.area.name}</p>
@@ -176,13 +188,13 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
           {proposal.attachments && proposal.attachments.length > 0 && (
             <div>
               <p className="text-sm font-semibold mb-2">Arquivos Anexados</p>
-              <div className="space-y-2">
+              <div className="max-h-56 space-y-2 overflow-y-auto pr-1 sm:max-h-64">
                 {proposal.attachments.map((attachment) => (
                   <div
                     key={attachment.id}
-                    className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded p-3"
+                    className="flex flex-col gap-2 rounded border border-gray-200 bg-gray-50 p-3 sm:flex-row sm:items-center sm:justify-between"
                   >
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1">
                       <p className="text-sm font-medium text-gray-900 truncate">
                         {attachment.originalName}
                       </p>
@@ -200,7 +212,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
                           attachment.originalName,
                         )
                       }
-                      className="ml-3 px-3 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors whitespace-nowrap hover:cursor-pointer"
+                      className="self-start whitespace-nowrap rounded px-3 py-1 text-xs font-medium text-blue-600 transition-colors hover:cursor-pointer hover:bg-blue-50 hover:text-blue-800 sm:ml-3"
                     >
                       Baixar
                     </button>

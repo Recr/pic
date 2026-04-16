@@ -63,72 +63,76 @@ const PayoutList: React.FC = () => {
   }
 
   return (
-    <>
-      <div className="text-left text-2xl font-semibold my-4 mx-4">Lista de Pagamentos</div>
-      <div className="mx-4 mb-4 flex items-center gap-3">
-        <label htmlFor="payout-next-status" className="text-sm font-medium text-gray-700">
-          Novo status
-        </label>
-        <select
-          id="payout-next-status"
-          value={nextStatus}
-          onChange={(event) => setNextStatus(event.target.value as PayoutStatus)}
-          className="border border-gray-300 rounded px-2 py-1 text-sm"
-        >
-          <option value="PENDING">Pendente</option>
-          <option value="PAID">Pago</option>
-          <option value="CANCELLED">Cancelado</option>
-        </select>
-        <button
-          type="button"
-          onClick={handleUpdateSelectedStatuses}
-          disabled={!canUpdate}
-          className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded px-3 py-1.5 text-sm cursor-pointer disabled:cursor-not-allowed"
-        >
-          {isUpdatingStatus
-            ? 'Atualizando...'
-            : `Atualizar selecionados (${selectedPayoutIds.length})`}
-        </button>
-        <button
-          type="button"
-          onClick={handleExportExcel}
-          disabled={!payoutData || payoutData.length === 0}
-          className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white rounded px-3 py-1.5 text-sm cursor-pointer disabled:cursor-not-allowed"
-        >
-          Exportar Excel
-        </button>
-      </div>
-      <div className="flex justify-center flex-col">
-        <div className="grid grid-cols-[40px_56px_2fr_2fr_1fr_1fr_1fr_1fr] px-4 py-2 border-b-2 border-gray-200 font-semibold mx-4">
-          <input
-            type="checkbox"
-            checked={
-              payoutData !== undefined && payoutData.length > 0
-                ? selectedPayoutIds.length === payoutData.length
-                : false
-            }
-            onChange={handleToggleSelectAll}
-            aria-label="Selecionar todos os pagamentos"
-            className="w-4 h-4 cursor-pointer"
-          />
-          <p>ID</p>
-          <p>Proposta</p>
-          <p>Colaborador</p>
-          <p>RE</p>
-          <p>Data</p>
-          <p>Valor</p>
-          <p>Status</p>
+    <div className="min-h-screen bg-gray-100 px-3 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8">
+      <div className="rounded-lg bg-white py-4 shadow-custom sm:py-5">
+        <div className="mx-4 my-3 text-left text-xl font-semibold sm:my-4 sm:text-2xl">
+          Lista de Pagamentos
         </div>
-        {payoutData?.map((payout) => (
-          <PayoutItem
-            key={payout.id}
-            payout={payout}
-            isSelected={selectedPayoutIds.includes(payout.id)}
-            onToggleSelect={handleToggleSelect}
-          />
-        ))}
+        <div className="mx-4 mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <label htmlFor="payout-next-status" className="text-sm font-medium text-gray-700">
+            Novo status
+          </label>
+          <select
+            id="payout-next-status"
+            value={nextStatus}
+            onChange={(event) => setNextStatus(event.target.value as PayoutStatus)}
+            className="w-full rounded border border-gray-300 px-2 py-1 text-sm sm:w-auto"
+          >
+            <option value="PENDING">Pendente</option>
+            <option value="PAID">Pago</option>
+            <option value="CANCELLED">Cancelado</option>
+          </select>
+          <button
+            type="button"
+            onClick={handleUpdateSelectedStatuses}
+            disabled={!canUpdate}
+            className="w-full cursor-pointer rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400 sm:w-auto"
+          >
+            {isUpdatingStatus
+              ? 'Atualizando...'
+              : `Atualizar selecionados (${selectedPayoutIds.length})`}
+          </button>
+          <button
+            type="button"
+            onClick={handleExportExcel}
+            disabled={!payoutData || payoutData.length === 0}
+            className="w-full cursor-pointer rounded bg-emerald-600 px-3 py-1.5 text-sm text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-gray-400 sm:w-auto"
+          >
+            Exportar Excel
+          </button>
+        </div>
+        <div className="mx-3 flex flex-col justify-center rounded-lg border border-gray-300 text-sm sm:mx-4">
+          <div className="mx-4 hidden grid-cols-[40px_56px_2fr_2fr_1fr_1fr_1fr_1fr] border-b-2 border-gray-200 px-4 py-2 font-semibold md:grid">
+            <input
+              type="checkbox"
+              checked={
+                payoutData !== undefined && payoutData.length > 0
+                  ? selectedPayoutIds.length === payoutData.length
+                  : false
+              }
+              onChange={handleToggleSelectAll}
+              aria-label="Selecionar todos os pagamentos"
+              className="w-4 h-4 cursor-pointer"
+            />
+            <p>ID</p>
+            <p>Proposta</p>
+            <p>Colaborador</p>
+            <p>RE</p>
+            <p>Data</p>
+            <p>Valor</p>
+            <p>Status</p>
+          </div>
+          {payoutData?.map((payout) => (
+            <PayoutItem
+              key={payout.id}
+              payout={payout}
+              isSelected={selectedPayoutIds.includes(payout.id)}
+              onToggleSelect={handleToggleSelect}
+            />
+          ))}
+        </div>
       </div>
-    </>
+    </div>
   )
 }
 
