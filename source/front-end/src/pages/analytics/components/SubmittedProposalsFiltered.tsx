@@ -65,7 +65,7 @@ const SubmittedProposalsFiltered: React.FC = () => {
   const { data: areaList } = areaAPI.useGetAreasQuery()
   return (
     <div>
-      <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+      <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
         <div>
           <label className="mb-1 block text-sm font-medium" htmlFor="analytics-status-filter">
             Status
@@ -150,43 +150,46 @@ const SubmittedProposalsFiltered: React.FC = () => {
           ? 'Loading proposals...'
           : `${proposalAnalytics?.totalProposals ?? 0} propostas encontrados com os filtros atuais.`}
       </p>
-      <Line
-        data={{
-          labels: proposalAnalytics?.labels || [],
-          datasets: [
-            {
-              label: 'Propostas',
-              data: proposalAnalytics?.data || [],
-              borderColor: 'rgb(75, 192, 192)',
-              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      <div className="mt-4 h-64 w-full sm:h-80">
+        <Line
+          data={{
+            labels: proposalAnalytics?.labels || [],
+            datasets: [
+              {
+                label: 'Propostas',
+                data: proposalAnalytics?.data || [],
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              },
+            ],
+          }}
+          options={{
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'top',
+              },
+              datalabels: {
+                display: true,
+                align: 'top',
+                font: {
+                  size: 10,
+                },
+              },
+              title: {
+                display: true,
+                text: 'Propostas Submetidas',
+              },
             },
-          ],
-        }}
-        options={{
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'top',
+            animations: {
+              tension: {
+                duration: 1000,
+              },
             },
-            datalabels: {
-              display: true,
-              align: 'top',
-              font: {
-                size: 16,
-              }
-            },
-            title: {
-              display: true,
-              text: 'Propostas Submetidas',
-            },
-          },
-          animations: {
-            tension: {
-              duration: 1000,
-            },
-          },
-        }}
-      />
+          }}
+        />
+      </div>
     </div>
   )
 }

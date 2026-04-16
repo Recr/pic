@@ -131,7 +131,7 @@ const AnnualAccumulatedSubmissionsAndTarget: React.FC = () => {
 
   return (
     <div>
-      <div className="flex justify-between">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <label className="mb-1 block text-md font-medium" htmlFor="year-filter">
             Ano
@@ -145,87 +145,90 @@ const AnnualAccumulatedSubmissionsAndTarget: React.FC = () => {
             onChange={(e) => handleYearChange(Number(e.target.value))}
           />
         </div>
-        <div className="mr-4">
+        <div>
           {isBelowTarget ? (
-            <div className="flex items-center gap-4 border p-2 pr-4 w-fit border-red-500 bg-red-50 rounded-md shadow-sm hover:shadow-lg transition hover:-translate-0.5 hover:scale-[1.02]">
-              <X size={50} color="rgb(255, 60, 50)" />
-              <p className="text-2xl">Abaixo da meta</p>
+            <div className="flex w-fit items-center gap-2 rounded-md border border-red-500 bg-red-50 p-2 pr-3 shadow-sm transition hover:-translate-0.5 hover:scale-[1.02] hover:shadow-lg sm:gap-4 sm:pr-4">
+              <X size={30} color="rgb(255, 60, 50)" />
+              <p className="text-base sm:text-2xl">Abaixo da meta</p>
             </div>
           ) : (
-            <div className="flex items-center gap-4 border p-2 pr-4 w-fit border-green-500 bg-green-50 rounded-md shadow-sm hover:shadow-lg transition hover:-translate-0.5 hover:scale-[1.02]">
-              <Circle size={50} color="rgb(32, 209, 91)" />
-              <p className="text-2xl">Acima da meta</p>
+            <div className="flex w-fit items-center gap-2 rounded-md border border-green-500 bg-green-50 p-2 pr-3 shadow-sm transition hover:-translate-0.5 hover:scale-[1.02] hover:shadow-lg sm:gap-4 sm:pr-4">
+              <Circle size={30} color="rgb(32, 209, 91)" />
+              <p className="text-base sm:text-2xl">Acima da meta</p>
             </div>
           )}
         </div>
       </div>
-      <ReactChart
-        key={`annual-submission-${year}`}
-        type="bar"
-        data={{
-          labels: monthLabels,
-          datasets: datasets,
-        }}
-        options={{
-          responsive: true,
-          animation: {
-            duration: 1200,
-            easing: 'easeOutCubic',
-          },
-          animations: {
-            x: {
-              duration: 900,
-              from: -30,
-            },
-            y: {
+      <div className="mt-4 h-64 w-full sm:h-80">
+        <ReactChart
+          key={`annual-submission-${year}`}
+          type="bar"
+          data={{
+            labels: monthLabels,
+            datasets: datasets,
+          }}
+          options={{
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
               duration: 1200,
-              from: 0,
-              delay: (ctx: any) => {
-                const index = typeof ctx.dataIndex === 'number' ? ctx.dataIndex : 0
-                return index * 90
+              easing: 'easeOutCubic',
+            },
+            animations: {
+              x: {
+                duration: 900,
+                from: -30,
+              },
+              y: {
+                duration: 1200,
+                from: 0,
+                delay: (ctx: any) => {
+                  const index = typeof ctx.dataIndex === 'number' ? ctx.dataIndex : 0
+                  return index * 90
+                },
               },
             },
-          },
-          transitions: {
-            active: {
-              animation: {
-                duration: 250,
+            transitions: {
+              active: {
+                animation: {
+                  duration: 250,
+                },
               },
             },
-          },
-          plugins: {
-            legend: {
-              position: 'top',
-              labels: {
-                usePointStyle: true,
-                pointStyle: 'circle',
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  usePointStyle: true,
+                  pointStyle: 'circle',
+                },
+              },
+              datalabels: {
+                anchor: 'end',
+                align: (ctx: any) => {
+                  const index = ctx.dataIndex
+                  const isNear =
+                    Math.abs(accumulatedData[index] - accumalatedTargetData[index]) < 15
+                  return !isNear ? 'start' : ctx.datasetIndex === 0 ? 'top' : 'bottom'
+                },
+                offset: 8,
+                color: '#374151',
+                font: {
+                  weight: 'bolder',
+                  size: 11,
+                },
+              },
+              title: {
+                display: true,
+                text: `Propostas Submetidas em ${year}`,
+                font: {
+                  size: 16,
+                },
               },
             },
-            datalabels: {
-              anchor: 'end',
-              align: (ctx: any) => {
-                const index = ctx.dataIndex
-                const isNear = Math.abs(accumulatedData[index] - accumalatedTargetData[index]) < 15
-                return !isNear ? 'start' : ctx.datasetIndex === 0 ? 'top' : 'bottom'
-              },
-              offset: 8,
-              color: '#374151',
-              font: {
-                weight: 'bolder',
-                size: 16,
-              },
-            },
-            title: {
-              display: true,
-              text: `Propostas Submetidas em ${year}`,
-              font: {
-                size: 24,
-              },
-
-            },
-          },
-        }}
-      />
+          }}
+        />
+      </div>
     </div>
   )
 }

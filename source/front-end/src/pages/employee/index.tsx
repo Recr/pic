@@ -71,63 +71,61 @@ const Employee: React.FC = () => {
     }
   }
   return (
-    <div className="font-inter">
+    <div className="font-inter bg-gray-100 min-h-screen p-5">
       <ToastContainer />
-      <h1 className="font-inter font-light text-3xl bg-gray-300 py-10 pl-10">Colaboradores</h1>
-      <div className="flex justify-evenly">
-        <div className="w-sm">
-          <h2 className="font-inter font-light text-2xl py-10 text-center">
-            Colaboradores Cadastrados
-          </h2>
-          <div className="m-auto rounded-lg p-2 flex flex-col gap-2">
-            {registeredEmployees?.map((employee: EmployeeType) => (
-              <div
-                key={employee.re}
-                className="flex justify-between gap-2 bg-gray-100 px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-blue-200 transition-all"
-                onClick={() => {
-                  setSelectedEmployee(employee)
-                  setIsEditModalOpen(true)
-                }}
-              >
-                <span>{employee.name}</span>
-                <span>{employee.re}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        {unregisteredEmployees && unregisteredEmployees.length > 0 && (
-          <div className="w-sm">
-            <h2 className="font-inter font-light text-2xl py-10 text-center">
-              Colaboradores Nao Cadastrados
-            </h2>
-            <div className="m-auto rounded-lg p-2 flex flex-col gap-2">
-              {unregisteredEmployees?.map((employee: UnregisteredEmployee) => (
+      <div className="bg-white rounded-xl m-auto p-8 lg:w-4xl">
+        <h1 className="font-inter font-light text-3xl py-10 pl-10">Colaboradores</h1>
+        <div className="flex flex-col md:flex-row justify-center gap-4">
+          <div className="md:w-sm shadow-lg rounded-lg p-5">
+            <h2 className="font-inter font-light text-2xl py-10 text-center">Cadastrados</h2>
+            <div className="m-auto rounded-lg p-2 flex flex-col gap-2 max-h-100 overflow-y-auto">
+              {registeredEmployees?.map((employee: EmployeeType) => (
                 <div
-                  key={employee.employeeRe}
+                  key={employee.re}
                   className="flex justify-between gap-2 bg-gray-100 px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-blue-200 transition-all"
                   onClick={() => {
-                    setSelectedUnregisteredEmployee(employee)
-                    setIsAddModalOpen(true)
-                    setValue('name', employee.employeeName)
-                    setValue('re', employee.employeeRe)
-                    setValue('shift', employee.employeeShift ? employee.employeeShift : 'ADM')
+                    setSelectedEmployee(employee)
+                    setIsEditModalOpen(true)
                   }}
                 >
-                  <span>{employee.employeeName}</span>
-                  <span>{employee.employeeRe}</span>
+                  <span>{employee.name}</span>
+                  <span>{employee.re}</span>
                 </div>
               ))}
             </div>
           </div>
-        )}
-      </div>
-      <div className="flex my-5">
-        <button
-          className="bg-blue-400 text-white py-2 px-4 rounded-2xl m-auto hover:bg-blue-700 transition-all hover:cursor-pointer"
-          onClick={() => setIsAddModalOpen(true)}
-        >
-          Adicionar Colaborador
-        </button>
+          <div className="md:w-sm shadow-lg rounded-lg p-5 hover:">
+            <h2 className="font-inter font-light text-2xl py-10 text-center">Não Cadastrados</h2>
+            <div className="m-auto rounded-lg p-2 flex flex-col gap-2 max-h-100 overflow-y-auto">
+              {unregisteredEmployees &&
+                unregisteredEmployees.length > 0 &&
+                unregisteredEmployees.map((employee: UnregisteredEmployee) => (
+                  <div
+                    key={employee.employeeRe}
+                    className="flex justify-between gap-2 bg-gray-100 px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-blue-200 transition-all"
+                    onClick={() => {
+                      setSelectedUnregisteredEmployee(employee)
+                      setIsAddModalOpen(true)
+                      setValue('name', employee.employeeName)
+                      setValue('re', employee.employeeRe)
+                      setValue('shift', employee.employeeShift ? employee.employeeShift : 'ADM')
+                    }}
+                  >
+                    <span>{employee.employeeName}</span>
+                    <span>{employee.employeeRe}</span>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+        <div className="flex my-5">
+          <button
+            className="bg-blue-400 text-white py-2 px-4 rounded-2xl m-auto hover:bg-blue-700 transition-all hover:cursor-pointer"
+            onClick={() => setIsAddModalOpen(true)}
+          >
+            Adicionar Colaborador
+          </button>
+        </div>
       </div>
       {passwordResetRequesters && passwordResetRequesters.length > 0 && (
         <div className="mt-8 mb-8">
@@ -220,6 +218,7 @@ const Employee: React.FC = () => {
               type="text"
               {...register('name')}
               placeholder="Nome completo do operador"
+              autoComplete="off"
             />
             {errors.name && <span className="text-xs text-red-600">{errors.name.message}</span>}
             <label>RE:</label>
@@ -230,6 +229,7 @@ const Employee: React.FC = () => {
               placeholder="RE do operador"
               min={0}
               max={50000}
+              autoComplete="off"
             />
             {errors.re && <span className="text-xs text-red-600">{errors.re.message}</span>}
             <label>Cargo:</label>

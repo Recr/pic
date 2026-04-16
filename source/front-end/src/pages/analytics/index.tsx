@@ -92,12 +92,12 @@ const AnalyticsPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-gray-100 pt-8 min-h-screen">
-      <div className="mx-auto w-full max-w-7xl rounded bg-white p-4">
-        <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+    <div className="min-h-screen bg-gray-100 px-3 pt-4 sm:px-4 sm:pt-8">
+      <div className="mx-auto w-full max-w-7xl rounded bg-white p-3 sm:p-4 md:p-6">
+        <h1 className="mb-3 text-xl font-bold sm:mb-4 sm:text-2xl">Dashboard</h1>
         <p>Métrica e KPIs do PIC.</p>
-        <div className="mt-4 rounded border border-gray-200 bg-gray-50 p-3">
-          <div className="flex items-center justify-between">
+        <div className="mt-4 rounded border border-gray-200 bg-gray-50 p-3 sm:p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="text-sm text-gray-700">
               <p>
                 Meta anual de sugestões enviadas:{' '}
@@ -114,7 +114,7 @@ const AnalyticsPage: React.FC = () => {
             </div>
             <button
               type="button"
-              className="rounded border border-gray-300 bg-white p-2 text-gray-700 transition-colors hover:cursor-pointer hover:bg-gray-100"
+              className="self-start rounded border border-gray-300 bg-white p-2 text-gray-700 transition-colors hover:cursor-pointer hover:bg-gray-100 sm:self-auto"
               onClick={() => setIsAnnualTargetModalOpen(true)}
               aria-label="Editar metas anuais"
               title="Editar metas anuais"
@@ -139,20 +139,20 @@ const AnalyticsPage: React.FC = () => {
         </div>
       </div>
       <Modal isOpen={isAnnualTargetModalOpen} onClose={() => setIsAnnualTargetModalOpen(false)}>
-        <div className="w-[90vw] max-w-4xl rounded-lg bg-white p-2">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Metas anuais</h2>
+        <div className="w-[95vw] max-w-4xl rounded-lg bg-white p-3 sm:w-[92vw] sm:p-4">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-lg font-semibold sm:text-xl">Metas anuais</h2>
             <button
               type="button"
               onClick={() => setIsAnnualTargetModalOpen(false)}
-              className="rounded border border-gray-300 px-3 py-1 text-sm text-gray-700 hover:cursor-pointer hover:bg-gray-100"
+              className="w-fit rounded border border-gray-300 px-3 py-1 text-sm text-gray-700 hover:cursor-pointer hover:bg-gray-100"
             >
               Fechar
             </button>
           </div>
 
           <div className="mb-5 overflow-x-auto">
-            <table className="min-w-full border border-gray-200 text-sm">
+            <table className="min-w-175 border border-gray-200 text-sm sm:min-w-full">
               <thead>
                 <tr className="bg-gray-100 text-left">
                   <th className="border-b border-gray-200 px-3 py-2">Ano</th>
@@ -215,7 +215,7 @@ const AnalyticsPage: React.FC = () => {
               {editingYear !== null ? `Editar meta ${editingYear}` : 'Criar nova meta'}
             </h3>
             <form
-              className="grid grid-cols-1 gap-3 md:grid-cols-3"
+              className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3"
               onSubmit={handleAnnualTargetSubmit}
             >
               <div>
@@ -290,7 +290,7 @@ const AnalyticsPage: React.FC = () => {
                   className="w-full rounded border px-3 py-2"
                 />
               </div>
-              <div className="flex items-end gap-2">
+              <div className="flex flex-wrap items-end gap-2">
                 <button
                   type="submit"
                   disabled={isCreatingAnnualTarget || isUpdatingAnnualTarget}

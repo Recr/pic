@@ -191,74 +191,77 @@ const AnnualImplementationAndTarget: React.FC = () => {
           onChange={(e) => handleYearChange(Number(e.target.value))}
         />
       </div>
-      <ReactChart
-        key={`annual-implementation-${year}`}
-        type="bar"
-        data={{
-          labels: monthLabels,
-          datasets: datasets,
-        }}
-        options={{
-          responsive: true,
-          animation: {
-            duration: 1200,
-            easing: 'easeOutCubic',
-          },
-          animations: {
-            x: {
-              duration: 900,
-              from: -30,
-            },
-            y: {
+      <div className="mt-4 h-64 w-full sm:h-80">
+        <ReactChart
+          key={`annual-implementation-${year}`}
+          type="bar"
+          data={{
+            labels: monthLabels,
+            datasets: datasets,
+          }}
+          options={{
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
               duration: 1200,
-              from: 0,
-              delay: (ctx: any) => {
-                const index = typeof ctx.dataIndex === 'number' ? ctx.dataIndex : 0
-                return index * 90
+              easing: 'easeOutCubic',
+            },
+            animations: {
+              x: {
+                duration: 900,
+                from: -30,
+              },
+              y: {
+                duration: 1200,
+                from: 0,
+                delay: (ctx: any) => {
+                  const index = typeof ctx.dataIndex === 'number' ? ctx.dataIndex : 0
+                  return index * 90
+                },
               },
             },
-          },
-          transitions: {
-            active: {
-              animation: {
-                duration: 250,
+            transitions: {
+              active: {
+                animation: {
+                  duration: 250,
+                },
               },
             },
-          },
-          scales: {
-            yBars: {
-              type: 'linear',
-              position: 'left',
-              grid: {
-                drawOnChartArea: false,
+            scales: {
+              yBars: {
+                type: 'linear',
+                position: 'left',
+                grid: {
+                  drawOnChartArea: false,
+                },
+                title: {
+                  display: true,
+                  text: 'Propostas',
+                },
+              },
+              y: {
+                type: 'linear',
+                position: 'right',
+                title: {
+                  display: true,
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                position: 'top',
               },
               title: {
                 display: true,
-                text: 'Propostas',
+                text: `Propostas Implementadas em ${year}`,
+              },
+              datalabels: {
+                display: false,
               },
             },
-            y: {
-              type: 'linear',
-              position: 'right',
-              title: {
-                display: true,
-              },
-            },
-          },
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-            title: {
-              display: true,
-              text: `Propostas Implementadas em ${year}`,
-            },
-            datalabels: {
-              display: false,
-            },
-          },
-        }}
-      />
+          }}
+        />
+      </div>
     </div>
   )
 }
