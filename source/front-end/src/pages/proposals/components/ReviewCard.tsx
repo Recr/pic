@@ -41,7 +41,7 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
   const [newStatus, setNewStatus] = useState<StatusOption | ''>('')
 
   return (
-    <div className="border border-[#ccc] rounded-md p-4 m-2.5 w-87.5 bg-white flex flex-col">
+    <div className="w-full border border-[#ccc] rounded-md p-4 bg-white flex flex-col">
       <div onClick={() => setIsModalOpen(true)} className="relative">
         <div className="flex justify-between items-center mb-2">
           <h3 className="text-lg m-0">Sugestão #{proposal.id}</h3>

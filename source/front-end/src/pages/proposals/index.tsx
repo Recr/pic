@@ -7,9 +7,9 @@ import StartImplementationCard from './components/StartImplementationCard'
 type CardRenderer = (proposal: ProposalWithSuggestions) => React.ReactNode
 
 const CardTypes: Record<string, CardRenderer> = {
-  UNDER_VALIDATION: (proposal) => <ReviewCard key={proposal.id} {...proposal} />,
-  TO_IMPLEMENT: (proposal) => <StartImplementationCard key={proposal.id} {...proposal} />,
-  IMPLEMENTATION: (proposal) => <ImplementationCard key={proposal.id} {...proposal} />,
+  UNDER_VALIDATION: (proposal) => <ReviewCard {...proposal} />,
+  TO_IMPLEMENT: (proposal) => <StartImplementationCard {...proposal} />,
+  IMPLEMENTATION: (proposal) => <ImplementationCard {...proposal} />,
 }
 function renderProposalCard(proposal: ProposalWithSuggestions) {
   const renderer = CardTypes[proposal.status]
@@ -25,13 +25,17 @@ const Proposals: React.FC = () => {
       <div className="flex justify-between items-center py-2.5 px-5 bg-white shadow-md mb-2.5">
         <h2 className="ml-8 text-xl">Lista de Propostas</h2>
       </div>
-      <div className="flex flex-wrap">
+      <div className="columns-1 sm:columns-[21rem] gap-4 px-4 pb-4">
         {!proposalsList || proposalsList.length === 0 ? (
           <p className="px-2.5">Nenhuma proposta encontrada.</p>
         ) : (
           proposalsList
             .filter((proposal) => proposal && proposal.id !== undefined)
-            .map(renderProposalCard)
+            .map((proposal) => (
+              <div key={proposal.id} className="mb-4 break-inside-avoid">
+                {renderProposalCard(proposal)}
+              </div>
+            ))
         )}
       </div>
     </div>
