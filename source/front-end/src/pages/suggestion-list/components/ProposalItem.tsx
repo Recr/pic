@@ -6,6 +6,10 @@ import { proposalAPI } from '../../../features/proposal/proposal-api'
 import { getStatusColor } from '../../../helpers/getStatusColor'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../../app/store'
+import { toast } from 'react-toastify'
+
+const MAX_ATTACHMENTS_PER_UPLOAD = 5
+const MAX_ATTACHMENT_SIZE_BYTES = 10 * 1024 * 1024
 
 const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) => {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
@@ -22,6 +26,26 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   const isManager = user?.re !== undefined && proposal.manager?.re === user.re
   const isChampion = user?.re !== undefined && proposal.champion?.re === user.re
   const canEditAttachments = Boolean(isAdmin || isManager || isChampion)
+  const fileInputId = `attachment-input-${proposal.id}`
+
+  const getErrorMessage = (error: unknown) => {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'data' in error &&
+      typeof (error as { data?: unknown }).data === 'object' &&
+      (error as { data?: { message?: unknown } }).data !== null &&
+      typeof (error as { data?: { message?: unknown } }).data?.message === 'string'
+    ) {
+      return (error as { data?: { message?: string } }).data?.message
+    }
+
+    if (error instanceof Error) {
+      return error.message
+    }
+
+    return 'Falha inesperada.'
+  }
 
   const handleDownloadAttachment = async (
     proposalId: number,
@@ -52,10 +76,8 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
         /* TODO: refactor to use toast */
       }
       if (!response.ok) {
-        await response.text()
-        // console.error('Download failed with response not ok:', response.status, text)
-        // alert(`Erro ao baixar: ${response.status} - ${text}`)
-        /* TODO: refactor to use toast */
+        const errorText = await response.text()
+        toast.error(`Erro ao baixar arquivo (${response.status}): ${errorText || 'Falha.'}`)
         return
       }
 
@@ -73,25 +95,23 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
 
       // console.log('Download triggered successfully')
     } catch (error) {
-      /* TODO: refactor to use toast */
       console.error('Download error:', error)
-      alert(`Erro ao baixar arquivo: ${error instanceof Error ? error.message : String(error)}`)
+      toast.error(`Erro ao baixar arquivo: ${getErrorMessage(error)}`)
     }
   }
 
   const handleUploadAttachments = async () => {
     if (selectedFiles.length === 0) {
-      alert('Selecione ao menos um arquivo para anexar.')
+      toast.warning('Selecione ao menos um arquivo para anexar.')
       return
     }
 
     try {
       await uploadAttachments({ proposalId: proposal.id, files: selectedFiles }).unwrap()
       setSelectedFiles([])
+      toast.success('Arquivos anexados com sucesso.')
     } catch (error) {
-      alert(
-        `Erro ao anexar arquivos: ${error instanceof Error ? error.message : 'falha inesperada'}`,
-      )
+      toast.error(`Erro ao anexar arquivos: ${getErrorMessage(error)}`)
     }
   }
 
@@ -104,10 +124,9 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
     try {
       setRemovingAttachmentId(attachmentId)
       await deleteAttachment({ proposalId: proposal.id, attachmentId }).unwrap()
+      toast.success('Arquivo removido com sucesso.')
     } catch (error) {
-      alert(
-        `Erro ao remover arquivo: ${error instanceof Error ? error.message : 'falha inesperada'}`,
-      )
+      toast.error(`Erro ao remover arquivo: ${getErrorMessage(error)}`)
     } finally {
       setRemovingAttachmentId(null)
     }
@@ -241,20 +260,70 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
 
             {canEditAttachments ? (
               <div className="mb-3 rounded border border-dashed border-gray-300 bg-gray-50 p-3">
+                <label
+                  htmlFor={fileInputId}
+                  className="flex cursor-pointer flex-col items-center justify-center rounded border border-dashed border-blue-300 bg-blue-50 px-4 py-5 text-center transition-colors hover:bg-blue-100"
+                  title="Clique para selecionar arquivos"
+                >
+                  <span className="text-sm font-medium text-blue-700">
+                    Clique aqui para selecionar arquivos
+                  </span>
+                  <span className="mt-1 text-xs text-blue-600">
+                    Máximo de 5 arquivos por envio, até 10 MB cada.
+                  </span>
+                </label>
                 <input
+                  id={fileInputId}
                   type="file"
                   multiple
+                  title="Selecionar arquivos para anexar"
                   onChange={(event) => {
                     const fileList = event.target.files
-                    setSelectedFiles(fileList ? Array.from(fileList) : [])
+                    const files = fileList ? Array.from(fileList) : []
+
+                    if (files.length > MAX_ATTACHMENTS_PER_UPLOAD) {
+                      toast.warning(
+                        `Você pode anexar no máximo ${MAX_ATTACHMENTS_PER_UPLOAD} arquivos por envio.`,
+                      )
+                      event.currentTarget.value = ''
+                      setSelectedFiles([])
+                      return
+                    }
+
+                    const oversizedFiles = files.filter(
+                      (file) => file.size > MAX_ATTACHMENT_SIZE_BYTES,
+                    )
+
+                    if (oversizedFiles.length > 0) {
+                      const oversizedNames = oversizedFiles
+                        .map((file) => file.name)
+                        .slice(0, 3)
+                        .join(', ')
+                      const suffix = oversizedFiles.length > 3 ? '...' : ''
+
+                      toast.warning(
+                        `Cada arquivo deve ter no máximo 10 MB. Arquivos inválidos: ${oversizedNames}${suffix}`,
+                      )
+                      event.currentTarget.value = ''
+                      setSelectedFiles([])
+                      return
+                    }
+
+                    setSelectedFiles(files)
                   }}
-                  className="w-full text-sm"
+                  className="sr-only"
                 />
                 {selectedFiles.length > 0 && (
                   <p className="mt-2 text-xs text-gray-600">
                     {selectedFiles.length} arquivo(s) selecionado(s).
                   </p>
                 )}
+                <label
+                  htmlFor={fileInputId}
+                  className="mt-3 inline-flex cursor-pointer rounded border border-blue-600 px-3 py-1 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-50"
+                >
+                  Selecionar arquivos
+                </label>
                 <button
                   type="button"
                   onClick={handleUploadAttachments}
