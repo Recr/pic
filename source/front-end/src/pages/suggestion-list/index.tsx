@@ -2,7 +2,7 @@ import { proposalAPI } from '../../features/proposal/proposal-api'
 import ProposalItem from './components/ProposalItem'
 
 const SuggestionList: React.FC = () => {
-  const { data: proposalsData } = proposalAPI.useGetProposalsDetailedQuery()
+  const { data: proposalsData, isLoading } = proposalAPI.useGetProposalsDetailedQuery()
   return (
     <div className="min-h-screen bg-gray-100 px-3 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8">
       <div className="mb-7.5 rounded-lg bg-white py-4 shadow-custom sm:py-5">
@@ -18,6 +18,7 @@ const SuggestionList: React.FC = () => {
             <p>Criado em</p>
             <p>Status</p>
           </div>
+          {isLoading && <h1 className="text-bold">Carregando</h1>}
           {proposalsData?.map((proposal) => (
             <ProposalItem key={proposal.id} proposal={proposal} />
           ))}

@@ -35,8 +35,24 @@ class ProposalsUseCase {
     return proposals
   }
 
-  public async executeFindAllDetailed() {
-    const proposals = await this.proposalRepository.findAllDetailed()
+  public async executeFindAllDetailed(role: Role, userId: number) {
+    if (role === Role.ADMIN) {
+      return await this.proposalRepository.findAllDetailed()
+    }
+
+    const proposals = await this.proposalRepository.findAllDetailed({
+      OR: [
+        {
+          suggestions: {
+            some: {
+              employeeId: userId,
+            },
+          },
+        },
+        { managerId: userId },
+        { championId: userId },
+      ],
+    })
     return proposals
   }
 

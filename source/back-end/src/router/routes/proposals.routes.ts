@@ -24,12 +24,7 @@ proposalsRoutes.get(
   authMiddleware,
   ProposalsController.handleFindAllUserProposalsWithEmployees,
 )
-proposalsRoutes.get(
-  '/detailed',
-  authMiddleware,
-  checkRole([Role.ADMIN]),
-  ProposalsController.handleFindAllProposalsDetailed,
-)
+proposalsRoutes.get('/detailed', authMiddleware, ProposalsController.handleFindAllProposalsDetailed)
 proposalsRoutes.get(
   '/to-define-champion',
   authMiddleware,

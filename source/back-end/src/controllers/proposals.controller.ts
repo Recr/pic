@@ -11,6 +11,7 @@ import { PrismaProposalAttachmentRepository } from '../repositories/proposal-att
 import path from 'node:path'
 import { createReadStream } from 'node:fs'
 import fs from 'node:fs/promises'
+import { Role } from '../utils/types/employees.types'
 
 export const ProposalsController = {
   async handleFindAll(req: Request, res: Response, next: NextFunction) {
@@ -39,7 +40,14 @@ export const ProposalsController = {
         new PrismaProposalAttachmentRepository(),
       )
 
-      const proposals = await proposalUseCase.executeFindAllDetailed()
+      const role = req.user?.role as Role | undefined
+      const userId = Number(req.user?.sub)
+
+      if (!role || Number.isNaN(userId)) {
+        return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
+      }
+
+      const proposals = await proposalUseCase.executeFindAllDetailed(role, userId)
       res.send(proposals)
     } catch (error) {
       next(error)

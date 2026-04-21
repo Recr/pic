@@ -8,6 +8,75 @@ class PrismaProposalRepository {
     return proposals
   }
 
+  private getDetailedSelect() {
+    return {
+      id: true,
+      description: true,
+      status: true,
+      createdAt: true,
+      adminReviewedAt: true,
+      championReviewedAt: true,
+      implementationStartedAt: true,
+      completedAt: true,
+      notes: true,
+      rejectionNote: true,
+      rewardAmount: true,
+      area: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      category: {
+        select: {
+          id: true,
+          name: true,
+          categoryReward: true,
+        },
+      },
+      champion: {
+        select: {
+          re: true,
+          name: true,
+          role: true,
+          shift: true,
+        },
+      },
+      manager: {
+        select: {
+          re: true,
+          name: true,
+          role: true,
+          shift: true,
+        },
+      },
+      suggestions: {
+        select: {
+          employeeName: true,
+          employeeRe: true,
+          employeeShift: true,
+          employee: {
+            select: {
+              re: true,
+              name: true,
+              role: true,
+              shift: true,
+            },
+          },
+        },
+      },
+      attachments: {
+        select: {
+          id: true,
+          storedName: true,
+          originalName: true,
+          sizeBytes: true,
+          uploadedAt: true,
+        },
+      },
+    }
+  }
+
   public async findAllFiltered(
     statuses?: string[],
     startDate?: Date,
@@ -52,83 +121,10 @@ class PrismaProposalRepository {
     return proposals
   }
 
-  public async findAllDetailed() {
+  public async findAllDetailed(where?: Prisma.ProposalWhereInput) {
     const proposals = await prisma.proposal.findMany({
-      select: {
-        id: true,
-        description: true,
-        status: true,
-        createdAt: true,
-        adminReviewedAt: true,
-        championReviewedAt: true,
-        implementationStartedAt: true,
-        completedAt: true,
-        notes: true,
-        rejectionNote: true,
-        rewardAmount: true,
-        area: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        category: {
-          select: {
-            id: true,
-            name: true,
-            categoryReward: true,
-          },
-        },
-        champion: {
-          select: {
-            re: true,
-            name: true,
-            role: true,
-            shift: true,
-          },
-        },
-        manager: {
-          select: {
-            re: true,
-            name: true,
-            role: true,
-            shift: true,
-          },
-        },
-        suggestions: {
-          select: {
-            employeeName: true,
-            employeeRe: true,
-            employeeShift: true,
-            employee: {
-              select: {
-                re: true,
-                name: true,
-                role: true,
-                shift: true,
-              },
-            },
-            // payout: {
-            //   select: {
-            //     id: true,
-            //     createdAt: true,
-            //     payedAt: true,
-            //     status: true,
-            //     value: true,
-            //   },
-            // },
-          },
-        },
-        attachments: {
-          select: {
-            id: true,
-            storedName: true,
-            originalName: true,
-            sizeBytes: true,
-            uploadedAt: true,
-          },
-        },
-      },
+      where,
+      select: this.getDetailedSelect(),
     })
     return proposals
   }

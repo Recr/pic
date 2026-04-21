@@ -41,7 +41,6 @@ const Sidebar: React.FC = () => {
       icon: <ListIcon />,
       label: 'Lista de Sugestões',
       path: '/suggestion-list',
-      allowedRoles: ['ADMIN'],
     },
     {
       icon: <UserPen />,
