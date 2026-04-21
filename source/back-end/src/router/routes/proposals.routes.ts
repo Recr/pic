@@ -46,6 +46,19 @@ proposalsRoutes.get(
   ProposalsController.handleDownloadAttachment,
 )
 
+proposalsRoutes.post(
+  '/:proposalId/attachments',
+  authMiddleware,
+  uploadProposalAttachment.array('attachments', 5),
+  ProposalsController.handleUploadAttachments,
+)
+
+proposalsRoutes.delete(
+  '/:proposalId/attachments/:attachmentId',
+  authMiddleware,
+  ProposalsController.handleDeleteAttachment,
+)
+
 proposalsRoutes.get(
   '/:id',
   validate(proposalIdSchema),

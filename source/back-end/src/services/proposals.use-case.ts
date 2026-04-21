@@ -15,6 +15,8 @@ import { PrismaCategoryRepository } from '../repositories/category.repository'
 import { PrismaSuggestionRepository } from '../repositories/suggestion.repository'
 import { Role } from '../utils/types/employees.types'
 import { PrismaProposalAttachmentRepository } from '../repositories/proposal-attachment.repository'
+import fs from 'node:fs/promises'
+import path from 'node:path'
 
 class ProposalsUseCase {
   constructor(
@@ -314,6 +316,50 @@ class ProposalsUseCase {
     return attachment
   }
 
+  public async executeAddAttachments(
+    proposalId: number,
+    userId: number,
+    role: Role,
+    files?: Express.Multer.File[],
+  ) {
+    await this.ensureCanManageAttachments(proposalId, userId, role)
+
+    if (!files || files.length === 0) {
+      throw new AppError('No files were provided.', StatusCodes.BAD_REQUEST)
+    }
+
+    return await Promise.all(
+      files.map((file) => this.proposalAttachmentRepository.create(file, proposalId)),
+    )
+  }
+
+  public async executeDeleteAttachment(
+    proposalId: number,
+    attachmentId: number,
+    userId: number,
+    role: Role,
+  ) {
+    await this.ensureCanManageAttachments(proposalId, userId, role)
+
+    const attachment = await this.executeGetAttachment(proposalId, attachmentId)
+    const uploadDir = path.resolve(process.cwd(), 'uploads', 'proposal-attachments')
+    const filePath = path.resolve(uploadDir, attachment.relativePath)
+
+    try {
+      await fs.unlink(filePath)
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code
+      if (code !== 'ENOENT') {
+        throw new AppError(
+          'Failed to remove attachment file from disk.',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+        )
+      }
+    }
+
+    await this.proposalAttachmentRepository.deleteById(attachmentId)
+  }
+
   // Helper methods
 
   private async verifyIsCustomReward(data: UpdateProposalWithChampion | UpdateProposalWithManager) {
@@ -325,6 +371,29 @@ class ProposalsUseCase {
       category.categoryReward == null ||
       category.categoryReward === undefined ||
       Number(category.categoryReward) === 0.0
+    )
+  }
+
+  private async ensureCanManageAttachments(proposalId: number, userId: number, role: Role) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) {
+      throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+    }
+
+    if (role === Role.ADMIN) {
+      return
+    }
+
+    const isManager = proposal.managerId === userId
+    const isChampion = proposal.championId === userId
+
+    if (isManager || isChampion) {
+      return
+    }
+
+    throw new AppError(
+      'Unauthorized to manage attachments for this proposal. Only manager, champion, or admin can edit attachments.',
+      StatusCodes.FORBIDDEN,
     )
   }
 }

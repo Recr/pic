@@ -2,10 +2,26 @@ import React from 'react'
 import Modal from '../../../components/modal/Modal'
 import StatusBadge from '../../../components/StatusBadge'
 import type { ProposalDetailed } from '../../../features/proposal/types'
+import { proposalAPI } from '../../../features/proposal/proposal-api'
 import { getStatusColor } from '../../../helpers/getStatusColor'
+import { useSelector } from 'react-redux'
+import type { RootState } from '../../../app/store'
 
 const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) => {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
+  const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
+  const [removingAttachmentId, setRemovingAttachmentId] = React.useState<number | null>(null)
+
+  const [uploadAttachments, { isLoading: isUploadingAttachments }] =
+    proposalAPI.useUploadProposalAttachmentsMutation()
+  const [deleteAttachment, { isLoading: isDeletingAttachment }] =
+    proposalAPI.useDeleteProposalAttachmentMutation()
+  const user = useSelector((state: RootState) => state.auth.user)
+
+  const isAdmin = user?.role === 'ADMIN'
+  const isManager = user?.re !== undefined && proposal.manager?.re === user.re
+  const isChampion = user?.re !== undefined && proposal.champion?.re === user.re
+  const canEditAttachments = Boolean(isAdmin || isManager || isChampion)
 
   const handleDownloadAttachment = async (
     proposalId: number,
@@ -62,6 +78,41 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
       alert(`Erro ao baixar arquivo: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
+
+  const handleUploadAttachments = async () => {
+    if (selectedFiles.length === 0) {
+      alert('Selecione ao menos um arquivo para anexar.')
+      return
+    }
+
+    try {
+      await uploadAttachments({ proposalId: proposal.id, files: selectedFiles }).unwrap()
+      setSelectedFiles([])
+    } catch (error) {
+      alert(
+        `Erro ao anexar arquivos: ${error instanceof Error ? error.message : 'falha inesperada'}`,
+      )
+    }
+  }
+
+  const handleRemoveAttachment = async (attachmentId: number) => {
+    const shouldDelete = window.confirm('Deseja remover este arquivo anexado?')
+    if (!shouldDelete) {
+      return
+    }
+
+    try {
+      setRemovingAttachmentId(attachmentId)
+      await deleteAttachment({ proposalId: proposal.id, attachmentId }).unwrap()
+    } catch (error) {
+      alert(
+        `Erro ao remover arquivo: ${error instanceof Error ? error.message : 'falha inesperada'}`,
+      )
+    } finally {
+      setRemovingAttachmentId(null)
+    }
+  }
+
   return (
     <>
       <div
@@ -185,9 +236,41 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
               </div>
             </div>
           )}
-          {proposal.attachments && proposal.attachments.length > 0 && (
-            <div>
-              <p className="text-sm font-semibold mb-2">Arquivos Anexados</p>
+          <div>
+            <p className="mb-2 text-sm font-semibold">Arquivos Anexados</p>
+
+            {canEditAttachments ? (
+              <div className="mb-3 rounded border border-dashed border-gray-300 bg-gray-50 p-3">
+                <input
+                  type="file"
+                  multiple
+                  onChange={(event) => {
+                    const fileList = event.target.files
+                    setSelectedFiles(fileList ? Array.from(fileList) : [])
+                  }}
+                  className="w-full text-sm"
+                />
+                {selectedFiles.length > 0 && (
+                  <p className="mt-2 text-xs text-gray-600">
+                    {selectedFiles.length} arquivo(s) selecionado(s).
+                  </p>
+                )}
+                <button
+                  type="button"
+                  onClick={handleUploadAttachments}
+                  disabled={isUploadingAttachments || selectedFiles.length === 0}
+                  className="mt-3 rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white transition-colors hover:cursor-pointer hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400"
+                >
+                  {isUploadingAttachments ? 'Anexando...' : 'Anexar arquivos'}
+                </button>
+              </div>
+            ) : (
+              <p className="mb-3 text-xs text-gray-500">
+                Apenas o gestor, executor ou administrador pode editar anexos.
+              </p>
+            )}
+
+            {proposal.attachments && proposal.attachments.length > 0 ? (
               <div className="max-h-56 space-y-2 overflow-y-auto pr-1 sm:max-h-64">
                 {proposal.attachments.map((attachment) => (
                   <div
@@ -195,7 +278,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
                     className="flex flex-col gap-2 rounded border border-gray-200 bg-gray-50 p-3 sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="truncate text-sm font-medium text-gray-900">
                         {attachment.originalName}
                       </p>
                       <p className="text-xs text-gray-500">
@@ -203,24 +286,41 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
                         {new Date(attachment.uploadedAt).toLocaleDateString()}
                       </p>
                     </div>
-                    {/* TODO: Possible Refactor */}
-                    <button
-                      onClick={() =>
-                        handleDownloadAttachment(
-                          proposal.id,
-                          attachment.id,
-                          attachment.originalName,
-                        )
-                      }
-                      className="self-start whitespace-nowrap rounded px-3 py-1 text-xs font-medium text-blue-600 transition-colors hover:cursor-pointer hover:bg-blue-50 hover:text-blue-800 sm:ml-3"
-                    >
-                      Baixar
-                    </button>
+
+                    <div className="flex items-center gap-2 sm:ml-3">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleDownloadAttachment(
+                            proposal.id,
+                            attachment.id,
+                            attachment.originalName,
+                          )
+                        }
+                        className="whitespace-nowrap rounded px-3 py-1 text-xs font-medium text-blue-600 transition-colors hover:cursor-pointer hover:bg-blue-50 hover:text-blue-800"
+                      >
+                        Baixar
+                      </button>
+                      {canEditAttachments && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveAttachment(attachment.id)}
+                          disabled={isDeletingAttachment && removingAttachmentId === attachment.id}
+                          className="whitespace-nowrap rounded px-3 py-1 text-xs font-medium text-red-600 transition-colors hover:cursor-pointer hover:bg-red-50 hover:text-red-800 disabled:cursor-not-allowed disabled:text-gray-400"
+                        >
+                          {isDeletingAttachment && removingAttachmentId === attachment.id
+                            ? 'Removendo...'
+                            : 'Remover'}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <p className="text-sm text-gray-500">Nenhum arquivo anexado.</p>
+            )}
+          </div>
         </div>
       </Modal>
     </>

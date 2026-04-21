@@ -21,6 +21,12 @@ class PrismaProposalAttachmentRepository {
       where: { id },
     })
   }
+
+  async deleteById(id: number) {
+    return await prisma.proposalAttachment.delete({
+      where: { id },
+    })
+  }
 }
 
 export { PrismaProposalAttachmentRepository }

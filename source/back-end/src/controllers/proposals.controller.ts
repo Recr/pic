@@ -368,4 +368,63 @@ export const ProposalsController = {
       next(error)
     }
   },
+
+  async handleUploadAttachments(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalId = Number(req.params.proposalId)
+      const userId = Number(req.user?.sub)
+      const role = req.user?.role as Role | undefined
+      const files = Array.isArray(req.files) ? req.files : undefined
+
+      if (Number.isNaN(proposalId) || Number.isNaN(userId) || !role) {
+        return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
+      }
+
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
+      )
+
+      const createdAttachments = await proposalUseCase.executeAddAttachments(
+        proposalId,
+        userId,
+        role,
+        files,
+      )
+
+      res.status(StatusCodes.CREATED).send(createdAttachments)
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  async handleDeleteAttachment(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalId = Number(req.params.proposalId)
+      const attachmentId = Number(req.params.attachmentId)
+      const userId = Number(req.user?.sub)
+      const role = req.user?.role as Role | undefined
+
+      if (Number.isNaN(proposalId) || Number.isNaN(attachmentId) || Number.isNaN(userId) || !role) {
+        return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
+      }
+
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
+      )
+
+      await proposalUseCase.executeDeleteAttachment(proposalId, attachmentId, userId, role)
+
+      res.status(StatusCodes.NO_CONTENT).send()
+    } catch (error) {
+      next(error)
+    }
+  },
 }

@@ -4,6 +4,7 @@ import type {
   UpdateProposalNotesRequest,
   Proposal,
   ProposalDetailed,
+  ProposalAttachment,
   ProposalWithSuggestions,
   UpdateProposalWithManagerRequest,
   UpdateProposalWithChampionRequest,
@@ -168,6 +169,37 @@ export const proposalAPI = api.injectEndpoints({
       }),
       invalidatesTags: (_result, _error, { proposalId }) => [
         { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
+    uploadProposalAttachments: builder.mutation<
+      ProposalAttachment[],
+      { proposalId: number; files: File[] }
+    >({
+      query: ({ proposalId, files }) => {
+        const formData = new FormData()
+        files.forEach((file) => {
+          formData.append('attachments', file)
+        })
+
+        return {
+          url: `/proposals/${proposalId}/attachments`,
+          method: 'POST',
+          body: formData,
+        }
+      },
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: proposalId },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
+    deleteProposalAttachment: builder.mutation<void, { proposalId: number; attachmentId: number }>({
+      query: ({ proposalId, attachmentId }) => ({
+        url: `/proposals/${proposalId}/attachments/${attachmentId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: proposalId },
         { type: 'Proposal', id: 'LIST' },
       ],
     }),
