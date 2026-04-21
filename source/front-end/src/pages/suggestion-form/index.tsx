@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../app/store'
 import EmployeeCombobox from '../../components/EmployeeCombobox'
+import { Skeleton } from '../../components/skeletons/Skeleton'
 
 const EMPLOYEE_OPTIONS = [1, 2, 3] as const
 
@@ -25,14 +26,15 @@ const SuggestionForm: React.FC = () => {
   const [selectedEmployees, setSelectedEmployees] = useState<
     Record<number, { name: string; shift: string }>
   >({})
-  const [createProposal, { isLoading }] = proposalAPI.useCreateProposalMutation()
+  const [createProposal] = proposalAPI.useCreateProposalMutation()
 
-  const { data: employees = [] } = employeeAPI.useGetEmployeesQuery()
-  const { data: areas = [] } = areaAPI.useGetAreasQuery()
+  const { data: employees = [], isLoading: isLoadingEmployees } = employeeAPI.useGetEmployeesQuery()
+  const { data: areas = [], isLoading: isLoadingAreas } = areaAPI.useGetAreasQuery()
 
   const navigate = useNavigate()
 
   const isLoggedin = useSelector((state: RootState) => state.auth.isLoggedin)
+  const isLoading = isLoadingEmployees || isLoadingAreas
 
   const handleEmployeeSelect = (num: number, re: string) => {
     const reNumber = Number(re)
@@ -124,6 +126,50 @@ const SuggestionForm: React.FC = () => {
       toast.error('Ah não. Algo deu errado!', TOAST_OPTIONS)
       console.error('Erro ao enviar sugestão:', error)
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="bg-gray-100 flex min-h-svh flex-col">
+        <div className="flex justify-center flex-col pt-4">
+          <div className="flex flex-col items-center">
+            <Skeleton className="mb-5 h-48 w-90 max-w-100 rounded-[20px] border-[5px] border-[#ccc]" />
+          </div>
+          <div className="mx-auto mb-7.5 flex w-90 flex-col items-center rounded-[20px] bg-white px-7.5 py-5 shadow-custom sm:w-auto md:max-w-175">
+            <Skeleton className="h-8 w-56" />
+            <div
+              id="employee_amount_radio"
+              className="my-8 mx-auto flex flex-col items-center gap-3"
+            >
+              <Skeleton className="h-4 w-48" />
+              <div className="flex gap-2.5">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <Skeleton key={index} className="h-5 w-10 rounded-full" />
+                ))}
+              </div>
+            </div>
+            <div className="flex w-full flex-col gap-5 md:flex-row md:justify-center">
+              <div className="flex w-full flex-col items-center gap-3 md:min-w-50">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-4 w-12" />
+                <Skeleton className="h-10 w-4/5 rounded-[5px]" />
+                <Skeleton className="h-4 w-12" />
+                <Skeleton className="h-10 w-4/5 rounded-[5px]" />
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-10 w-4/5 rounded-[5px]" />
+              </div>
+            </div>
+            <div className="mt-7.5 flex w-90 flex-col gap-3">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-10 w-full rounded-[5px]" />
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-28 w-full rounded-[5px]" />
+              <Skeleton className="h-12 w-full rounded-[5px]" />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { logout } from '../../features/auth/auth-slice'
 import { api } from '../../services/api'
 import { authAPI } from '../../features/auth/auth-api'
+import { Skeleton } from '../../components/skeletons/Skeleton'
 
 const Logout: React.FC = () => {
   const dispatch = useDispatch()
@@ -36,8 +37,12 @@ const Logout: React.FC = () => {
   }, [dispatch, navigate, triggerLogout])
 
   return (
-    <div className="m-auto">
-      <h2 className="text-4xl font-semibold text-center mt-20 animate-bounce">Saindo...</h2>
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
+      <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-lg">
+        <Skeleton className="mx-auto h-8 w-28" />
+        <Skeleton className="mx-auto mt-4 h-4 w-48" />
+        <Skeleton className="mx-auto mt-6 h-2 w-full rounded-full" />
+      </div>
     </div>
   )
 }

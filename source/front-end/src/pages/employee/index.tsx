@@ -12,6 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { createEmployeeSchema } from '../../validation/schemas/employee-schemas'
 import { translateRoles } from '../../helpers/translateRoles'
 import type z from 'zod'
+import { Skeleton } from '../../components/skeletons/Skeleton'
 
 const Employee: React.FC = () => {
   type CreateEmployeeSchemaInput = z.input<typeof createEmployeeSchema>
@@ -25,9 +26,12 @@ const Employee: React.FC = () => {
   } = useForm<CreateEmployeeSchemaInput, undefined, CreateEmployeeSchemaOutput>({
     resolver: zodResolver(createEmployeeSchema),
   })
-  const { data: registeredEmployees } = employeeAPI.useGetEmployeesQuery()
-  const { data: unregisteredEmployees } = employeeAPI.useGetUnregisteredEmployeesQuery()
-  const { data: passwordResetRequesters } = employeeAPI.useGetPasswordResetRequestersQuery()
+  const { data: registeredEmployees, isLoading: isLoadingRegisteredEmployees } =
+    employeeAPI.useGetEmployeesQuery()
+  const { data: unregisteredEmployees, isLoading: isLoadingUnregisteredEmployees } =
+    employeeAPI.useGetUnregisteredEmployeesQuery()
+  const { data: passwordResetRequesters, isLoading: isLoadingPasswordResetRequesters } =
+    employeeAPI.useGetPasswordResetRequestersQuery()
   const [createEmployee, { isLoading }] = employeeAPI.useCreateEmployeeMutation()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -70,10 +74,49 @@ const Employee: React.FC = () => {
       })
     }
   }
+
+  const isLoadingEmployees =
+    isLoadingRegisteredEmployees ||
+    isLoadingUnregisteredEmployees ||
+    isLoadingPasswordResetRequesters
+
+  if (isLoadingEmployees) {
+    return (
+      <div className="font-inter bg-gray-100 min-h-screen p-5">
+        <div className="bg-white rounded-xl m-auto p-8 lg:w-4xl">
+          <Skeleton className="mx-auto h-8 w-56" />
+          <div className="mt-8 flex flex-col gap-4 md:flex-row justify-center">
+            {Array.from({ length: 2 }).map((_, columnIndex) => (
+              <div key={columnIndex} className="md:w-sm rounded-lg p-5 shadow-lg">
+                <Skeleton className="mx-auto h-7 w-40" />
+                <div className="mt-6 flex flex-col gap-2">
+                  {Array.from({ length: 5 }).map((__, rowIndex) => (
+                    <Skeleton key={rowIndex} className="h-12 w-full rounded-lg" />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="my-5 flex">
+            <Skeleton className="mx-auto h-10 w-56 rounded-2xl" />
+          </div>
+        </div>
+        <div className="mt-8 mb-8">
+          <Skeleton className="mx-auto h-8 w-80" />
+          <div className="mx-auto mt-4 flex max-w-2xl flex-col gap-3 rounded-lg bg-yellow-50 p-4">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Skeleton key={index} className="h-20 w-full rounded-lg bg-gray-200/70" />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="font-inter bg-gray-100 min-h-screen p-5">
       <ToastContainer />
-      <div className="bg-white rounded-xl m-auto p-8 lg:w-4xl">
+      <div className="bg-white rounded-xl m-auto p-8 w-fit">
         <h1 className="font-inter font-light text-3xl py-10 pl-10">Colaboradores</h1>
         <div className="flex flex-col md:flex-row justify-center gap-4">
           <div className="md:w-sm shadow-lg rounded-lg p-5">
@@ -94,29 +137,30 @@ const Employee: React.FC = () => {
               ))}
             </div>
           </div>
-          <div className="md:w-sm shadow-lg rounded-lg p-5 hover:">
-            <h2 className="font-inter font-light text-2xl py-10 text-center">Não Cadastrados</h2>
-            <div className="m-auto rounded-lg p-2 flex flex-col gap-2 max-h-100 overflow-y-auto">
-              {unregisteredEmployees &&
-                unregisteredEmployees.length > 0 &&
-                unregisteredEmployees.map((employee: UnregisteredEmployee) => (
-                  <div
-                    key={employee.employeeRe}
-                    className="flex justify-between gap-2 bg-gray-100 px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-blue-200 transition-all"
-                    onClick={() => {
-                      setSelectedUnregisteredEmployee(employee)
-                      setIsAddModalOpen(true)
-                      setValue('name', employee.employeeName)
-                      setValue('re', employee.employeeRe)
-                      setValue('shift', employee.employeeShift ? employee.employeeShift : 'ADM')
-                    }}
-                  >
-                    <span>{employee.employeeName}</span>
-                    <span>{employee.employeeRe}</span>
-                  </div>
-                ))}
+          {unregisteredEmployees && unregisteredEmployees.length > 0 && (
+            <div className="md:w-sm shadow-lg rounded-lg p-5 hover:">
+              <h2 className="font-inter font-light text-2xl py-10 text-center">Não Cadastrados</h2>
+              <div className="m-auto rounded-lg p-2 flex flex-col gap-2 max-h-100 overflow-y-auto">
+                {unregisteredEmployees.length > 0 &&
+                  unregisteredEmployees.map((employee: UnregisteredEmployee) => (
+                    <div
+                      key={employee.employeeRe}
+                      className="flex justify-between gap-2 bg-gray-100 px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-blue-200 transition-all"
+                      onClick={() => {
+                        setSelectedUnregisteredEmployee(employee)
+                        setIsAddModalOpen(true)
+                        setValue('name', employee.employeeName)
+                        setValue('re', employee.employeeRe)
+                        setValue('shift', employee.employeeShift ? employee.employeeShift : 'ADM')
+                      }}
+                    >
+                      <span>{employee.employeeName}</span>
+                      <span>{employee.employeeRe}</span>
+                    </div>
+                  ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
         <div className="flex my-5">
           <button

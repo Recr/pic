@@ -6,6 +6,7 @@ import AnnualImplementationAndTarget from './components/AnnualImplementationAndT
 import SubmittedProposalsFiltered from './components/SubmittedProposalsFiltered'
 import AnnualAccumulatedSubmissionsAndTarget from './components/AnnualAccumulatedSubmissionsAndTarget'
 import MonthlySubmissionAccumulatedAndTarget from './components/MonthlySubmissionAccumulatedAndTarget'
+import { Skeleton } from '../../components/skeletons/Skeleton'
 
 const currentYear = new Date().getFullYear()
 
@@ -19,7 +20,7 @@ const AnalyticsPage: React.FC = () => {
   const [communicationDaysTarget, setCommunicationDaysTarget] = useState(0)
   const [editingYear, setEditingYear] = useState<number | null>(null)
 
-  const { data: annualTargets } = annualTargetAPI.useGetAnnualTargetsQuery()
+  const { data: annualTargets, isLoading } = annualTargetAPI.useGetAnnualTargetsQuery()
   const [createAnnualTarget, { isLoading: isCreatingAnnualTarget }] =
     annualTargetAPI.useCreateAnnualTargetMutation()
   const [updateAnnualTarget, { isLoading: isUpdatingAnnualTarget }] =
@@ -27,6 +28,32 @@ const AnalyticsPage: React.FC = () => {
   const [deleteAnnualTarget] = annualTargetAPI.useDeleteAnnualTargetMutation()
 
   const currentYearTarget = annualTargets?.find((target) => target.year === currentYear)
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 px-3 pt-4 sm:px-4 sm:pt-8">
+        <div className="mx-auto w-full max-w-7xl rounded bg-white p-3 sm:p-4 md:p-6">
+          <Skeleton className="mb-3 h-7 w-40 sm:mb-4 sm:h-8" />
+          <Skeleton className="h-5 w-48" />
+          <div className="mt-4 rounded border border-gray-200 bg-gray-50 p-3 sm:p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-3">
+                <Skeleton className="h-4 w-64" />
+                <Skeleton className="h-4 w-72" />
+              </div>
+              <Skeleton className="h-9 w-9 rounded-md" />
+            </div>
+          </div>
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <Skeleton className="h-64 w-full rounded border border-gray-200 bg-gray-50 shadow-sm" />
+            <Skeleton className="h-64 w-full rounded border border-gray-200 bg-gray-50 shadow-sm" />
+            <Skeleton className="h-72 w-full rounded border border-gray-200 bg-gray-50 shadow-sm lg:col-span-2" />
+            <Skeleton className="h-72 w-full rounded border border-gray-200 bg-gray-50 shadow-sm lg:col-span-2" />
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const resetAnnualTargetForm = () => {
     setYear(currentYear)

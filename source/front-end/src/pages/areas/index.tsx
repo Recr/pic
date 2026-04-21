@@ -3,6 +3,7 @@ import { areaAPI } from '../../features/area/area-api'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import Modal from '../../components/modal/Modal'
 import { useState } from 'react'
+import { Skeleton } from '../../components/skeletons/Skeleton'
 
 const Areas: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -15,7 +16,7 @@ const Areas: React.FC = () => {
     setValue,
   } = useForm<{ updateName: string }>()
 
-  const { data } = areaAPI.useGetAreasQuery(undefined)
+  const { data, isLoading } = areaAPI.useGetAreasQuery(undefined)
   const [createArea] = areaAPI.useCreateAreaMutation()
   const [deleteArea] = areaAPI.useDeleteAreaMutation()
   const [updateArea] = areaAPI.useUpdateAreaMutation()
@@ -55,6 +56,34 @@ const Areas: React.FC = () => {
     setSelectedAreaId(area.id)
     setValue('updateName', area.name)
     setIsModalOpen(true)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="bg-gray-100 min-h-screen py-5">
+        <div className="m-auto mt-5 flex w-xs flex-col gap-4 rounded-xl bg-white p-8 sm:w-sm md:w-md">
+          <Skeleton className="h-8 w-32" />
+          <div className="flex flex-col gap-3">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm"
+              >
+                <Skeleton className="h-5 w-32" />
+                <div className="flex gap-2">
+                  <Skeleton className="size-6 rounded-md" />
+                  <Skeleton className="size-6 rounded-md" />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mx-auto mt-5 flex w-1/3 flex-col items-center gap-3">
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-10 w-full rounded-lg" />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

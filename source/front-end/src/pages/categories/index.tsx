@@ -10,9 +10,10 @@ import {
   updateCategorySchema,
 } from '../../validation/schemas/category-schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Skeleton } from '../../components/skeletons/Skeleton'
 
 const Categories: React.FC = () => {
-  const { data: categoriesList } = categoryAPI.useGetCategoriesQuery()
+  const { data: categoriesList, isLoading } = categoryAPI.useGetCategoriesQuery()
   const [createCategory] = categoryAPI.useCreateCategoryMutation()
   const [deleteCategory] = categoryAPI.useDeleteCategoryMutation()
   const [updateCategory] = categoryAPI.useUpdateCategoryMutation()
@@ -78,6 +79,39 @@ const Categories: React.FC = () => {
     setValueUpdate('name', category.name)
     setValueUpdate('categoryReward', category.categoryReward)
     setIsUpdateModalOpen(true)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="bg-gray-100 min-h-screen py-5">
+        <div className="m-auto flex w-xs flex-col gap-4 rounded-xl bg-white p-8 sm:w-sm md:w-md lg:w-xl">
+          <Skeleton className="h-8 w-40" />
+          <div className="flex flex-col gap-3">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm"
+              >
+                <div className="flex w-full items-center gap-4">
+                  <Skeleton className="h-5 w-32" />
+                  <Skeleton className="h-4 w-16" />
+                </div>
+                <div className="flex gap-2">
+                  <Skeleton className="size-6 rounded-md" />
+                  <Skeleton className="size-6 rounded-md" />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mx-auto mt-10 flex w-1/3 flex-col items-center gap-3">
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-10 w-full rounded-lg" />
+            <Skeleton className="h-10 w-full rounded-lg" />
+            <Skeleton className="h-10 w-full rounded-lg" />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
