@@ -115,4 +115,34 @@ proposalsRoutes.put(
   ProposalsController.handleAdminRejection,
 )
 
+proposalsRoutes.put(
+  '/:id/undo/implemented-to-implementation',
+  authMiddleware,
+  ProposalsController.handleUndoImplementedToImplementation,
+)
+
+proposalsRoutes.put(
+  '/:id/undo/implementation-to-to-implement',
+  authMiddleware,
+  ProposalsController.handleUndoImplementationToToImplement,
+)
+
+proposalsRoutes.put(
+  '/:id/undo/to-implement-to-under-validation',
+  authMiddleware,
+  ProposalsController.handleUndoToImplementToUnderValidation,
+)
+
+proposalsRoutes.put(
+  '/:id/undo/rejected-to-under-validation',
+  authMiddleware,
+  ProposalsController.handleUndoRejectedToUnderValidation,
+)
+
+proposalsRoutes.put(
+  '/:id/undo/rejected-to-define-champion',
+  authMiddleware,
+  ProposalsController.handleUndoRejectedToDefineChampion,
+)
+
 export { proposalsRoutes }

@@ -54,6 +54,16 @@ class PrismaPayoutRepository {
 
     return updateResult.count
   }
+
+  public async deleteByProposalId(proposalId: number) {
+    return await prisma.payout.deleteMany({
+      where: {
+        suggestion: {
+          proposalId,
+        },
+      },
+    })
+  }
 }
 
 export { PrismaPayoutRepository }

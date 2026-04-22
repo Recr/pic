@@ -203,5 +203,55 @@ export const proposalAPI = api.injectEndpoints({
         { type: 'Proposal', id: 'LIST' },
       ],
     }),
+    undoImplementedToImplementation: builder.mutation<Proposal, { proposalId: string }>({
+      query: ({ proposalId }) => ({
+        url: `/proposals/${proposalId}/undo/implemented-to-implementation`,
+        method: 'PUT',
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
+    undoImplementationToToImplement: builder.mutation<Proposal, { proposalId: string }>({
+      query: ({ proposalId }) => ({
+        url: `/proposals/${proposalId}/undo/implementation-to-to-implement`,
+        method: 'PUT',
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
+    undoToImplementToUnderValidation: builder.mutation<Proposal, { proposalId: string }>({
+      query: ({ proposalId }) => ({
+        url: `/proposals/${proposalId}/undo/to-implement-to-under-validation`,
+        method: 'PUT',
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
+    undoRejectedToUnderValidation: builder.mutation<Proposal, { proposalId: string }>({
+      query: ({ proposalId }) => ({
+        url: `/proposals/${proposalId}/undo/rejected-to-under-validation`,
+        method: 'PUT',
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
+    undoRejectedToDefineChampion: builder.mutation<Proposal, { proposalId: string }>({
+      query: ({ proposalId }) => ({
+        url: `/proposals/${proposalId}/undo/rejected-to-define-champion`,
+        method: 'PUT',
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
   }),
 })

@@ -15,6 +15,7 @@ import { PrismaCategoryRepository } from '../repositories/category.repository'
 import { PrismaSuggestionRepository } from '../repositories/suggestion.repository'
 import { Role } from '../utils/types/employees.types'
 import { PrismaProposalAttachmentRepository } from '../repositories/proposal-attachment.repository'
+import { PrismaPayoutRepository } from '../repositories/payout.repository'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
@@ -25,6 +26,7 @@ class ProposalsUseCase {
     private categoryRepository: PrismaCategoryRepository,
     private suggestionRepository: PrismaSuggestionRepository,
     private proposalAttachmentRepository: PrismaProposalAttachmentRepository,
+    private payoutRepository?: PrismaPayoutRepository,
   ) {}
 
   public async executeFindAll() {
@@ -358,6 +360,146 @@ class ProposalsUseCase {
     }
 
     await this.proposalAttachmentRepository.deleteById(attachmentId)
+  }
+
+  // Undo status methods
+
+  public async executeUndoImplementedToImplementation(
+    proposalId: number,
+    userId: number,
+    role: Role,
+  ) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+
+    if (proposal.status !== 'IMPLEMENTED') {
+      throw new AppError('Proposal is not in IMPLEMENTED status.', StatusCodes.BAD_REQUEST)
+    }
+
+    // Check authorization
+    if (role !== Role.ADMIN && proposal.championId !== userId) {
+      throw new AppError('Unauthorized to undo this proposal.', StatusCodes.FORBIDDEN)
+    }
+
+    // Check if proposal was completed more than 1 week ago
+    if (proposal.completedAt) {
+      const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      if (proposal.completedAt < oneWeekAgo) {
+        throw new AppError(
+          'Cannot undo a proposal that was implemented more than 1 week ago.',
+          StatusCodes.BAD_REQUEST,
+        )
+      }
+    }
+
+    // Delete payouts
+    if (this.payoutRepository) {
+      await this.payoutRepository.deleteByProposalId(proposalId)
+    }
+
+    const updatedData: Prisma.ProposalUpdateInput = {
+      status: 'IMPLEMENTATION',
+      completedAt: null,
+    }
+
+    const updatedProposal = await this.proposalRepository.updateProposal(proposalId, updatedData)
+    return updatedProposal
+  }
+
+  public async executeUndoImplementationToToImplement(proposalId: number, userId: number) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+
+    if (proposal.status !== 'IMPLEMENTATION') {
+      throw new AppError('Proposal is not in IMPLEMENTATION status.', StatusCodes.BAD_REQUEST)
+    }
+
+    if (proposal.championId !== userId) {
+      throw new AppError('Unauthorized to undo this proposal.', StatusCodes.FORBIDDEN)
+    }
+
+    const updatedData: Prisma.ProposalUpdateInput = {
+      status: 'TO_IMPLEMENT',
+      implementationStartedAt: null,
+    }
+
+    const updatedProposal = await this.proposalRepository.updateProposal(proposalId, updatedData)
+    return updatedProposal
+  }
+
+  public async executeUndoToImplementToUnderValidation(proposalId: number, userId: number) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+
+    if (proposal.status !== 'TO_IMPLEMENT') {
+      throw new AppError('Proposal is not in TO_IMPLEMENT status.', StatusCodes.BAD_REQUEST)
+    }
+
+    if (proposal.championId !== userId) {
+      throw new AppError('Unauthorized to undo this proposal.', StatusCodes.FORBIDDEN)
+    }
+
+    const updatedData: Prisma.ProposalUpdateInput = {
+      status: 'UNDER_VALIDATION',
+      championReviewedAt: null,
+    }
+
+    const updatedProposal = await this.proposalRepository.updateProposal(proposalId, updatedData)
+    return updatedProposal
+  }
+
+  public async executeUndoRejectedToUnderValidation(proposalId: number, userId: number) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+
+    if (proposal.status !== 'REJECTED' && proposal.status !== 'NOT_VIABLE') {
+      throw new AppError(
+        'Proposal is not in REJECTED or NOT_VIABLE status.',
+        StatusCodes.BAD_REQUEST,
+      )
+    }
+
+    if (proposal.championId !== userId) {
+      throw new AppError('Unauthorized to undo this proposal.', StatusCodes.FORBIDDEN)
+    }
+
+    const updatedData: Prisma.ProposalUpdateInput = {
+      status: 'UNDER_VALIDATION',
+      rejectionNote: null,
+    }
+
+    const updatedProposal = await this.proposalRepository.updateProposal(proposalId, updatedData)
+    return updatedProposal
+  }
+
+  public async executeUndoRejectedToDefineChampion(proposalId: number, userId: number, role: Role) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+
+    if (proposal.status !== 'REJECTED') {
+      throw new AppError('Proposal is not in REJECTED status.', StatusCodes.BAD_REQUEST)
+    }
+
+    // Check authorization: manager of the proposal or admin
+    if (role !== Role.ADMIN && proposal.managerId !== userId) {
+      throw new AppError('Unauthorized to undo this proposal.', StatusCodes.FORBIDDEN)
+    }
+
+    // Check if there's no champion
+    if (proposal.championId !== null) {
+      throw new AppError(
+        'Cannot undo to DEFINE_CHAMPION if a champion is already assigned.',
+        StatusCodes.BAD_REQUEST,
+      )
+    }
+
+    const updatedData: Prisma.ProposalUpdateInput = {
+      status: 'DEFINE_CHAMPION',
+      rejectionNote: null,
+    }
+
+    const updatedProposal = await this.proposalRepository.updateProposal(proposalId, updatedData)
+    return updatedProposal
   }
 
   // Helper methods

@@ -7,19 +7,40 @@ import { getStatusColor } from '../../../helpers/getStatusColor'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../../app/store'
 import { toast } from 'react-toastify'
+import { Undo2 } from 'lucide-react'
+import UndoStatusModal from './UndoStatusModal'
 
 const MAX_ATTACHMENTS_PER_UPLOAD = 5
 const MAX_ATTACHMENT_SIZE_BYTES = 10 * 1024 * 1024
 
 const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) => {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
+  const [isUndoModalOpen, setIsUndoModalOpen] = React.useState(false)
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
   const [removingAttachmentId, setRemovingAttachmentId] = React.useState<number | null>(null)
+  const [selectedUndoType, setSelectedUndoType] = React.useState<
+    | 'IMPLEMENTED_TO_IMPLEMENTATION'
+    | 'IMPLEMENTATION_TO_TO_IMPLEMENT'
+    | 'TO_IMPLEMENT_TO_UNDER_VALIDATION'
+    | 'REJECTED_TO_UNDER_VALIDATION'
+    | 'REJECTED_TO_DEFINE_CHAMPION'
+    | null
+  >(null)
 
   const [uploadAttachments, { isLoading: isUploadingAttachments }] =
     proposalAPI.useUploadProposalAttachmentsMutation()
   const [deleteAttachment, { isLoading: isDeletingAttachment }] =
     proposalAPI.useDeleteProposalAttachmentMutation()
+  const [undoImplementedToImplementation, { isLoading: isUndoImplementedLoading }] =
+    proposalAPI.useUndoImplementedToImplementationMutation()
+  const [undoImplementationToToImplement, { isLoading: isUndoImplementationLoading }] =
+    proposalAPI.useUndoImplementationToToImplementMutation()
+  const [undoToImplementToUnderValidation, { isLoading: isUndoToImplementLoading }] =
+    proposalAPI.useUndoToImplementToUnderValidationMutation()
+  const [undoRejectedToUnderValidation, { isLoading: isUndoRejectedValidationLoading }] =
+    proposalAPI.useUndoRejectedToUnderValidationMutation()
+  const [undoRejectedToDefineChampion, { isLoading: isUndoRejectedChampionLoading }] =
+    proposalAPI.useUndoRejectedToDefineChampionMutation()
   const user = useSelector((state: RootState) => state.auth.user)
 
   const isAdmin = user?.role === 'ADMIN'
@@ -27,6 +48,95 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   const isChampion = user?.re !== undefined && proposal.champion?.re === user.re
   const canEditAttachments = Boolean(isAdmin || isManager || isChampion)
   const fileInputId = `attachment-input-${proposal.id}`
+
+  const getUndoLoading = () => {
+    switch (selectedUndoType) {
+      case 'IMPLEMENTED_TO_IMPLEMENTATION':
+        return isUndoImplementedLoading
+      case 'IMPLEMENTATION_TO_TO_IMPLEMENT':
+        return isUndoImplementationLoading
+      case 'TO_IMPLEMENT_TO_UNDER_VALIDATION':
+        return isUndoToImplementLoading
+      case 'REJECTED_TO_UNDER_VALIDATION':
+        return isUndoRejectedValidationLoading
+      case 'REJECTED_TO_DEFINE_CHAMPION':
+        return isUndoRejectedChampionLoading
+      default:
+        return false
+    }
+  }
+
+  const getAvailableUndoActions = () => {
+    const actions: (typeof selectedUndoType)[] = []
+
+    if (proposal.status === 'IMPLEMENTED' && (isAdmin || isChampion)) {
+      actions.push('IMPLEMENTED_TO_IMPLEMENTATION')
+    }
+
+    if (proposal.status === 'IMPLEMENTATION' && isChampion) {
+      actions.push('IMPLEMENTATION_TO_TO_IMPLEMENT')
+    }
+
+    if (proposal.status === 'TO_IMPLEMENT' && isChampion) {
+      actions.push('TO_IMPLEMENT_TO_UNDER_VALIDATION')
+    }
+
+    if ((proposal.status === 'REJECTED' || proposal.status === 'NOT_VIABLE') && isChampion) {
+      actions.push('REJECTED_TO_UNDER_VALIDATION')
+    }
+
+    if (proposal.status === 'REJECTED' && (isAdmin || isManager) && !proposal.champion) {
+      actions.push('REJECTED_TO_DEFINE_CHAMPION')
+    }
+
+    return actions
+  }
+
+  const getPrimaryUndoAction = () => {
+    const actions = getAvailableUndoActions()
+    return actions.length > 0 ? actions[0] : null
+  }
+
+  const handleUndoClick = () => {
+    const undoType = getPrimaryUndoAction()
+    if (!undoType) {
+      return
+    }
+    setSelectedUndoType(undoType)
+    setIsUndoModalOpen(true)
+  }
+
+  const handleConfirmUndo = async () => {
+    if (!selectedUndoType) {
+      return
+    }
+
+    try {
+      switch (selectedUndoType) {
+        case 'IMPLEMENTED_TO_IMPLEMENTATION':
+          await undoImplementedToImplementation({ proposalId: proposal.id.toString() }).unwrap()
+          break
+        case 'IMPLEMENTATION_TO_TO_IMPLEMENT':
+          await undoImplementationToToImplement({ proposalId: proposal.id.toString() }).unwrap()
+          break
+        case 'TO_IMPLEMENT_TO_UNDER_VALIDATION':
+          await undoToImplementToUnderValidation({ proposalId: proposal.id.toString() }).unwrap()
+          break
+        case 'REJECTED_TO_UNDER_VALIDATION':
+          await undoRejectedToUnderValidation({ proposalId: proposal.id.toString() }).unwrap()
+          break
+        case 'REJECTED_TO_DEFINE_CHAMPION':
+          await undoRejectedToDefineChampion({ proposalId: proposal.id.toString() }).unwrap()
+          break
+      }
+
+      setIsUndoModalOpen(false)
+      setSelectedUndoType(null)
+      toast.success('Ação desfeita com sucesso.')
+    } catch (error) {
+      toast.error(`Erro ao desfazer ação: ${getErrorMessage(error)}`)
+    }
+  }
 
   const getErrorMessage = (error: unknown) => {
     if (
@@ -183,7 +293,19 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
                 Criado em {new Date(proposal.createdAt).toLocaleDateString()}
               </p>
             </div>
-            <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
+            <div className="flex items-center gap-2">
+              {getPrimaryUndoAction() && (
+                <button
+                  type="button"
+                  onClick={handleUndoClick}
+                  title="Desfazer para status anterior"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded border border-orange-200 text-orange-600 transition-colors hover:cursor-pointer hover:bg-orange-50"
+                >
+                  <Undo2 size={16} />
+                </button>
+              )}
+              <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
@@ -392,6 +514,17 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
           </div>
         </div>
       </Modal>
+      <UndoStatusModal
+        isOpen={isUndoModalOpen}
+        onClose={() => {
+          setIsUndoModalOpen(false)
+          setSelectedUndoType(null)
+        }}
+        onConfirm={handleConfirmUndo}
+        proposal={proposal}
+        undoType={selectedUndoType}
+        isLoading={getUndoLoading()}
+      />
     </>
   )
 }
