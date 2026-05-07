@@ -111,3 +111,9 @@ export const adminRejectionSchema = z.object({
     rejectionNote: z.string().trim().min(1, 'Rejection note is required.').max(1000),
   }),
 })
+
+export const softDeleteProposalSchema = z.object({
+  params: z.object({
+    id: z.coerce.number(),
+  }),
+})

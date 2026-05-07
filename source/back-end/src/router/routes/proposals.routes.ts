@@ -10,6 +10,7 @@ import {
   updateProposalStatusByChampionSchema,
   updateProposalWithChampion,
   updateProposalWithManager,
+  softDeleteProposalSchema,
 } from '../../utils/schemas/proposal.schemas'
 import { authMiddleware } from '../../middlewares/auth.middeware'
 import { checkRole } from '../../middlewares/role.middleware'
@@ -113,6 +114,14 @@ proposalsRoutes.put(
   authMiddleware,
   checkRole([Role.ADMIN]),
   ProposalsController.handleAdminRejection,
+)
+
+proposalsRoutes.delete(
+  '/:id',
+  validate(softDeleteProposalSchema),
+  authMiddleware,
+  checkRole([Role.ADMIN]),
+  ProposalsController.handleSoftDeleteProposal,
 )
 
 proposalsRoutes.put(

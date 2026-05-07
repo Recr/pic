@@ -253,5 +253,15 @@ export const proposalAPI = api.injectEndpoints({
         { type: 'Proposal', id: 'LIST' },
       ],
     }),
+    softDeleteProposal: builder.mutation<Proposal, { proposalId: string }>({
+      query: ({ proposalId }) => ({
+        url: `/proposals/${proposalId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
   }),
 })

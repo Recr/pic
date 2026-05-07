@@ -7,7 +7,7 @@ import { getStatusColor } from '../../../helpers/getStatusColor'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../../app/store'
 import { toast } from 'react-toastify'
-import { Undo2 } from 'lucide-react'
+import { Undo2, Trash2 } from 'lucide-react'
 import UndoStatusModal from './UndoStatusModal'
 
 const MAX_ATTACHMENTS_PER_UPLOAD = 5
@@ -16,6 +16,7 @@ const MAX_ATTACHMENT_SIZE_BYTES = 10 * 1024 * 1024
 const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) => {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [isUndoModalOpen, setIsUndoModalOpen] = React.useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false)
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
   const [removingAttachmentId, setRemovingAttachmentId] = React.useState<number | null>(null)
   const [selectedUndoType, setSelectedUndoType] = React.useState<
@@ -41,6 +42,8 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
     proposalAPI.useUndoRejectedToUnderValidationMutation()
   const [undoRejectedToDefineChampion, { isLoading: isUndoRejectedChampionLoading }] =
     proposalAPI.useUndoRejectedToDefineChampionMutation()
+  const [softDeleteProposal, { isLoading: isSoftDeleteLoading }] =
+    proposalAPI.useSoftDeleteProposalMutation()
   const user = useSelector((state: RootState) => state.auth.user)
 
   const isAdmin = user?.role === 'ADMIN'
@@ -135,6 +138,21 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
       toast.success('Ação desfeita com sucesso.')
     } catch (error) {
       toast.error(`Erro ao desfazer ação: ${getErrorMessage(error)}`)
+    }
+  }
+
+  const handleSoftDelete = () => {
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    try {
+      await softDeleteProposal({ proposalId: proposal.id.toString() }).unwrap()
+      setIsModalOpen(false)
+      setIsDeleteModalOpen(false)
+      toast.success('Proposta deletada com sucesso.')
+    } catch (error) {
+      toast.error(`Erro ao deletar proposta: ${getErrorMessage(error)}`)
     }
   }
 
@@ -302,6 +320,17 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
                   className="inline-flex h-8 w-8 items-center justify-center rounded border border-orange-200 text-orange-600 transition-colors hover:cursor-pointer hover:bg-orange-50"
                 >
                   <Undo2 size={16} />
+                </button>
+              )}
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={handleSoftDelete}
+                  disabled={isSoftDeleteLoading}
+                  title="Deletar proposta"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded border border-red-200 text-red-600 transition-colors hover:cursor-pointer hover:bg-red-50 disabled:cursor-not-allowed disabled:text-gray-400"
+                >
+                  <Trash2 size={16} />
                 </button>
               )}
               <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
@@ -525,6 +554,32 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
         undoType={selectedUndoType}
         isLoading={getUndoLoading()}
       />
+      <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>
+        <div className="w-full max-w-sm space-y-4 p-6">
+          <h3 className="text-lg font-semibold text-red-600">Deletar Proposta</h3>
+          <p className="text-gray-700">
+            Tem certeza que deseja deletar esta proposta? Esta ação não pode ser desfeita.
+          </p>
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={() => setIsDeleteModalOpen(false)}
+              disabled={isSoftDeleteLoading}
+              className="rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmDelete}
+              disabled={isSoftDeleteLoading}
+              className="rounded bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isSoftDeleteLoading ? 'Deletando...' : 'Deletar'}
+            </button>
+          </div>
+        </div>
+      </Modal>
     </>
   )
 }

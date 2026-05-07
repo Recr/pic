@@ -245,6 +245,25 @@ export const ProposalsController = {
     }
   },
 
+  async handleSoftDeleteProposal(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalId = Number(req.params.id)
+
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
+      )
+
+      const updatedProposal = await proposalUseCase.executeSoftDeleteProposal(proposalId)
+      res.send(updatedProposal)
+    } catch (error) {
+      next(error)
+    }
+  },
+
   async handleStatusUpdate(req: Request, res: Response, next: NextFunction) {
     try {
       const proposalId = Number(req.params.id)

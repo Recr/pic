@@ -63,6 +63,7 @@ model Proposal {
   managerNotes            String?   @map("manager_notes") @db.NVarChar(1000)
   rejectionNote           String?   @map("rejection_note") @db.NVarChar(1000)
   isCustomReward          Boolean   @map("is_custom_reward") @default(false)
+  isActive                Boolean   @map("is_active") @default(true)
 
   area        Area         @relation(fields: [areaId], references: [id])
   category    Category?    @relation(fields: [categoryId], references: [id])

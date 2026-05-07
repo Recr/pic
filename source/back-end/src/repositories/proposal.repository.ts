@@ -4,7 +4,11 @@ import { CreateProposalWithSuggestions } from '../utils/types/proposals.types'
 
 class PrismaProposalRepository {
   public async findAll() {
-    const proposals = await prisma.proposal.findMany()
+    const proposals = await prisma.proposal.findMany({
+      where: {
+        isActive: true,
+      },
+    })
     return proposals
   }
 
@@ -85,7 +89,9 @@ class PrismaProposalRepository {
     categoryId?: number,
     areaId?: number,
   ) {
-    const where: Prisma.ProposalWhereInput = {}
+    const where: Prisma.ProposalWhereInput = {
+      isActive: true,
+    }
     if (statuses) {
       where.status = { in: statuses }
     }
@@ -122,8 +128,13 @@ class PrismaProposalRepository {
   }
 
   public async findAllDetailed(where?: Prisma.ProposalWhereInput) {
+    const finalWhere: Prisma.ProposalWhereInput = where
+      ? {
+          AND: [{ isActive: true }, where],
+        }
+      : { isActive: true }
     const proposals = await prisma.proposal.findMany({
-      where,
+      where: finalWhere,
       select: this.getDetailedSelect(),
     })
     return proposals
@@ -133,6 +144,7 @@ class PrismaProposalRepository {
     const where: Prisma.ProposalWhereInput =
       userId === undefined
         ? {
+            isActive: true,
             OR: [
               { status: 'UNDER_VALIDATION' },
               { status: 'TO_IMPLEMENT' },
@@ -140,6 +152,7 @@ class PrismaProposalRepository {
             ],
           }
         : {
+            isActive: true,
             championId: userId,
             OR: [
               { status: 'UNDER_VALIDATION' },
@@ -197,6 +210,7 @@ class PrismaProposalRepository {
   public async findAllWithoutChampion(userId: number) {
     const proposals = await prisma.proposal.findMany({
       where: {
+        isActive: true,
         championId: null,
         status: 'DEFINE_CHAMPION',
         OR: [
@@ -246,6 +260,7 @@ class PrismaProposalRepository {
   public async findAllWithoutManager() {
     const proposals = await prisma.proposal.findMany({
       where: {
+        isActive: true,
         managerId: null,
         championId: null,
         status: 'DEFINE_CHAMPION',
@@ -287,6 +302,7 @@ class PrismaProposalRepository {
   public async findAllWithoutChampionFromManager(userId: number) {
     const proposals = await prisma.proposal.findMany({
       where: {
+        isActive: true,
         championId: null,
         managerId: userId,
         status: 'DEFINE_CHAMPION',
@@ -332,12 +348,16 @@ class PrismaProposalRepository {
         id: proposalId,
       },
     })
+    if (proposal && !proposal.isActive) {
+      return null
+    }
     return proposal
   }
 
   public async findByCategoryId(categoryId: number) {
     const proposals = await prisma.proposal.findMany({
       where: {
+        isActive: true,
         categoryId: categoryId,
       },
     })
