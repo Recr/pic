@@ -33,6 +33,7 @@ const MonthlySubmissionAccumulatedAndTarget: React.FC = () => {
   const [year, setYear] = useState(currentYear)
   const [startDate, setStartDate] = useState<string>(`${year}-01-01`)
   const [endDate, setEndDate] = useState<string>(`${year}-12-31`)
+  const [leftAxisScale, setLeftAxisScale] = useState(1)
 
   const filters = useMemo(
     () => ({
@@ -54,6 +55,15 @@ const MonthlySubmissionAccumulatedAndTarget: React.FC = () => {
   const currentYearTarget = useMemo(() => {
     return targets?.find((target) => target.year === year)
   }, [targets, year])
+
+  const leftAxisSuggestedMax = useMemo(() => {
+    if (!proposalAnalytics?.data?.length) {
+      return undefined
+    }
+
+    const highestValue = Math.max(...proposalAnalytics.data)
+    return Math.max(highestValue * leftAxisScale, highestValue)
+  }, [proposalAnalytics?.data, leftAxisScale])
 
   const monthLabels = useMemo(() => {
     return (
@@ -194,6 +204,21 @@ const MonthlySubmissionAccumulatedAndTarget: React.FC = () => {
           onChange={(e) => handleYearChange(Number(e.target.value))}
         />
       </div>
+      <div className="mt-4">
+        <label className="mb-1 block text-sm font-medium" htmlFor="left-axis-scale">
+          Eixo esquerdo: {leftAxisScale.toFixed(1)}x
+        </label>
+        <input
+          id="left-axis-scale"
+          type="range"
+          min={1}
+          max={3}
+          step={0.1}
+          className="w-full"
+          value={leftAxisScale}
+          onChange={(e) => setLeftAxisScale(Number(e.target.value))}
+        />
+      </div>
       {/* <input type="checkbox" id="show-trend" onChange={(e) => setShowTrend(e.target.checked)} />
       <label htmlFor="show-trend">Mostrar tendência</label> */}
       <div className="mt-4 h-64 w-full sm:h-80">
@@ -236,6 +261,7 @@ const MonthlySubmissionAccumulatedAndTarget: React.FC = () => {
               yBars: {
                 type: 'linear',
                 position: 'left',
+                suggestedMax: leftAxisSuggestedMax,
                 grid: {
                   drawOnChartArea: false,
                 },
