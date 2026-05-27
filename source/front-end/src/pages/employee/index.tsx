@@ -13,6 +13,7 @@ import { createEmployeeSchema } from '../../validation/schemas/employee-schemas'
 import { translateRoles } from '../../helpers/translateRoles'
 import type z from 'zod'
 import { Skeleton } from '../../components/skeletons/Skeleton'
+import { X } from 'lucide-react'
 
 const Employee: React.FC = () => {
   type CreateEmployeeSchemaInput = z.input<typeof createEmployeeSchema>
@@ -40,6 +41,7 @@ const Employee: React.FC = () => {
     useState<UnregisteredEmployee | null>(null)
 
   const formatShift = (shift?: string) => {
+    console.log(shift)
     const shiftMap: Record<string, string> = {
       '1': '1º turno',
       '2': '2º turno',
@@ -208,26 +210,32 @@ const Employee: React.FC = () => {
           setSelectedEmployee(null)
         }}
       >
-        <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
-          <h2 className="text-center text-xl font-semibold text-gray-800">Dados do colaborador</h2>
+        <div className="rounded-xl bg-whites p-1 gap-4 flex flex-col w-2xs">
+          <X
+            className="hover:cursor-pointer size-4 hover:size-6 "
+            onClick={() => setIsEditModalOpen(false)}
+          />
+          <h2 className="text-center text-xl font-semibold text-gray-800 flex self-start">
+            Colaborador
+          </h2>
           {selectedEmployee ? (
-            <div className="mt-6 space-y-3 rounded-lg bg-gray-50 p-4">
+            <div className="w-fulls">
               <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-600">Nome</span>
+                <span className="text-sm text-gray-400">Nome</span>
                 <span className="font-medium text-gray-900">{selectedEmployee.name}</span>
               </div>
               <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-600">RE</span>
+                <span className="text-sm text-gray-400">RE</span>
                 <span className="font-medium text-gray-900">{selectedEmployee.re}</span>
               </div>
               <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-600">Cargo</span>
+                <span className="text-sm text-gray-400">Cargo</span>
                 <span className="font-medium text-gray-900">
                   {translateRoles(selectedEmployee.role)}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Turno</span>
+                <span className="text-sm text-gray-400">Turno</span>
                 <span className="font-medium text-gray-900">
                   {formatShift(selectedEmployee.shift)}
                 </span>
