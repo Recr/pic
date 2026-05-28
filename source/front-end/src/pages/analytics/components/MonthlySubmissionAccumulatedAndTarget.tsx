@@ -212,7 +212,7 @@ const MonthlySubmissionAccumulatedAndTarget: React.FC = () => {
           id="left-axis-scale"
           type="range"
           min={1}
-          max={3}
+          max={5}
           step={0.1}
           className="w-full"
           value={leftAxisScale}

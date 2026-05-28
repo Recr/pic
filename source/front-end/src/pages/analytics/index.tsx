@@ -4,9 +4,9 @@ import { annualTargetAPI } from '../../features/annual-target/annual-target-api'
 import Modal from '../../components/modal/Modal'
 import AnnualImplementationAndTarget from './components/AnnualImplementationAndTarget'
 import SubmittedProposalsFiltered from './components/SubmittedProposalsFiltered'
-import AnnualAccumulatedSubmissionsAndTarget from './components/AnnualAccumulatedSubmissionsAndTarget'
 import MonthlySubmissionAccumulatedAndTarget from './components/MonthlySubmissionAccumulatedAndTarget'
 import { Skeleton } from '../../components/skeletons/Skeleton'
+import AnnualAccumulatedAndTarget from './components/AnnualAccumulatedAndTarget'
 
 const currentYear = new Date().getFullYear()
 
@@ -161,7 +161,7 @@ const AnalyticsPage: React.FC = () => {
             <SubmittedProposalsFiltered />
           </div>
           <div className="rounded border border-gray-200 bg-gray-50 p-4 shadow-sm lg:col-span-2">
-            <AnnualAccumulatedSubmissionsAndTarget />
+            <AnnualAccumulatedAndTarget />
           </div>
         </div>
       </div>

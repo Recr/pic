@@ -106,7 +106,7 @@ const AnnualAccumulatedSubmissionsAndTarget: React.FC = () => {
 
     if (monthlyTarget !== undefined) {
       proposalAnalytics.labels.forEach((_, index) => {
-        accumalatedTargetData[index] = Math.round(monthlyTarget * (index + 1) * 100) / 100
+        accumalatedTargetData[index] = Math.round(monthlyTarget * (index + 1))
       })
 
       datasets.push({
