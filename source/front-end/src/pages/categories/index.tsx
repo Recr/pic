@@ -193,6 +193,7 @@ const Categories: React.FC = () => {
               <input
                 {...registerUpdate('categoryReward')}
                 type="number"
+                step="any"
                 className="border-2 border-gray-300 rounded-lg p-2"
                 placeholder="Prêmio"
               />
