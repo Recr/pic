@@ -22,7 +22,17 @@ const getQueryStringArray = (value: unknown): string[] => {
   return []
 }
 
-const parseDateQuery = (value: unknown, fieldName: string): Date | undefined => {
+const startOfUtcDay = (date: Date): Date =>
+  new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
+
+const endOfUtcDay = (date: Date): Date =>
+  new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999))
+
+const parseDateQuery = (
+  value: unknown,
+  fieldName: string,
+  bound: 'start' | 'end' = 'start',
+): Date | undefined => {
   if (typeof value !== 'string' || value.trim() === '') {
     return undefined
   }
@@ -36,7 +46,7 @@ const parseDateQuery = (value: unknown, fieldName: string): Date | undefined => 
     )
   }
 
-  return parsedDate
+  return bound === 'end' ? endOfUtcDay(parsedDate) : startOfUtcDay(parsedDate)
 }
 
 export const AnalyticsController = {
@@ -46,6 +56,7 @@ export const AnalyticsController = {
       const statuses = getQueryStringArray(req.query.status)
       const startDate = parseDateQuery(req.query.startDate, 'startDate')
       const endDate = parseDateQuery(req.query.endDate, 'endDate')
+      const completionDate = parseDateQuery(req.query.completionDate, 'completionDate', 'end')
       const category = typeof req.query.category === 'string' ? req.query.category.trim() : ''
       const categoryId =
         typeof req.query.categoryId === 'string' && req.query.categoryId.trim() !== ''
@@ -74,6 +85,7 @@ export const AnalyticsController = {
         ...(statuses.length > 0 ? { statuses } : {}),
         ...(startDate ? { startDate } : {}),
         ...(endDate ? { endDate } : {}),
+        ...(completionDate ? { completionDate } : {}),
         ...(category ? { category } : {}),
         ...(categoryId !== undefined ? { categoryId } : {}),
         ...(areaId !== undefined ? { areaId } : {}),

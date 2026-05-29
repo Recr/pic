@@ -32,22 +32,22 @@ ChartJS.register(
 const AnnualImplementationAndTarget: React.FC = () => {
   const [year, setYear] = useState(currentYear)
   const [startDate, setStartDate] = useState<string>(`${year}-01-01`)
-  const [endDate, setEndDate] = useState<string>(`${year}-12-31`)
+  const [completionDate, setCompletionDate] = useState<string>(`${year}-12-31`)
   const [leftAxisScale, setLeftAxisScale] = useState(1)
 
   const filters = useMemo(
     () => ({
       ...(startDate ? { startDate } : {}),
-      ...(endDate ? { endDate } : {}),
+      ...(completionDate ? { completionDate } : {}),
       ...{ status: 'IMPLEMENTED' },
     }),
-    [startDate, endDate],
+    [startDate, completionDate],
   )
 
   const handleYearChange = (newYear: number) => {
     setYear(newYear)
     setStartDate(`${newYear}-01-01`)
-    setEndDate(`${newYear}-12-31`)
+    setCompletionDate(`${newYear}-12-31`)
   }
 
   const { data: proposalAnalytics } = analyticsAPI.useGetProposalAnalyticsQuery(filters)
@@ -93,48 +93,6 @@ const AnnualImplementationAndTarget: React.FC = () => {
       currentYearTarget?.annualImplementedProposalsTarget !== undefined
         ? currentYearTarget.annualImplementedProposalsTarget / 12
         : undefined
-
-    // Build tendency only until the last month with real values to avoid a fake downtrend at year end.
-    // const lastInfoIndex = proposalAnalytics.data.reduce(
-    //   (lastIndex, value, index) => (value > 0 ? index : lastIndex),
-    //   -1,
-    // )
-    // const trendBaseData =
-    //   lastInfoIndex >= 0
-    //     ? proposalAnalytics.data.slice(0, lastInfoIndex + 1)
-    //     : proposalAnalytics.data
-
-    // const n = trendBaseData.length
-    // const sumX = trendBaseData.reduce((acc, _, index) => acc + index, 0)
-    // const sumY = trendBaseData.reduce((acc, value) => acc + value, 0)
-    // const sumXY = trendBaseData.reduce((acc, value, index) => acc + index * value, 0)
-    // const sumXX = trendBaseData.reduce((acc, _, index) => acc + index * index, 0)
-
-    // const denominator = n * sumXX - sumX * sumX
-    // const slope = denominator === 0 ? 0 : (n * sumXY - sumX * sumY) / denominator
-    // const intercept = (sumY - slope * sumX) / n
-
-    // const trendLineData = proposalAnalytics.data.map((_, index) => {
-    //   if (lastInfoIndex >= 0 && index > lastInfoIndex) {
-    //     return Number.NaN
-    //   }
-
-    //   const value = slope * index + intercept
-    //   return value > 0 ? value : 0
-    // })
-
-    // dataset.push({
-    //   label: 'Tendencia',
-    //   type: 'line',
-    //   yAxisID: 'yBars',
-    //   data: trendLineData,
-    //   borderColor: 'rgb(245, 158, 11)',
-    //   backgroundColor: 'rgba(245, 158, 11, 0.2)',
-    //   borderDash: [6, 4],
-    //   pointRadius: 0,
-    //   tension: 0,
-    //   spanGaps: false,
-    // })
 
     const accumulatedData: number[] = []
     proposalAnalytics.data.forEach((value, index) => {

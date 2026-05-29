@@ -85,6 +85,7 @@ class PrismaProposalRepository {
     statuses?: string[],
     startDate?: Date,
     endDate?: Date,
+    completionDate?: Date,
     category?: string,
     categoryId?: number,
     areaId?: number,
@@ -110,13 +111,34 @@ class PrismaProposalRepository {
     if (areaId !== undefined) {
       where.areaId = areaId
     }
-    if (startDate || endDate) {
-      where.createdAt = {}
-      if (startDate) {
-        where.createdAt.gte = startDate
-      }
-      if (endDate) {
-        where.createdAt.lte = endDate
+    if (startDate || endDate || completionDate) {
+      if (completionDate) {
+        const completionUpperBound = endDate ?? completionDate
+
+        const completedAtFilter: Prisma.ProposalWhereInput = {
+          completedAt: {
+            ...(startDate ? { gte: startDate } : {}),
+            lte: completionUpperBound,
+          },
+        }
+
+        const createdAtFallbackFilter: Prisma.ProposalWhereInput = {
+          completedAt: null,
+          createdAt: {
+            ...(startDate ? { gte: startDate } : {}),
+            lte: completionUpperBound,
+          },
+        }
+
+        where.OR = [completedAtFilter, createdAtFallbackFilter]
+      } else {
+        where.createdAt = {}
+        if (startDate) {
+          where.createdAt.gte = startDate
+        }
+        if (endDate) {
+          where.createdAt.lte = endDate
+        }
       }
     }
 

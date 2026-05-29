@@ -8,6 +8,7 @@ interface GetProposalAnalyticsFilters {
   statuses?: string[]
   startDate?: Date
   endDate?: Date
+  completionDate?: Date
   category?: string
   categoryId?: number
   areaId?: number
@@ -126,12 +127,15 @@ class AnalyticsUseCase {
       filters?.statuses,
       filters?.startDate,
       filters?.endDate,
+      filters?.completionDate,
       filters?.category,
       filters?.categoryId,
       filters?.areaId,
     )
 
-    const proposalDates = proposals.map((proposal) => proposal.createdAt)
+    const proposalDates = proposals.map((proposal) =>
+      filters?.completionDate ? proposal.completedAt ?? proposal.createdAt : proposal.createdAt,
+    )
 
     const minProposalDate = proposalDates.length
       ? new Date(Math.min(...proposalDates.map((date) => date.getTime())))
@@ -142,7 +146,7 @@ class AnalyticsUseCase {
       : undefined
 
     const startDate = filters?.startDate ?? minProposalDate
-    const endDate = filters?.endDate ?? maxProposalDate
+    const endDate = filters?.endDate ?? filters?.completionDate ?? maxProposalDate
 
     if (!startDate || !endDate) {
       return {
@@ -155,7 +159,8 @@ class AnalyticsUseCase {
     const bucket = getBucketByRange(startDate, endDate)
 
     const groupedByBucket = proposals.reduce<Map<string, number>>((acc, proposal) => {
-      const key = getBucketFromDate(proposal.createdAt, bucket)
+      const proposalDate = filters?.completionDate ? proposal.completedAt ?? proposal.createdAt : proposal.createdAt
+      const key = getBucketFromDate(proposalDate, bucket)
       const count = acc.get(key) ?? 0
       acc.set(key, count + 1)
 

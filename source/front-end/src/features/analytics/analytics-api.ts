@@ -4,6 +4,7 @@ export interface GetProposalAnalyticsFilters {
   status?: string
   startDate?: string
   endDate?: string
+  completionDate?: string
   category?: string
   categoryId?: number
   areaId?: number
@@ -34,6 +35,10 @@ export const analyticsAPI = api.injectEndpoints({
 
         if (filters?.endDate) {
           params.set('endDate', filters.endDate)
+        }
+
+        if (filters?.completionDate) {
+          params.set('completionDate', filters.completionDate)
         }
 
         if (filters?.category) {
