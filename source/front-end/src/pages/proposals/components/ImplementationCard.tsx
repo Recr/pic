@@ -243,7 +243,7 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
         </form>
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div className="w-160 max-w-[95vw] p-6 space-y-5">
+        <div className="w-auto max-w-130 p-4 space-y-5">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-xl font-semibold">Proposta #{proposal.id}</h2>

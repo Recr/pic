@@ -36,6 +36,7 @@ const RequestTokenForm: React.FC = () => {
   }
   return (
     <form
+      className="w-2xs p-2 bg-white rounded-2xl m-auto"
       onSubmit={async (e) => {
         e.preventDefault()
         await handleSubmit(onSubmit)()

@@ -119,15 +119,15 @@ const PasswordResetPage: React.FC = () => {
             </button>
           </div>
         </form>
-        <Modal
-          isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false)
-          }}
-        >
-          <RequestTokenForm />
-        </Modal>
       </div>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false)
+        }}
+      >
+        <RequestTokenForm />
+      </Modal>
     </div>
   )
 }

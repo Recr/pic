@@ -166,8 +166,8 @@ const AnalyticsPage: React.FC = () => {
         </div>
       </div>
       <Modal isOpen={isAnnualTargetModalOpen} onClose={() => setIsAnnualTargetModalOpen(false)}>
-        <div className="w-[95vw] max-w-4xl rounded-lg bg-white p-3 sm:w-[92vw] sm:p-4">
-          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="w-auto max-w-4xl rounded-lg bg-white p-3 sm:w-[92vw] sm:p-4">
+          <div className="mb-4 flex gap-3 flex-row justify-between">
             <h2 className="text-lg font-semibold sm:text-xl">Metas anuais</h2>
             <button
               type="button"

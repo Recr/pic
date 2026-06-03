@@ -41,7 +41,6 @@ const Employee: React.FC = () => {
     useState<UnregisteredEmployee | null>(null)
 
   const formatShift = (shift?: string) => {
-    console.log(shift)
     const shiftMap: Record<string, string> = {
       '1': '1º turno',
       '2': '2º turno',

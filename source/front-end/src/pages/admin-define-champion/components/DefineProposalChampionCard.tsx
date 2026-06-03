@@ -246,7 +246,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
         </div>
       </form>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div className="w-130 max-w-[95vw] p-6 space-y-5">
+        <div className="w-auto max-w-100 p-4 space-y-5">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-xl font-semibold">Proposta #{proposal.id}</h2>
@@ -257,8 +257,8 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
             <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-50 rounded p-3">
+          <div className="flex justify-start">
+            <div className="bg-gray-50 rounded p-3 min-w-30">
               <p className="text-xs text-gray-500">Area</p>
               <p className="font-medium">{proposal.area?.name}</p>
             </div>

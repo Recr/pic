@@ -195,7 +195,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableC
         </div>
       </form>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div className="w-130 max-w-[95vw] p-6 space-y-5">
+        <div className="w-100 max-w-[95vw] p-6 space-y-5">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-xl font-semibold">Proposta #{proposal.id}</h2>
