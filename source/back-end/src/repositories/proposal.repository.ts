@@ -417,7 +417,7 @@ class PrismaProposalRepository {
     return proposal
   }
 
-  public async completeProposal(
+  public async updateApprovedProposalAndCreatePayouts(
     proposalId: number,
     updatedProposal: Prisma.ProposalUpdateInput,
     payouts: Prisma.PayoutCreateManyInput[],

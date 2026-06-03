@@ -186,6 +186,7 @@ class ProposalsUseCase {
   ) {
     const proposal = await this.proposalRepository.findById(proposalId)
     if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+
     const updatedData: Prisma.ProposalUpdateInput = { status: newStatus }
 
     if (newStatus == 'TO_IMPLEMENT' || newStatus == 'NOT_VIABLE' || newStatus == 'REJECTED') {
@@ -201,6 +202,45 @@ class ProposalsUseCase {
         }
         updatedData.rejectionNote = normalizedRejectionNote
       }
+
+      // Reward calculation for approved proposals
+
+      if (!proposal.isCustomReward && !customRewardAmount) {
+        if (!proposal.categoryId)
+          throw new AppError('Category not defined.', StatusCodes.BAD_REQUEST)
+        const category = await this.categoryRepository.findById(proposal.categoryId)
+        if (category?.categoryReward == null)
+          throw new AppError('Category reward not defined.', StatusCodes.BAD_REQUEST)
+        updatedData.rewardAmount = category?.categoryReward
+
+        const suggestionIdList = (
+          await this.suggestionRepository.findByProposalId(proposal.id)
+        ).map((suggestion) => {
+          return suggestion.id
+        })
+
+        if (suggestionIdList.length === 0)
+          throw new AppError('Proposal has no suggestions.', StatusCodes.BAD_REQUEST)
+
+        const payoutData: Prisma.PayoutCreateManyInput[] = suggestionIdList.map((id) => {
+          return {
+            status: 'PENDING',
+            value: Number(updatedData.rewardAmount) / suggestionIdList.length,
+            suggestionId: id,
+          }
+        })
+
+        const updatedProposal =
+          await this.proposalRepository.updateApprovedProposalAndCreatePayouts(
+            proposal.id,
+            updatedData,
+            payoutData,
+          )
+        return updatedProposal
+      }
+
+      const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
+      return updatedProposal
     } else if (newStatus == 'IMPLEMENTATION') {
       updatedData.implementationStartedAt = new Date()
     } else if (newStatus == 'IMPLEMENTED') {
@@ -209,50 +249,61 @@ class ProposalsUseCase {
       // Reward calculation
 
       if (proposal.isCustomReward) {
-        if (!customRewardAmount || customRewardAmount <= 0)
+        if (!customRewardAmount || customRewardAmount <= 0) {
           throw new AppError('Invalid or missing custom reward amount.', StatusCodes.BAD_REQUEST)
-        updatedData.rewardAmount = customRewardAmount
-      } else {
-        if (!proposal.categoryId)
-          throw new AppError('Category not defined.', StatusCodes.BAD_REQUEST)
-        const category = await this.categoryRepository.findById(proposal.categoryId)
-        if (category?.categoryReward == null)
-          throw new AppError('Category reward not defined.', StatusCodes.BAD_REQUEST)
-        updatedData.rewardAmount = category?.categoryReward
-      }
-
-      const suggestionIdList = (await this.suggestionRepository.findByProposalId(proposal.id)).map(
-        (suggestion) => {
-          return suggestion.id
-        },
-      )
-
-      if (suggestionIdList.length === 0)
-        throw new AppError('Proposal has no suggestions.', StatusCodes.BAD_REQUEST)
-
-      const payoutData: Prisma.PayoutCreateManyInput[] = suggestionIdList.map((id) => {
-        return {
-          status: 'PENDING',
-          value: Number(updatedData.rewardAmount) / suggestionIdList.length,
-          suggestionId: id,
         }
-      })
+        updatedData.rewardAmount = customRewardAmount
 
-      if (proposal.isCustomReward && (!files || files.length === 0))
-        throw new AppError('Evidence file is required for custom rewards.', StatusCodes.BAD_REQUEST)
+        const suggestionIdList = (
+          await this.suggestionRepository.findByProposalId(proposal.id)
+        ).map((suggestion) => {
+          return suggestion.id
+        })
 
-      if (files && files.length > 0) {
-        await Promise.all(
-          files.map((file) => this.proposalAttachmentRepository.create(file, proposal.id)),
+        if (suggestionIdList.length === 0)
+          throw new AppError('Proposal has no suggestions.', StatusCodes.BAD_REQUEST)
+
+        const payoutData: Prisma.PayoutCreateManyInput[] = suggestionIdList.map((id) => {
+          return {
+            status: 'PENDING',
+            value: Number(updatedData.rewardAmount) / suggestionIdList.length,
+            suggestionId: id,
+          }
+        })
+
+        if (!files || files.length === 0)
+          throw new AppError(
+            'Evidence file is required for custom rewards.',
+            StatusCodes.BAD_REQUEST,
+          )
+
+        if (files && files.length > 0) {
+          await Promise.all(
+            files.map((file) => this.proposalAttachmentRepository.create(file, proposal.id)),
+          )
+        }
+
+        const completedProposal =
+          await this.proposalRepository.updateApprovedProposalAndCreatePayouts(
+            proposal.id,
+            updatedData,
+            payoutData,
+          )
+        return completedProposal
+      } else {
+        if (files && files.length > 0) {
+          await Promise.all(
+            files.map((file) => this.proposalAttachmentRepository.create(file, proposal.id)),
+          )
+        }
+
+        const completedProposal = await this.proposalRepository.updateProposal(
+          proposal.id,
+          updatedData,
         )
-      }
 
-      const completedProposal = await this.proposalRepository.completeProposal(
-        proposal.id,
-        updatedData,
-        payoutData,
-      )
-      return completedProposal
+        return completedProposal
+      }
     } else {
       throw new AppError('Invalid Status.', StatusCodes.BAD_REQUEST)
     }
