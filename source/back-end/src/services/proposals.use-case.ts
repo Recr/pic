@@ -5,6 +5,7 @@ import {
   CreateProposalInput,
   CreateProposalWithSuggestions,
   EmployeeInfo,
+  Pagination,
   UpdateProposalNotes,
   UpdateProposalWithChampion,
   UpdateProposalWithManager,
@@ -39,12 +40,12 @@ class ProposalsUseCase {
     return proposals
   }
 
-  public async executeFindAllDetailed(role: Role, userId: number) {
+  public async executeFindAllDetailed(role: Role, userId: number, pagination: Pagination) {
     if (role === Role.ADMIN) {
-      return await this.proposalRepository.findAllDetailed()
+      return await this.proposalRepository.findAllDetailed(pagination)
     }
 
-    const proposals = await this.proposalRepository.findAllDetailed({
+    const proposals = await this.proposalRepository.findAllDetailed(pagination, {
       OR: [
         {
           suggestions: {

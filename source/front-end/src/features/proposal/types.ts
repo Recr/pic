@@ -89,6 +89,11 @@ export interface ProposalDetailed {
   attachments: ProposalAttachment[]
 }
 
+export interface ProposalDetailedPaginationResponse {
+  proposals: ProposalDetailed[]
+  totalCount: number
+}
+
 export interface CreateProposalRequest {
   description: string
   employees: EmployeeInput[]
@@ -119,4 +124,9 @@ export interface FinishProposalRequest {
 
 export interface UpdateProposalNotesRequest {
   notes?: string
+}
+
+export interface Pagination {
+  limit: number
+  offset: number
 }

@@ -44,11 +44,16 @@ export const ProposalsController = {
       const role = req.user?.role as Role | undefined
       const userId = Number(req.user?.sub)
 
+      const pagination = {
+        limit: Number(req.query.limit) || 50,
+        offset: Number(req.query.offset) || 0,
+      }
+
       if (!role || Number.isNaN(userId)) {
         return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
       }
 
-      const proposals = await proposalUseCase.executeFindAllDetailed(role, userId)
+      const proposals = await proposalUseCase.executeFindAllDetailed(role, userId, pagination)
       res.send(proposals)
     } catch (error) {
       next(error)

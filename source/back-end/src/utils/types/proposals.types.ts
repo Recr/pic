@@ -37,3 +37,8 @@ export interface UpdateProposalStatus {
 export interface UpdateProposalNotes {
   notes?: string
 }
+
+export interface Pagination {
+  limit: number
+  offset: number
+}

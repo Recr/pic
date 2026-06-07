@@ -3,12 +3,13 @@ import type {
   CreateProposalRequest,
   UpdateProposalNotesRequest,
   Proposal,
-  ProposalDetailed,
   ProposalAttachment,
+  ProposalDetailedPaginationResponse,
   ProposalWithSuggestions,
   UpdateProposalWithManagerRequest,
   UpdateProposalWithChampionRequest,
   FinishProposalRequest,
+  Pagination,
 } from './types'
 import { api } from '../../services/api'
 
@@ -35,15 +36,15 @@ export const proposalAPI = api.injectEndpoints({
             ]
           : [{ type: 'Proposal', id: 'LIST' }],
     }),
-    getProposalsDetailed: builder.query<ProposalDetailed[], void>({
-      query: () => ({
-        url: '/proposals/detailed',
+    getProposalsDetailed: builder.query<ProposalDetailedPaginationResponse, Pagination>({
+      query: (pagination) => ({
+        url: `/proposals/detailed?limit=${pagination.limit}&offset=${pagination.offset}`,
         method: 'GET',
       }),
       providesTags: (result) =>
         result
           ? [
-              ...result.map(({ id }) => ({ type: 'Proposal' as const, id })),
+              ...result.proposals.map(({ id }) => ({ type: 'Proposal' as const, id })),
               { type: 'Proposal', id: 'LIST' },
             ]
           : [{ type: 'Proposal', id: 'LIST' }],

@@ -1,6 +1,6 @@
 import { Prisma } from '../../prisma/client/client'
 import { prisma } from '../lib/prisma'
-import { CreateProposalWithSuggestions } from '../utils/types/proposals.types'
+import { CreateProposalWithSuggestions, Pagination } from '../utils/types/proposals.types'
 
 class PrismaProposalRepository {
   public async findAll() {
@@ -149,17 +149,28 @@ class PrismaProposalRepository {
     return proposals
   }
 
-  public async findAllDetailed(where?: Prisma.ProposalWhereInput) {
+  public async findAllDetailed(pagination: Pagination, where?: Prisma.ProposalWhereInput) {
     const finalWhere: Prisma.ProposalWhereInput = where
       ? {
           AND: [{ isActive: true }, where],
         }
       : { isActive: true }
-    const proposals = await prisma.proposal.findMany({
-      where: finalWhere,
-      select: this.getDetailedSelect(),
-    })
-    return proposals
+    const [proposals, totalCount] = await Promise.all([
+      prisma.proposal.findMany({
+        take: pagination.limit,
+        skip: pagination.offset,
+        where: finalWhere,
+        select: this.getDetailedSelect(),
+      }),
+      prisma.proposal.count({
+        where: finalWhere,
+      }),
+    ])
+
+    return {
+      proposals,
+      totalCount,
+    }
   }
 
   public async findAllWithEmployees(userId?: number) {
