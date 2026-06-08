@@ -467,6 +467,7 @@ const SuggestionList: React.FC = () => {
             </p>
           )}
         </div>
+        <p className="ml-6 mb-2 text-gray-500">{totalCount} propostas encontradas</p>
         <div className="mx-3 flex flex-col justify-center rounded-lg border border-gray-300 text-sm sm:mx-4">
           <div className="hidden grid-cols-[56px_2fr_2fr_1fr_1fr_1fr] rounded-t-lg bg-gray-300 px-4 py-2 text-left font-semibold md:grid">
             <p>ID</p>
