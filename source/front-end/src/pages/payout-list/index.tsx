@@ -4,6 +4,7 @@ import { payoutAPI } from '../../features/payout/payout-api'
 import type { PayoutStatus } from '../../features/payout/types'
 import PayoutItem from './components/PayoutItem'
 import { Skeleton } from '../../components/skeletons/Skeleton'
+import DropdownSelect from '../../components/DropdownSelect'
 
 const PayoutList: React.FC = () => {
   const { data: payoutData, isLoading } = payoutAPI.useGetPayoutsQuery(undefined)
@@ -105,19 +106,21 @@ const PayoutList: React.FC = () => {
           Lista de Pagamentos
         </div>
         <div className="mx-4 mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-          <label htmlFor="payout-next-status" className="text-sm font-medium text-gray-700">
-            Novo status
-          </label>
-          <select
+          <DropdownSelect
             id="payout-next-status"
+            label="Novo status"
             value={nextStatus}
-            onChange={(event) => setNextStatus(event.target.value as PayoutStatus)}
-            className="w-full rounded border border-gray-300 px-2 py-1 text-sm sm:w-auto"
-          >
-            <option value="PENDING">Pendente</option>
-            <option value="PAID">Pago</option>
-            <option value="CANCELLED">Cancelado</option>
-          </select>
+            onChange={(value) => setNextStatus(value as PayoutStatus)}
+            placeholder="Selecione"
+            options={[
+              { value: 'PENDING', label: 'Pendente' },
+              { value: 'PAID', label: 'Pago' },
+              { value: 'CANCELLED', label: 'Cancelado' },
+            ]}
+            className="w-full sm:w-auto"
+            buttonClassName="w-full rounded border border-gray-300 px-2 py-1 text-sm sm:w-auto"
+            menuClassName="sm:w-56"
+          />
           <button
             type="button"
             onClick={handleUpdateSelectedStatuses}

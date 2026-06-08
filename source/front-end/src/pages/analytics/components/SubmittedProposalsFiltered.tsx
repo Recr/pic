@@ -3,6 +3,7 @@ import { analyticsAPI } from '../../../features/analytics/analytics-api'
 import { useMemo, useState } from 'react'
 import { categoryAPI } from '../../../features/category/category-api'
 import { areaAPI } from '../../../features/area/area-api'
+import DropdownSelect from '../../../components/DropdownSelect'
 import {
   BarElement,
   CategoryScale,
@@ -66,24 +67,14 @@ const SubmittedProposalsFiltered: React.FC = () => {
   return (
     <div>
       <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-        <div>
-          <label className="mb-1 block text-sm font-medium" htmlFor="analytics-status-filter">
-            Status
-          </label>
-          <select
-            id="analytics-status-filter"
-            className="w-full rounded border px-3 py-2"
-            value={status}
-            onChange={(event) => setStatus(event.target.value)}
-          >
-            <option value="">Tudo</option>
-            {STATUS_OPTIONS.map((statusOption) => (
-              <option key={statusOption.value} value={statusOption.value}>
-                {statusOption.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <DropdownSelect
+          id="analytics-status-filter"
+          label="Status"
+          value={status}
+          onChange={setStatus}
+          placeholder="Tudo"
+          options={STATUS_OPTIONS}
+        />
         <div>
           <label className="mb-1 block text-sm font-medium" htmlFor="analytics-start-date-filter">
             Data de início
@@ -108,42 +99,32 @@ const SubmittedProposalsFiltered: React.FC = () => {
             onChange={(event) => setEndDate(event.target.value)}
           />
         </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium" htmlFor="analytics-category-filter">
-            Categoria
-          </label>
-          <select
-            id="analytics-category-filter"
-            className="w-full rounded border px-3 py-2"
-            value={categoryId}
-            onChange={(event) => setCategoryId(event.target.value)}
-          >
-            <option value="">Tudo</option>
-            {categoryList?.map((categoryOption) => (
-              <option key={categoryOption.id} value={categoryOption.id}>
-                {categoryOption.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium" htmlFor="analytics-area-filter">
-            Area
-          </label>
-          <select
-            id="analytics-area-filter"
-            className="w-full rounded border px-3 py-2"
-            value={areaId}
-            onChange={(event) => setAreaId(event.target.value)}
-          >
-            <option value="">Tudo</option>
-            {areaList?.map((areaOption) => (
-              <option key={areaOption.id} value={areaOption.id}>
-                {areaOption.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <DropdownSelect
+          id="analytics-category-filter"
+          label="Categoria"
+          value={categoryId}
+          onChange={setCategoryId}
+          placeholder="Tudo"
+          options={
+            categoryList?.map((categoryOption) => ({
+              value: String(categoryOption.id),
+              label: categoryOption.name,
+            })) ?? []
+          }
+        />
+        <DropdownSelect
+          id="analytics-area-filter"
+          label="Area"
+          value={areaId}
+          onChange={setAreaId}
+          placeholder="Tudo"
+          options={
+            areaList?.map((areaOption) => ({
+              value: String(areaOption.id),
+              label: areaOption.name,
+            })) ?? []
+          }
+        />
       </div>
       <p className="mt-3 text-sm text-gray-600">
         {isLoading

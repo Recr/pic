@@ -14,6 +14,7 @@ import { translateRoles } from '../../helpers/translateRoles'
 import type z from 'zod'
 import { Skeleton } from '../../components/skeletons/Skeleton'
 import { X } from 'lucide-react'
+import DropdownSelect from '../../components/DropdownSelect'
 
 const Employee: React.FC = () => {
   type CreateEmployeeSchemaInput = z.input<typeof createEmployeeSchema>
@@ -23,9 +24,14 @@ const Employee: React.FC = () => {
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<CreateEmployeeSchemaInput, undefined, CreateEmployeeSchemaOutput>({
     resolver: zodResolver(createEmployeeSchema),
+    defaultValues: {
+      role: 'OPERATOR',
+      shift: '1',
+    },
   })
   const { data: registeredEmployees, isLoading: isLoadingRegisteredEmployees } =
     employeeAPI.useGetEmployeesQuery()
@@ -80,6 +86,8 @@ const Employee: React.FC = () => {
     isLoadingRegisteredEmployees ||
     isLoadingUnregisteredEmployees ||
     isLoadingPasswordResetRequesters
+  const roleValue = watch('role') || 'OPERATOR'
+  const shiftValue = watch('shift') || '1'
 
   if (isLoadingEmployees) {
     return (
@@ -283,25 +291,39 @@ const Employee: React.FC = () => {
               autoComplete="off"
             />
             {errors.re && <span className="text-xs text-red-600">{errors.re.message}</span>}
-            <label>Cargo:</label>
-            <select className="bg-white px-4 py-1" {...register('role')}>
-              <option value="OPERATOR">Operador</option>
-              <option value="TEAM_LEADER">Team Leader</option>
-              <option value="SUPERVISOR">Supervisor</option>
-              <option value="MANAGER">Gerente</option>
-              <option value="GENERAL_MANAGER">Gerente Geral (GM)</option>
-              <option value="HUMAN_RESOURCES">Recursos Humanos (RH)</option>
-              <option value="TECHNICAL_SUPPORT">Suporte Técnico</option>
-              <option value="ADMIN">Administrador</option>
-            </select>
+            <DropdownSelect
+              label="Cargo"
+              value={roleValue}
+              onChange={(value) => setValue('role', value as CreateEmployeeSchemaInput['role'])}
+              placeholder="Selecione um cargo"
+              options={[
+                { value: 'OPERATOR', label: 'Operador' },
+                { value: 'TEAM_LEADER', label: 'Team Leader' },
+                { value: 'SUPERVISOR', label: 'Supervisor' },
+                { value: 'MANAGER', label: 'Gerente' },
+                { value: 'GENERAL_MANAGER', label: 'Gerente Geral (GM)' },
+                { value: 'HUMAN_RESOURCES', label: 'Recursos Humanos (RH)' },
+                { value: 'TECHNICAL_SUPPORT', label: 'Suporte Técnico' },
+                { value: 'ADMIN', label: 'Administrador' },
+              ]}
+              showEmptyOption={false}
+              buttonClassName="bg-white px-4 py-1"
+            />
             {errors.role && <span className="text-xs text-red-600">{errors.role.message}</span>}
-            <label>Turno:</label>
-            <select className="bg-white px-4 py-1" {...register('shift')}>
-              <option value="1">1º</option>
-              <option value="2">2º</option>
-              <option value="3">3º</option>
-              <option value="ADM">Administrativo</option>
-            </select>
+            <DropdownSelect
+              label="Turno"
+              value={shiftValue}
+              onChange={(value) => setValue('shift', value as CreateEmployeeSchemaInput['shift'])}
+              placeholder="Selecione um turno"
+              options={[
+                { value: '1', label: '1º' },
+                { value: '2', label: '2º' },
+                { value: '3', label: '3º' },
+                { value: 'ADM', label: 'Administrativo' },
+              ]}
+              showEmptyOption={false}
+              buttonClassName="bg-white px-4 py-1"
+            />
             {errors.shift && <span className="text-xs text-red-600">{errors.shift.message}</span>}
             <label>Senha:</label>
             <input

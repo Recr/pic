@@ -5,6 +5,9 @@ import { ToastContainer } from 'react-toastify'
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { translateStatus } from '../../helpers/translateStatus'
+import { areaAPI } from '../../features/area/area-api'
+import { categoryAPI } from '../../features/category/category-api'
+import DropdownSelect from '../../components/DropdownSelect'
 
 type PageSizeSelection = '50' | '100' | '200' | 'more'
 type MoreLimitSelection = 'all' | 'custom' | null
@@ -83,6 +86,9 @@ const getPageItems = (currentPage: number, totalPages: number): PageItem[] => {
 }
 
 const SuggestionList: React.FC = () => {
+  const { data: areasList } = areaAPI.useGetAreasQuery()
+  const { data: categoryList } = categoryAPI.useGetCategoriesQuery()
+
   const [pageSizeSelection, setPageSizeSelection] = useState<PageSizeSelection>('50')
   const [moreLimitSelection, setMoreLimitSelection] = useState<MoreLimitSelection>(null)
   const [isMoreOptionsOpen, setIsMoreOptionsOpen] = useState(false)
@@ -95,6 +101,8 @@ const SuggestionList: React.FC = () => {
   const [filterDescriptionInput, setFilterDescriptionInput] = useState('')
   const [filterCreatedAtInput, setFilterCreatedAtInput] = useState('')
   const [filterStatusInput, setFilterStatusInput] = useState('')
+  const [filterAreaInput, setFilterAreaInput] = useState('')
+  const [filterCategoryInput, setFilterCategoryInput] = useState('')
   const presetLimit =
     pageSizeSelection === '50'
       ? 50
@@ -233,6 +241,8 @@ const SuggestionList: React.FC = () => {
     setFilterDescriptionInput('')
     setFilterCreatedAtInput('')
     setFilterStatusInput('')
+    setFilterAreaInput('')
+    setFilterCategoryInput('')
   }
 
   if (isLoading) {
@@ -407,19 +417,41 @@ const SuggestionList: React.FC = () => {
             </label>
             <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
               Status
-              <select
+              <DropdownSelect
                 value={filterStatusInput}
-                onChange={(event) => setFilterStatusInput(event.target.value)}
-                className="rounded border border-gray-300 px-3 py-2 text-sm"
-              >
-                <option value="">Todos</option>
-                {STATUS_OPTIONS.map((status) => (
-                  <option key={status} value={status}>
-                    {translateStatus(status)}
-                  </option>
-                ))}
-              </select>
+                onChange={setFilterStatusInput}
+                placeholder="Todos"
+                options={STATUS_OPTIONS.map((status) => ({
+                  label: translateStatus(status),
+                  value: status,
+                }))}
+                buttonClassName="rounded border border-gray-300 px-3 py-2 text-sm"
+              />
             </label>
+            <DropdownSelect
+              label="Área"
+              value={filterAreaInput}
+              placeholder="Todas"
+              onChange={setFilterAreaInput}
+              options={
+                areasList?.map((area) => ({
+                  label: area.name,
+                  value: String(area.id),
+                })) ?? []
+              }
+            />
+            <DropdownSelect
+              label="Categoria"
+              value={filterCategoryInput}
+              placeholder="Todas"
+              onChange={setFilterCategoryInput}
+              options={
+                categoryList?.map((category) => ({
+                  label: category.name,
+                  value: String(category.id),
+                })) ?? []
+              }
+            />
           </div>
           {hasActiveFilters && (
             <p className="mt-3 text-xs text-gray-500">

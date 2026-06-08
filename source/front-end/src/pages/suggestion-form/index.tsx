@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../app/store'
 import EmployeeCombobox from '../../components/EmployeeCombobox'
+import DropdownSelect from '../../components/DropdownSelect'
 import { Skeleton } from '../../components/skeletons/Skeleton'
 
 const EMPLOYEE_OPTIONS = [1, 2, 3] as const
@@ -26,6 +27,8 @@ const SuggestionForm: React.FC = () => {
   const [selectedEmployees, setSelectedEmployees] = useState<
     Record<number, { name: string; shift: string }>
   >({})
+  const [selectedAreaId, setSelectedAreaId] = useState('')
+  const [areaError, setAreaError] = useState<string | null>(null)
   const [createProposal] = proposalAPI.useCreateProposalMutation()
 
   const { data: employees = [], isLoading: isLoadingEmployees } = employeeAPI.useGetEmployeesQuery()
@@ -88,9 +91,12 @@ const SuggestionForm: React.FC = () => {
     const areaId = Number(formData.get('areaId'))
 
     if (!areaId) {
+      setAreaError('Selecione uma área.')
       toast.error('Ah não. Algo deu errado!', TOAST_OPTIONS)
       return
     }
+
+    setAreaError(null)
 
     const description = String(formData.get('description') ?? '').trim()
     if (!description) {
@@ -120,6 +126,8 @@ const SuggestionForm: React.FC = () => {
       toast.success('Sugestão enviada. Obrigado!', TOAST_OPTIONS)
 
       setSelectedEmployees({})
+      setSelectedAreaId('')
+      setAreaError(null)
       setEmployeeCount(1)
       setFormKey((prev) => prev + 1)
     } catch (error) {
@@ -264,22 +272,27 @@ const SuggestionForm: React.FC = () => {
             id="suggestion_area"
             className="flex flex-col gap-1.5 justify-center items-center w-90"
           >
-            <label>Local:</label>
-            <select
+            <DropdownSelect
+              label="Local"
               name="areaId"
-              defaultValue=""
+              value={selectedAreaId}
+              onChange={(value) => {
+                setSelectedAreaId(value)
+                if (value) {
+                  setAreaError(null)
+                }
+              }}
+              placeholder="Selecione uma área"
+              error={areaError}
+              options={areas.map((area) => ({
+                value: String(area.id),
+                label: area.name,
+              }))}
               required
-              className="w-4/5 p-2.5 my-1.5 rounded-[5px] border border-[#ccc] bg-white"
-            >
-              <option value="" disabled>
-                Selecione uma área
-              </option>
-              {areas.map((area) => (
-                <option key={area.id} value={area.id}>
-                  {area.name}
-                </option>
-              ))}
-            </select>
+              className="w-4/5"
+              buttonClassName="w-full p-2.5 my-1.5 rounded-[5px] border border-[#ccc] bg-white"
+              menuClassName="w-full"
+            />
           </div>
           <label>Sugestão:</label>
           <textarea

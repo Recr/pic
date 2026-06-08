@@ -5,6 +5,7 @@ import { proposalAPI } from '../../../features/proposal/proposal-api'
 import StatusBadge from '../../../components/StatusBadge'
 import { getStatusColor } from '../../../helpers/getStatusColor'
 import EmployeeCombobox from '../../../components/EmployeeCombobox'
+import DropdownSelect from '../../../components/DropdownSelect'
 import { useState } from 'react'
 import Modal from '../../../components/modal/Modal'
 import type { Category } from '../../../features/category/types'
@@ -76,9 +77,15 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<UpdateProposalFormInput, unknown, UpdateProposalFormOutput>({
     resolver: zodResolver(updateProposalSchema),
+    defaultValues: {
+      areaId: proposal.area?.id,
+      categoryId: undefined,
+      isCustomReward: false,
+    },
   })
 
   const [updateProposal, { isLoading }] = proposalAPI.useUpdateProposalWithManagerMutation()
@@ -104,6 +111,8 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
     re: suggestion.employee ? suggestion.employee.re : suggestion.employeeRe,
     shift: suggestion.employee ? suggestion.employee.shift : suggestion.employeeShift,
   }))
+  const areaIdValue = String(watch('areaId') ?? proposal.area?.id ?? '')
+  const categoryIdValue = String(watch('categoryId') ?? '')
 
   const handleReject = async (note: string) => {
     try {
@@ -160,21 +169,22 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           <label htmlFor={`area-input-${proposal.id}`}>
             <strong>Área:</strong>
           </label>
-          <select
+          <DropdownSelect
             id={`area-input-${proposal.id}`}
-            defaultValue={proposal.area?.id || ''}
-            className="p-2.5 w-full border border-[#ccc] rounded bg-white"
-            {...register('areaId', { valueAsNumber: true })}
-          >
-            <option value="" disabled>
-              Selecione uma área
-            </option>
-            {availableAreas?.map((area: Area) => (
-              <option key={area.id} value={area.id}>
-                {area.name}
-              </option>
-            ))}
-          </select>
+            value={areaIdValue}
+            onChange={(value) => setValue('areaId', Number(value), { shouldValidate: true })}
+            placeholder="Selecione uma área"
+            error={errors.areaId?.message}
+            options={
+              availableAreas?.map((area: Area) => ({
+                value: String(area.id),
+                label: area.name,
+              })) ?? []
+            }
+            showEmptyOption={false}
+            className="w-full"
+            buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white"
+          />
           {errors.areaId && <p className="text-sm text-red-600">{errors.areaId.message}</p>}
           <p className="text-xs text-gray-500 mt-0.5">
             Mantenha a seleção do colaborador ou escolha na lista
@@ -183,21 +193,22 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           <label htmlFor={`category-input-${proposal.id}`}>
             <strong>Categoria:</strong>
           </label>
-          <select
+          <DropdownSelect
             id={`category-input-${proposal.id}`}
-            defaultValue=""
-            className="p-2.5 w-full border border-[#ccc] rounded bg-white"
-            {...register('categoryId', { valueAsNumber: true })}
-          >
-            <option value="" disabled>
-              Selecione uma categoria
-            </option>
-            {categories?.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name} - Recompensa: R$ {Number(category.categoryReward).toFixed(2)}
-              </option>
-            ))}
-          </select>
+            value={categoryIdValue}
+            onChange={(value) => setValue('categoryId', Number(value), { shouldValidate: true })}
+            placeholder="Selecione uma categoria"
+            error={errors.categoryId?.message}
+            options={
+              categories?.map((category) => ({
+                value: String(category.id),
+                label: `${category.name} - Recompensa: R$ ${Number(category.categoryReward).toFixed(2)}`,
+              })) ?? []
+            }
+            showEmptyOption={false}
+            className="w-full"
+            buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white"
+          />
           {errors.categoryId && <p className="text-sm text-red-600">{errors.categoryId.message}</p>}
           <p className="text-xs text-gray-500 mt-0.5">Selecione a categoria da sugestão.</p>
           <div className="flex gap-4 bg-gray-100 py-2 px-4 rounded-2xl border border-gray-200">
