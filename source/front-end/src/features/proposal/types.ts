@@ -94,6 +94,15 @@ export interface ProposalDetailedPaginationResponse {
   totalCount: number
 }
 
+export interface ProposalDetailedQueryParams extends Pagination {
+  id?: number
+  re?: number
+  employeeName?: string
+  description?: string
+  createdAt?: string
+  status?: string
+}
+
 export interface CreateProposalRequest {
   description: string
   employees: EmployeeInput[]

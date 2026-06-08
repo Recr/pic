@@ -4,10 +4,35 @@ import { Skeleton } from '../../components/skeletons/Skeleton'
 import { ToastContainer } from 'react-toastify'
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
+import { translateStatus } from '../../helpers/translateStatus'
 
 type PageSizeSelection = '50' | '100' | '200' | 'more'
 type MoreLimitSelection = 'all' | 'custom' | null
 type PageItem = number | 'ellipsis'
+
+const STATUS_OPTIONS = [
+  'DEFINE_CHAMPION',
+  'UNDER_VALIDATION',
+  'TO_IMPLEMENT',
+  'IMPLEMENTATION',
+  'REJECTED',
+  'NOT_VIABLE',
+  'IMPLEMENTED',
+  'PENDING',
+  'PAID',
+  'CANCELLED',
+] as const
+
+const parseOptionalNumber = (value: string) => {
+  const trimmedValue = value.trim()
+
+  if (!trimmedValue) {
+    return undefined
+  }
+
+  const parsedValue = Number(trimmedValue)
+  return Number.isFinite(parsedValue) ? parsedValue : undefined
+}
 
 const getPageItems = (currentPage: number, totalPages: number): PageItem[] => {
   if (totalPages <= 0) {
@@ -64,6 +89,12 @@ const SuggestionList: React.FC = () => {
   const [customLimitInput, setCustomLimitInput] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [resolvedLimit, setResolvedLimit] = useState(50)
+  const [filterIdInput, setFilterIdInput] = useState('')
+  const [filterReInput, setFilterReInput] = useState('')
+  const [filterEmployeeNameInput, setFilterEmployeeNameInput] = useState('')
+  const [filterDescriptionInput, setFilterDescriptionInput] = useState('')
+  const [filterCreatedAtInput, setFilterCreatedAtInput] = useState('')
+  const [filterStatusInput, setFilterStatusInput] = useState('')
   const presetLimit =
     pageSizeSelection === '50'
       ? 50
@@ -76,9 +107,37 @@ const SuggestionList: React.FC = () => {
   const customLimit =
     Number.isInteger(customLimitValue) && customLimitValue > 0 ? customLimitValue : 50
   const offset = (currentPage - 1) * resolvedLimit
+  const activeFilters = useMemo(() => {
+    const employeeName = filterEmployeeNameInput.trim()
+    const description = filterDescriptionInput.trim()
+
+    return {
+      id: parseOptionalNumber(filterIdInput),
+      re: parseOptionalNumber(filterReInput),
+      employeeName: employeeName || undefined,
+      description: description || undefined,
+      createdAt: filterCreatedAtInput || undefined,
+      status: filterStatusInput || undefined,
+    }
+  }, [
+    filterCreatedAtInput,
+    filterDescriptionInput,
+    filterEmployeeNameInput,
+    filterIdInput,
+    filterReInput,
+    filterStatusInput,
+  ])
+  const hasActiveFilters =
+    activeFilters.id !== undefined ||
+    activeFilters.re !== undefined ||
+    activeFilters.employeeName !== undefined ||
+    activeFilters.description !== undefined ||
+    activeFilters.createdAt !== undefined ||
+    activeFilters.status !== undefined
   const { data: proposalsResponse, isLoading } = proposalAPI.useGetProposalsDetailedQuery({
     limit: resolvedLimit,
     offset,
+    ...activeFilters,
   })
   const proposalsData = proposalsResponse?.proposals ?? []
   const totalCount = proposalsResponse?.totalCount ?? 0
@@ -128,6 +187,17 @@ const SuggestionList: React.FC = () => {
   }, [pageSizeSelection, moreLimitSelection])
 
   useEffect(() => {
+    setCurrentPage(1)
+  }, [
+    activeFilters.createdAt,
+    activeFilters.description,
+    activeFilters.employeeName,
+    activeFilters.id,
+    activeFilters.re,
+    activeFilters.status,
+  ])
+
+  useEffect(() => {
     if (pageSizeSelection !== 'more') {
       setMoreLimitSelection(null)
       setIsMoreOptionsOpen(false)
@@ -154,6 +224,15 @@ const SuggestionList: React.FC = () => {
 
   const handleCustomLimitChange = (event: ChangeEvent<HTMLInputElement>) => {
     setCustomLimitInput(event.target.value)
+  }
+
+  const handleClearFilters = () => {
+    setFilterIdInput('')
+    setFilterReInput('')
+    setFilterEmployeeNameInput('')
+    setFilterDescriptionInput('')
+    setFilterCreatedAtInput('')
+    setFilterStatusInput('')
   }
 
   if (isLoading) {
@@ -261,6 +340,91 @@ const SuggestionList: React.FC = () => {
                 />
               )}
             </div>
+          )}
+        </div>
+        <div className="mx-4 mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <span className="text-sm font-semibold text-gray-700">Filtros</span>
+            <button
+              type="button"
+              onClick={handleClearFilters}
+              className="rounded-full border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-white hover:text-blue-700"
+            >
+              Limpar filtros
+            </button>
+          </div>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+              ID
+              <input
+                type="number"
+                min={1}
+                value={filterIdInput}
+                onChange={(event) => setFilterIdInput(event.target.value)}
+                placeholder="Ex.: 123"
+                className="rounded border border-gray-300 px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+              RE
+              <input
+                type="number"
+                min={1}
+                value={filterReInput}
+                onChange={(event) => setFilterReInput(event.target.value)}
+                placeholder="Ex.: 45678"
+                className="rounded border border-gray-300 px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+              Nome do funcionário
+              <input
+                type="text"
+                value={filterEmployeeNameInput}
+                onChange={(event) => setFilterEmployeeNameInput(event.target.value)}
+                placeholder="Buscar por nome"
+                className="rounded border border-gray-300 px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+              Descrição
+              <input
+                type="text"
+                value={filterDescriptionInput}
+                onChange={(event) => setFilterDescriptionInput(event.target.value)}
+                placeholder="Buscar na descrição"
+                className="rounded border border-gray-300 px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+              Data de criação
+              <input
+                type="date"
+                value={filterCreatedAtInput}
+                onChange={(event) => setFilterCreatedAtInput(event.target.value)}
+                className="rounded border border-gray-300 px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+              Status
+              <select
+                value={filterStatusInput}
+                onChange={(event) => setFilterStatusInput(event.target.value)}
+                className="rounded border border-gray-300 px-3 py-2 text-sm"
+              >
+                <option value="">Todos</option>
+                {STATUS_OPTIONS.map((status) => (
+                  <option key={status} value={status}>
+                    {translateStatus(status)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          {hasActiveFilters && (
+            <p className="mt-3 text-xs text-gray-500">
+              Os filtros são aplicados em todas as propostas que você pode visualizar.
+            </p>
           )}
         </div>
         <div className="mx-3 flex flex-col justify-center rounded-lg border border-gray-300 text-sm sm:mx-4">

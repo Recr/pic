@@ -42,3 +42,12 @@ export interface Pagination {
   limit: number
   offset: number
 }
+
+export interface DetailedProposalFilters {
+  id?: number
+  re?: number
+  employeeName?: string
+  description?: string
+  createdAt?: Date
+  status?: string
+}

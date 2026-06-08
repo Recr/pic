@@ -149,26 +149,55 @@ class PrismaProposalRepository {
     return proposals
   }
 
-  public async findAllDetailed(pagination: Pagination, where?: Prisma.ProposalWhereInput) {
+  public async findAllDetailed(
+    pagination: Pagination,
+    where?: Prisma.ProposalWhereInput,
+    reMatcher?: (proposal: {
+      suggestions: {
+        employeeRe: number
+        employee?: { re: number | null } | null
+      }[]
+    }) => boolean,
+  ) {
     const finalWhere: Prisma.ProposalWhereInput = where
       ? {
           AND: [{ isActive: true }, where],
         }
       : { isActive: true }
-    const [proposals, totalCount] = await Promise.all([
-      prisma.proposal.findMany({
-        take: pagination.limit,
-        skip: pagination.offset,
-        where: finalWhere,
-        select: this.getDetailedSelect(),
-      }),
-      prisma.proposal.count({
-        where: finalWhere,
-      }),
-    ])
+
+    if (!reMatcher) {
+      const [proposals, totalCount] = await Promise.all([
+        prisma.proposal.findMany({
+          take: pagination.limit,
+          skip: pagination.offset,
+          where: finalWhere,
+          select: this.getDetailedSelect(),
+        }),
+        prisma.proposal.count({
+          where: finalWhere,
+        }),
+      ])
+
+      return {
+        proposals,
+        totalCount,
+      }
+    }
+
+    const proposals = await prisma.proposal.findMany({
+      where: finalWhere,
+      select: this.getDetailedSelect(),
+    })
+
+    const filteredProposals = proposals.filter(reMatcher)
+    const totalCount = filteredProposals.length
+    const paginatedProposals = filteredProposals.slice(
+      pagination.offset,
+      pagination.offset + pagination.limit,
+    )
 
     return {
-      proposals,
+      proposals: paginatedProposals,
       totalCount,
     }
   }

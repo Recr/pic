@@ -4,6 +4,7 @@ import { PrismaProposalRepository } from '../repositories/proposal.repository'
 import {
   CreateProposalInput,
   CreateProposalWithSuggestions,
+  DetailedProposalFilters,
   EmployeeInfo,
   Pagination,
   UpdateProposalNotes,
@@ -40,25 +41,105 @@ class ProposalsUseCase {
     return proposals
   }
 
-  public async executeFindAllDetailed(role: Role, userId: number, pagination: Pagination) {
-    if (role === Role.ADMIN) {
-      return await this.proposalRepository.findAllDetailed(pagination)
+  public async executeFindAllDetailed(
+    role: Role,
+    userId: number,
+    pagination: Pagination,
+    filters: DetailedProposalFilters = {},
+  ) {
+    const where: Prisma.ProposalWhereInput =
+      role === Role.ADMIN
+        ? { isActive: true }
+        : {
+            isActive: true,
+            OR: [
+              {
+                suggestions: {
+                  some: {
+                    employeeId: userId,
+                  },
+                },
+              },
+              { managerId: userId },
+              { championId: userId },
+            ],
+          }
+
+    if (filters.id !== undefined) {
+      where.id = filters.id
     }
 
-    const proposals = await this.proposalRepository.findAllDetailed(pagination, {
-      OR: [
-        {
+    if (filters.description) {
+      where.description = {
+        contains: filters.description,
+      }
+    }
+
+    if (filters.status) {
+      where.status = filters.status
+    }
+
+    if (filters.createdAt) {
+      const startOfDay = new Date(filters.createdAt)
+      startOfDay.setHours(0, 0, 0, 0)
+
+      const endOfDay = new Date(filters.createdAt)
+      endOfDay.setHours(23, 59, 59, 999)
+
+      where.createdAt = {
+        gte: startOfDay,
+        lte: endOfDay,
+      }
+    }
+
+    const suggestionFilters: Prisma.SuggestionWhereInput[] = []
+    const reFilter = filters.re === undefined ? undefined : String(filters.re)
+
+    const reMatcher = reFilter
+      ? (proposal: {
           suggestions: {
-            some: {
-              employeeId: userId,
+            employeeRe: number
+            employee?: { re: number | null } | null
+          }[]
+        }) =>
+          proposal.suggestions.some((suggestion) => {
+            const suggestionRe = String(suggestion.employeeRe)
+            const employeeRe = suggestion.employee?.re
+
+            return suggestionRe.includes(reFilter) || String(employeeRe ?? '').includes(reFilter)
+          })
+      : undefined
+
+    if (filters.employeeName) {
+      suggestionFilters.push({
+        OR: [
+          {
+            employeeName: {
+              contains: filters.employeeName,
             },
           },
+          {
+            employee: {
+              is: {
+                name: {
+                  contains: filters.employeeName,
+                },
+              },
+            },
+          },
+        ],
+      })
+    }
+
+    if (suggestionFilters.length > 0) {
+      where.suggestions = {
+        some: {
+          AND: suggestionFilters,
         },
-        { managerId: userId },
-        { championId: userId },
-      ],
-    })
-    return proposals
+      }
+    }
+
+    return await this.proposalRepository.findAllDetailed(pagination, where, reMatcher)
   }
 
   public async executeFindAllWithoutChampion(role: Role, userId: number) {

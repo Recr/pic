@@ -13,6 +13,7 @@ import path from 'node:path'
 import { createReadStream } from 'node:fs'
 import fs from 'node:fs/promises'
 import { Role } from '../utils/types/employees.types'
+import { DetailedProposalFilters } from '../utils/types/proposals.types'
 
 export const ProposalsController = {
   async handleFindAll(req: Request, res: Response, next: NextFunction) {
@@ -49,11 +50,75 @@ export const ProposalsController = {
         offset: Number(req.query.offset) || 0,
       }
 
+      const parseOptionalNumber = (value: unknown) => {
+        if (typeof value !== 'string' || value.trim() === '') {
+          return undefined
+        }
+
+        const parsedValue = Number(value)
+        return Number.isFinite(parsedValue) ? parsedValue : undefined
+      }
+
+      const parseOptionalDate = (value: unknown) => {
+        if (typeof value !== 'string' || value.trim() === '') {
+          return undefined
+        }
+
+        const parsedValue = new Date(value)
+        return Number.isNaN(parsedValue.getTime()) ? undefined : parsedValue
+      }
+
+      const filters: DetailedProposalFilters = {}
+
+      const idFilter = parseOptionalNumber(req.query.id)
+      if (idFilter !== undefined) {
+        filters.id = idFilter
+      }
+
+      const reFilter = parseOptionalNumber(req.query.re)
+      if (reFilter !== undefined) {
+        filters.re = reFilter
+      }
+
+      const employeeNameFilter =
+        typeof req.query.employeeName === 'string' && req.query.employeeName.trim() !== ''
+          ? req.query.employeeName.trim()
+          : undefined
+      if (employeeNameFilter) {
+        filters.employeeName = employeeNameFilter
+      }
+
+      const descriptionFilter =
+        typeof req.query.description === 'string' && req.query.description.trim() !== ''
+          ? req.query.description.trim()
+          : undefined
+      if (descriptionFilter) {
+        filters.description = descriptionFilter
+      }
+
+      const createdAtFilter = parseOptionalDate(req.query.createdAt)
+      if (createdAtFilter) {
+        filters.createdAt = createdAtFilter
+      }
+
+      const statusFilter =
+        typeof req.query.status === 'string' && req.query.status.trim() !== ''
+          ? req.query.status.trim()
+          : undefined
+      if (statusFilter) {
+        filters.status = statusFilter
+      }
+
       if (!role || Number.isNaN(userId)) {
         return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
       }
 
-      const proposals = await proposalUseCase.executeFindAllDetailed(role, userId, pagination)
+      const proposals = await proposalUseCase.executeFindAllDetailed(
+        role,
+        userId,
+        pagination,
+        filters,
+      )
       res.send(proposals)
     } catch (error) {
       next(error)

@@ -6,10 +6,10 @@ import type {
   ProposalAttachment,
   ProposalDetailedPaginationResponse,
   ProposalWithSuggestions,
+  ProposalDetailedQueryParams,
   UpdateProposalWithManagerRequest,
   UpdateProposalWithChampionRequest,
   FinishProposalRequest,
-  Pagination,
 } from './types'
 import { api } from '../../services/api'
 
@@ -36,11 +36,45 @@ export const proposalAPI = api.injectEndpoints({
             ]
           : [{ type: 'Proposal', id: 'LIST' }],
     }),
-    getProposalsDetailed: builder.query<ProposalDetailedPaginationResponse, Pagination>({
-      query: (pagination) => ({
-        url: `/proposals/detailed?limit=${pagination.limit}&offset=${pagination.offset}`,
-        method: 'GET',
-      }),
+    getProposalsDetailed: builder.query<
+      ProposalDetailedPaginationResponse,
+      ProposalDetailedQueryParams
+    >({
+      query: ({ limit, offset, id, re, employeeName, description, createdAt, status }) => {
+        const params = new URLSearchParams({
+          limit: String(limit),
+          offset: String(offset),
+        })
+
+        if (id !== undefined) {
+          params.set('id', String(id))
+        }
+
+        if (re !== undefined) {
+          params.set('re', String(re))
+        }
+
+        if (employeeName) {
+          params.set('employeeName', employeeName)
+        }
+
+        if (description) {
+          params.set('description', description)
+        }
+
+        if (createdAt) {
+          params.set('createdAt', createdAt)
+        }
+
+        if (status) {
+          params.set('status', status)
+        }
+
+        return {
+          url: `/proposals/detailed?${params.toString()}`,
+          method: 'GET',
+        }
+      },
       providesTags: (result) =>
         result
           ? [
