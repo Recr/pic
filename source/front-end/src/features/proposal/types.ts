@@ -67,6 +67,7 @@ export interface ProposalDetailed {
   rejectionNote: string | null
   rewardAmount: number | null
   isCustomReward: boolean
+  isLegacy: boolean
   suggestions: [
     {
       employeeName: string

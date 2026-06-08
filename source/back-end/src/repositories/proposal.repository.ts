@@ -25,6 +25,7 @@ class PrismaProposalRepository {
       notes: true,
       rejectionNote: true,
       rewardAmount: true,
+      isLegacy: true,
       area: {
         select: {
           id: true,

@@ -306,7 +306,14 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
         <div className="w-full max-w-[95vw] space-y-4 p-4 sm:max-w-[90vw] sm:p-6 lg:w-152">
           <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:gap-4">
             <div>
-              <h2 className="text-xl font-semibold">Proposta #{proposal.id}</h2>
+              <div className="flex gap-2">
+                <h2 className="text-xl font-semibold">Proposta #{proposal.id}</h2>
+                <p
+                  className={`${!proposal.isLegacy && 'hidden'} bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-600 rounded flex items-center justify-center`}
+                >
+                  {proposal.isLegacy && 'Legado'}
+                </p>
+              </div>
               <p className="text-sm text-gray-600 mt-1">
                 Criado em {new Date(proposal.createdAt).toLocaleDateString()}
               </p>
