@@ -21,9 +21,6 @@ const STATUS_OPTIONS = [
   'REJECTED',
   'NOT_VIABLE',
   'IMPLEMENTED',
-  'PENDING',
-  'PAID',
-  'CANCELLED',
 ] as const
 
 const parseOptionalNumber = (value: string) => {
