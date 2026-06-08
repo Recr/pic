@@ -158,6 +158,12 @@ class PrismaProposalRepository {
         employee?: { re: number | null } | null
       }[]
     }) => boolean,
+    idMatcher?: (proposal: {
+      suggestions: {
+        employeeId: number
+        employee?: { id: number | null } | null
+      }[]
+    }) => boolean,
   ) {
     const finalWhere: Prisma.ProposalWhereInput = where
       ? {
@@ -165,7 +171,7 @@ class PrismaProposalRepository {
         }
       : { isActive: true }
 
-    if (!reMatcher) {
+    if (!reMatcher && !idMatcher) {
       const [proposals, totalCount] = await Promise.all([
         prisma.proposal.findMany({
           take: pagination.limit,
@@ -189,7 +195,12 @@ class PrismaProposalRepository {
       select: this.getDetailedSelect(),
     })
 
-    const filteredProposals = proposals.filter(reMatcher)
+    const filteredProposals = proposals.filter((proposal) => {
+      const matchesRe = reMatcher ? reMatcher(proposal as never) : true
+      const matchesId = idMatcher ? idMatcher(proposal as never) : true
+
+      return matchesRe && matchesId
+    })
     const totalCount = filteredProposals.length
     const paginatedProposals = filteredProposals.slice(
       pagination.offset,

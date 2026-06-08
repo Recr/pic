@@ -65,10 +65,6 @@ class ProposalsUseCase {
             ],
           }
 
-    if (filters.id !== undefined) {
-      where.id = filters.id
-    }
-
     if (filters.description) {
       where.description = {
         contains: filters.description,
@@ -94,6 +90,7 @@ class ProposalsUseCase {
 
     const suggestionFilters: Prisma.SuggestionWhereInput[] = []
     const reFilter = filters.re === undefined ? undefined : String(filters.re)
+    const idFilter = filters.id === undefined ? undefined : String(filters.id)
 
     const reMatcher = reFilter
       ? (proposal: {
@@ -108,6 +105,28 @@ class ProposalsUseCase {
 
             return suggestionRe.includes(reFilter) || String(employeeRe ?? '').includes(reFilter)
           })
+      : undefined
+
+    const idMatcher = idFilter
+      ? (proposal: {
+          id: number
+          suggestions: {
+            employeeId: number
+            employee?: { id: number | null } | null
+          }[]
+        }) => {
+          const proposalId = String(proposal.id)
+
+          return (
+            proposalId.includes(idFilter) ||
+            proposal.suggestions.some((suggestion) => {
+              const suggestionId = String(suggestion.employeeId)
+              const employeeId = suggestion.employee?.id
+
+              return suggestionId.includes(idFilter) || String(employeeId ?? '').includes(idFilter)
+            })
+          )
+        }
       : undefined
 
     if (filters.employeeName) {
@@ -139,7 +158,7 @@ class ProposalsUseCase {
       }
     }
 
-    return await this.proposalRepository.findAllDetailed(pagination, where, reMatcher)
+    return await this.proposalRepository.findAllDetailed(pagination, where, reMatcher, idMatcher)
   }
 
   public async executeFindAllWithoutChampion(role: Role, userId: number) {
