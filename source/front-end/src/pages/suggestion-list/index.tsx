@@ -126,12 +126,16 @@ const SuggestionList: React.FC = () => {
       description: description || undefined,
       createdAt: filterCreatedAtInput || undefined,
       status: filterStatusInput || undefined,
+      areaId: parseOptionalNumber(filterAreaInput),
+      categoryId: parseOptionalNumber(filterCategoryInput),
     }
   }, [
     filterCreatedAtInput,
     filterDescriptionInput,
     filterEmployeeNameInput,
     filterIdInput,
+    filterAreaInput,
+    filterCategoryInput,
     filterReInput,
     filterStatusInput,
   ])
@@ -141,7 +145,9 @@ const SuggestionList: React.FC = () => {
     activeFilters.employeeName !== undefined ||
     activeFilters.description !== undefined ||
     activeFilters.createdAt !== undefined ||
-    activeFilters.status !== undefined
+    activeFilters.status !== undefined ||
+    activeFilters.areaId !== undefined ||
+    activeFilters.categoryId !== undefined
   const { data: proposalsResponse, isLoading } = proposalAPI.useGetProposalsDetailedQuery({
     limit: resolvedLimit,
     offset,
@@ -201,6 +207,8 @@ const SuggestionList: React.FC = () => {
     activeFilters.description,
     activeFilters.employeeName,
     activeFilters.id,
+    activeFilters.areaId,
+    activeFilters.categoryId,
     activeFilters.re,
     activeFilters.status,
   ])

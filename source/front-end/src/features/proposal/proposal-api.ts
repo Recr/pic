@@ -40,7 +40,18 @@ export const proposalAPI = api.injectEndpoints({
       ProposalDetailedPaginationResponse,
       ProposalDetailedQueryParams
     >({
-      query: ({ limit, offset, id, re, employeeName, description, createdAt, status }) => {
+      query: ({
+        limit,
+        offset,
+        id,
+        re,
+        employeeName,
+        description,
+        createdAt,
+        status,
+        categoryId,
+        areaId,
+      }) => {
         const params = new URLSearchParams({
           limit: String(limit),
           offset: String(offset),
@@ -68,6 +79,14 @@ export const proposalAPI = api.injectEndpoints({
 
         if (status) {
           params.set('status', status)
+        }
+
+        if (categoryId !== undefined) {
+          params.set('categoryId', String(categoryId))
+        }
+
+        if (areaId !== undefined) {
+          params.set('areaId', String(areaId))
         }
 
         return {

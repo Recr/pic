@@ -109,6 +109,16 @@ export const ProposalsController = {
         filters.status = statusFilter
       }
 
+      const categoryIdFilter = parseOptionalNumber(req.query.categoryId)
+      if (categoryIdFilter !== undefined) {
+        filters.categoryId = categoryIdFilter
+      }
+
+      const areaIdFilter = parseOptionalNumber(req.query.areaId)
+      if (areaIdFilter !== undefined) {
+        filters.areaId = areaIdFilter
+      }
+
       if (!role || Number.isNaN(userId)) {
         return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
       }

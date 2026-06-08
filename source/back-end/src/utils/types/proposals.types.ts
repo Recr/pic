@@ -50,4 +50,6 @@ export interface DetailedProposalFilters {
   description?: string
   createdAt?: Date
   status?: string
+  categoryId?: number
+  areaId?: number
 }

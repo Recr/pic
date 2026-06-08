@@ -75,6 +75,14 @@ class ProposalsUseCase {
       where.status = filters.status
     }
 
+    if (filters.categoryId !== undefined) {
+      where.categoryId = filters.categoryId
+    }
+
+    if (filters.areaId !== undefined) {
+      where.areaId = filters.areaId
+    }
+
     if (filters.createdAt) {
       const startOfDay = new Date(filters.createdAt)
       startOfDay.setHours(0, 0, 0, 0)

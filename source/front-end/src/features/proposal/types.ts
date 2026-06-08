@@ -102,6 +102,8 @@ export interface ProposalDetailedQueryParams extends Pagination {
   description?: string
   createdAt?: string
   status?: string
+  categoryId?: number
+  areaId?: number
 }
 
 export interface CreateProposalRequest {
