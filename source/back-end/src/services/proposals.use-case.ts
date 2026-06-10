@@ -295,7 +295,6 @@ class ProposalsUseCase {
   ) {
     const proposal = await this.proposalRepository.findById(proposalId)
     if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
-
     const updatedData: Prisma.ProposalUpdateInput = { status: newStatus }
 
     if (newStatus == 'TO_IMPLEMENT' || newStatus == 'NOT_VIABLE' || newStatus == 'REJECTED') {
@@ -314,7 +313,7 @@ class ProposalsUseCase {
 
       // Reward calculation for approved proposals
 
-      if (!proposal.isCustomReward && !customRewardAmount) {
+      if (!proposal.isCustomReward && !customRewardAmount && newStatus === 'TO_IMPLEMENT') {
         if (!proposal.categoryId)
           throw new AppError('Category not defined.', StatusCodes.BAD_REQUEST)
         const category = await this.categoryRepository.findById(proposal.categoryId)
