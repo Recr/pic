@@ -48,7 +48,8 @@ export interface DetailedProposalFilters {
   re?: number
   employeeName?: string
   description?: string
-  createdAt?: Date
+  dateFrom?: Date
+  dateTo?: Date
   status?: string
   categoryId?: number
   areaId?: number

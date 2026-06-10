@@ -96,9 +96,14 @@ export const ProposalsController = {
         filters.description = descriptionFilter
       }
 
-      const createdAtFilter = parseOptionalDate(req.query.createdAt)
-      if (createdAtFilter) {
-        filters.createdAt = createdAtFilter
+      const dateFromFilter = parseOptionalDate(req.query.dateFrom)
+      if (dateFromFilter) {
+        filters.dateFrom = dateFromFilter
+      }
+
+      const dateToFilter = parseOptionalDate(req.query.dateTo)
+      if (dateToFilter) {
+        filters.dateTo = dateToFilter
       }
 
       const statusFilter =

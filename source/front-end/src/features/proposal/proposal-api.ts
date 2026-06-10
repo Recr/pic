@@ -47,7 +47,8 @@ export const proposalAPI = api.injectEndpoints({
         re,
         employeeName,
         description,
-        createdAt,
+        dateFrom,
+        dateTo,
         status,
         categoryId,
         areaId,
@@ -73,8 +74,12 @@ export const proposalAPI = api.injectEndpoints({
           params.set('description', description)
         }
 
-        if (createdAt) {
-          params.set('createdAt', createdAt)
+        if (dateFrom) {
+          params.set('dateFrom', dateFrom)
+        }
+
+        if (dateTo) {
+          params.set('dateTo', dateTo)
         }
 
         if (status) {

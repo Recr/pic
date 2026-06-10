@@ -100,7 +100,8 @@ export interface ProposalDetailedQueryParams extends Pagination {
   re?: number
   employeeName?: string
   description?: string
-  createdAt?: string
+  dateFrom?: string
+  dateTo?: string
   status?: string
   categoryId?: number
   areaId?: number

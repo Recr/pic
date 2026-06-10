@@ -83,18 +83,18 @@ class ProposalsUseCase {
       where.areaId = filters.areaId
     }
 
-    if (filters.createdAt) {
-      const startOfDay = new Date(filters.createdAt)
-      startOfDay.setHours(0, 0, 0, 0)
-
-      const endOfDay = new Date(filters.createdAt)
-      endOfDay.setHours(23, 59, 59, 999)
-
-      where.createdAt = {
-        gte: startOfDay,
-        lte: endOfDay,
-      }
+    const createdAt: { gte?: Date; lte?: Date } = {}
+    if (filters.dateFrom) {
+      const d = new Date(filters.dateFrom)
+      d.setHours(0, 0, 0, 0)
+      createdAt.gte = d
     }
+    if (filters.dateTo) {
+      const d = new Date(filters.dateTo)
+      d.setHours(23, 59, 59, 999)
+      createdAt.lte = d
+    }
+    if (createdAt.gte || createdAt.lte) where.createdAt = createdAt
 
     const suggestionFilters: Prisma.SuggestionWhereInput[] = []
     const reFilter = filters.re === undefined ? undefined : String(filters.re)
@@ -165,7 +165,7 @@ class ProposalsUseCase {
         },
       }
     }
-
+    console.log(filters)
     return await this.proposalRepository.findAllDetailed(pagination, where, reMatcher, idMatcher)
   }
 

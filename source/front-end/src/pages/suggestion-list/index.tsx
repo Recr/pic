@@ -96,7 +96,8 @@ const SuggestionList: React.FC = () => {
   const [filterReInput, setFilterReInput] = useState('')
   const [filterEmployeeNameInput, setFilterEmployeeNameInput] = useState('')
   const [filterDescriptionInput, setFilterDescriptionInput] = useState('')
-  const [filterCreatedAtInput, setFilterCreatedAtInput] = useState('')
+  const [filterDateFromInput, setFilterDateFromInput] = useState('')
+  const [filterDateToInput, setFilterDateToInput] = useState('')
   const [filterStatusInput, setFilterStatusInput] = useState('')
   const [filterAreaInput, setFilterAreaInput] = useState('')
   const [filterCategoryInput, setFilterCategoryInput] = useState('')
@@ -121,13 +122,15 @@ const SuggestionList: React.FC = () => {
       re: parseOptionalNumber(filterReInput),
       employeeName: employeeName || undefined,
       description: description || undefined,
-      createdAt: filterCreatedAtInput || undefined,
+      dateFrom: filterDateFromInput || undefined,
+      dateTo: filterDateToInput || undefined,
       status: filterStatusInput || undefined,
       areaId: parseOptionalNumber(filterAreaInput),
       categoryId: parseOptionalNumber(filterCategoryInput),
     }
   }, [
-    filterCreatedAtInput,
+    filterDateFromInput,
+    filterDateToInput,
     filterDescriptionInput,
     filterEmployeeNameInput,
     filterIdInput,
@@ -141,7 +144,8 @@ const SuggestionList: React.FC = () => {
     activeFilters.re !== undefined ||
     activeFilters.employeeName !== undefined ||
     activeFilters.description !== undefined ||
-    activeFilters.createdAt !== undefined ||
+    activeFilters.dateFrom !== undefined ||
+    activeFilters.dateTo !== undefined ||
     activeFilters.status !== undefined ||
     activeFilters.areaId !== undefined ||
     activeFilters.categoryId !== undefined
@@ -200,7 +204,8 @@ const SuggestionList: React.FC = () => {
   useEffect(() => {
     setCurrentPage(1)
   }, [
-    activeFilters.createdAt,
+    activeFilters.dateFrom,
+    activeFilters.dateTo,
     activeFilters.description,
     activeFilters.employeeName,
     activeFilters.id,
@@ -244,7 +249,8 @@ const SuggestionList: React.FC = () => {
     setFilterReInput('')
     setFilterEmployeeNameInput('')
     setFilterDescriptionInput('')
-    setFilterCreatedAtInput('')
+    setFilterDateFromInput('')
+    setFilterDateToInput('')
     setFilterStatusInput('')
     setFilterAreaInput('')
     setFilterCategoryInput('')
@@ -412,11 +418,20 @@ const SuggestionList: React.FC = () => {
               />
             </label>
             <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-              Data de criação
+              De
               <input
                 type="date"
-                value={filterCreatedAtInput}
-                onChange={(event) => setFilterCreatedAtInput(event.target.value)}
+                value={filterDateFromInput}
+                onChange={(event) => setFilterDateFromInput(event.target.value)}
+                className="rounded border border-gray-300 px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+              Até
+              <input
+                type="date"
+                value={filterDateToInput}
+                onChange={(event) => setFilterDateToInput(event.target.value)}
                 className="rounded border border-gray-300 px-3 py-2 text-sm"
               />
             </label>
