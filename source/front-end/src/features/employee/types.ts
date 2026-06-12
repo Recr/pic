@@ -1,4 +1,5 @@
 export interface Employee {
+  id: number
   re: number
   name: string
   role: string
@@ -11,7 +12,11 @@ export interface UnregisteredEmployee {
   employeeShift?: string
 }
 
-export interface CreateEmployee extends Employee {
+export interface UpdateEmployee extends Employee {
+  id: number
+}
+
+export type CreateEmployee = Omit<Employee, 'id'> & {
   password: string
 }
 

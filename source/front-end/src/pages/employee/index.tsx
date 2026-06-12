@@ -9,30 +9,47 @@ import Modal from '../../components/modal/Modal'
 import { useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createEmployeeSchema } from '../../validation/schemas/employee-schemas'
-import { translateRoles } from '../../helpers/translateRoles'
+import {
+  createEmployeeSchema,
+  updateEmployeeSchema,
+} from '../../validation/schemas/employee-schemas'
 import type z from 'zod'
 import { Skeleton } from '../../components/skeletons/Skeleton'
-import { X } from 'lucide-react'
 import DropdownSelect from '../../components/DropdownSelect'
 
 const Employee: React.FC = () => {
   type CreateEmployeeSchemaInput = z.input<typeof createEmployeeSchema>
   type CreateEmployeeSchemaOutput = z.output<typeof createEmployeeSchema>
   const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    watch,
-    formState: { errors },
+    register: createRegister,
+    handleSubmit: createHandleSubmit,
+    reset: createReset,
+    setValue: createSetValue,
+    watch: createWatch,
+    formState: { errors: createErrors },
   } = useForm<CreateEmployeeSchemaInput, undefined, CreateEmployeeSchemaOutput>({
     resolver: zodResolver(createEmployeeSchema),
     defaultValues: {
       role: 'OPERATOR',
-      shift: '1',
     },
   })
+
+  type UpdateEmployeeSchemaInput = z.input<typeof updateEmployeeSchema>
+  type UpdateEmployeeSchemaOutput = z.output<typeof updateEmployeeSchema>
+  const {
+    register: updateRegister,
+    handleSubmit: updateHandleSubmit,
+    reset: updateReset,
+    setValue: updateSetValue,
+    watch: updateWatch,
+    formState: { errors: updateErrors },
+  } = useForm<UpdateEmployeeSchemaInput, undefined, UpdateEmployeeSchemaOutput>({
+    resolver: zodResolver(updateEmployeeSchema),
+    defaultValues: {
+      role: 'OPERATOR',
+    },
+  })
+
   const { data: registeredEmployees, isLoading: isLoadingRegisteredEmployees } =
     employeeAPI.useGetEmployeesQuery()
   const { data: unregisteredEmployees, isLoading: isLoadingUnregisteredEmployees } =
@@ -40,28 +57,14 @@ const Employee: React.FC = () => {
   const { data: passwordResetRequesters, isLoading: isLoadingPasswordResetRequesters } =
     employeeAPI.useGetPasswordResetRequestersQuery()
   const [createEmployee, { isLoading }] = employeeAPI.useCreateEmployeeMutation()
+  const [updateEmployee, { isLoading: isUpdating }] = employeeAPI.useUpdateEmployeeMutation()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [selectedEmployee, setSelectedEmployee] = useState<EmployeeType | null>(null)
   const [selectedUnregisteredEmployee, setSelectedUnregisteredEmployee] =
     useState<UnregisteredEmployee | null>(null)
 
-  const formatShift = (shift?: string) => {
-    const shiftMap: Record<string, string> = {
-      '1': '1º turno',
-      '2': '2º turno',
-      '3': '3º turno',
-      ADM: 'Administrativo',
-    }
-
-    if (!shift) {
-      return 'Nao informado'
-    }
-
-    return shiftMap[shift] || shift
-  }
-
-  const onSubmit: SubmitHandler<CreateEmployeeSchemaOutput> = async (data) => {
+  const createOnSubmit: SubmitHandler<CreateEmployeeSchemaOutput> = async (data) => {
     try {
       await createEmployee(data).unwrap()
       toast('Colaborador cadastrado com sucesso!', {
@@ -70,10 +73,32 @@ const Employee: React.FC = () => {
         hideProgressBar: false,
         closeOnClick: true,
       })
-      reset()
+      createReset()
       setIsAddModalOpen(false)
     } catch {
       toast('Nao foi possivel cadastrar o colaborador.', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+      })
+    }
+  }
+
+  const updateOnSubmit: SubmitHandler<UpdateEmployeeSchemaOutput> = async (data) => {
+    try {
+      if (!selectedEmployee) return
+      await updateEmployee({ id: selectedEmployee?.id, ...data }).unwrap()
+      toast('Colaborador atualizado com sucesso!', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+      })
+      updateReset()
+      setIsEditModalOpen(false)
+    } catch {
+      toast('Nao foi possivel atualizar o colaborador.', {
         position: 'top-right',
         autoClose: 3000,
         hideProgressBar: false,
@@ -86,8 +111,11 @@ const Employee: React.FC = () => {
     isLoadingRegisteredEmployees ||
     isLoadingUnregisteredEmployees ||
     isLoadingPasswordResetRequesters
-  const roleValue = watch('role') || 'OPERATOR'
-  const shiftValue = watch('shift') || '1'
+  const createRoleValue = createWatch('role') || 'OPERATOR'
+  const createShiftValue = createWatch('shift') || '1'
+
+  const updateRoleValue = updateWatch('role') || 'OPERATOR'
+  const updateShiftValue = updateWatch('shift') || '1'
 
   if (isLoadingEmployees) {
     return (
@@ -138,6 +166,10 @@ const Employee: React.FC = () => {
                   onClick={() => {
                     setSelectedEmployee(employee)
                     setIsEditModalOpen(true)
+                    updateSetValue('name', employee.name)
+                    updateSetValue('re', employee.re)
+                    updateSetValue('role', employee.role)
+                    updateSetValue('shift', employee.shift || '1')
                   }}
                 >
                   <span>{employee.name}</span>
@@ -158,9 +190,12 @@ const Employee: React.FC = () => {
                       onClick={() => {
                         setSelectedUnregisteredEmployee(employee)
                         setIsAddModalOpen(true)
-                        setValue('name', employee.employeeName)
-                        setValue('re', employee.employeeRe)
-                        setValue('shift', employee.employeeShift ? employee.employeeShift : 'ADM')
+                        createSetValue('name', employee.employeeName)
+                        createSetValue('re', employee.employeeRe)
+                        createSetValue(
+                          'shift',
+                          employee.employeeShift ? employee.employeeShift : 'ADM',
+                        )
                       }}
                     >
                       <span>{employee.employeeName}</span>
@@ -215,39 +250,96 @@ const Employee: React.FC = () => {
         onClose={() => {
           setIsEditModalOpen(false)
           setSelectedEmployee(null)
+          updateReset()
         }}
       >
         <div className="rounded-xl bg-whites p-1 gap-4 flex flex-col w-2xs">
-          <X
+          {/* <X
             className="hover:cursor-pointer size-4 hover:size-6 "
             onClick={() => setIsEditModalOpen(false)}
-          />
-          <h2 className="text-center text-xl font-semibold text-gray-800 flex self-start">
-            Colaborador
-          </h2>
+          /> */}
+          <h2 className="text-center">Editar Colaborador</h2>
           {selectedEmployee ? (
-            <div className="w-fulls">
-              <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-400">Nome</span>
-                <span className="font-medium text-gray-900">{selectedEmployee.name}</span>
+            <form
+              className="flex flex-col  mt-5 p-2 rounded-lg"
+              onSubmit={updateHandleSubmit(updateOnSubmit)}
+            >
+              <div className="flex flex-col gap-2 text-sm">
+                <label>Nome:</label>
+                <input
+                  className="bg-white px-4 py-1"
+                  type="text"
+                  {...updateRegister('name')}
+                  placeholder="Nome completo do operador"
+                  autoComplete="off"
+                />
+                {updateErrors.name && (
+                  <span className="text-xs text-red-600">{updateErrors.name.message}</span>
+                )}
+                <label>RE:</label>
+                <input
+                  className="bg-white px-4 py-1"
+                  type="number"
+                  {...updateRegister('re')}
+                  placeholder="RE do operador"
+                  min={0}
+                  max={50000}
+                  autoComplete="off"
+                />
+                {updateErrors.re && (
+                  <span className="text-xs text-red-600">{updateErrors.re.message}</span>
+                )}
+                <DropdownSelect
+                  label="Cargo"
+                  value={updateRoleValue}
+                  onChange={(value) =>
+                    updateSetValue('role', value as UpdateEmployeeSchemaInput['role'])
+                  }
+                  placeholder="Selecione um cargo"
+                  options={[
+                    { value: 'OPERATOR', label: 'Operador' },
+                    { value: 'TEAM_LEADER', label: 'Team Leader' },
+                    { value: 'SUPERVISOR', label: 'Supervisor' },
+                    { value: 'MANAGER', label: 'Gerente' },
+                    { value: 'GENERAL_MANAGER', label: 'Gerente Geral (GM)' },
+                    { value: 'HUMAN_RESOURCES', label: 'Recursos Humanos (RH)' },
+                    { value: 'TECHNICAL_SUPPORT', label: 'Suporte Técnico' },
+                    { value: 'ADMIN', label: 'Administrador' },
+                  ]}
+                  showEmptyOption={false}
+                  buttonClassName="bg-white px-4 py-1"
+                />
+                {updateErrors.role && (
+                  <span className="text-xs text-red-600">{updateErrors.role.message}</span>
+                )}
+                <DropdownSelect
+                  label="Turno"
+                  value={updateShiftValue}
+                  onChange={(value) =>
+                    updateSetValue('shift', value as UpdateEmployeeSchemaInput['shift'])
+                  }
+                  placeholder="Selecione um turno"
+                  options={[
+                    { value: '1', label: '1º' },
+                    { value: '2', label: '2º' },
+                    { value: '3', label: '3º' },
+                    { value: 'ADM', label: 'Administrativo' },
+                  ]}
+                  showEmptyOption={false}
+                  buttonClassName="bg-white px-4 py-1"
+                />
+                {updateErrors.shift && (
+                  <span className="text-xs text-red-600">{updateErrors.shift.message}</span>
+                )}
+                <button
+                  className="hover:cursor-pointer hover:bg-blue-700 transition-all bg-blue-500 text-white py-2 px-4 rounded mt-4"
+                  type="submit"
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? 'Atualizando...' : 'Atualizar'}
+                </button>
               </div>
-              <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-400">RE</span>
-                <span className="font-medium text-gray-900">{selectedEmployee.re}</span>
-              </div>
-              <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-400">Cargo</span>
-                <span className="font-medium text-gray-900">
-                  {translateRoles(selectedEmployee.role)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400">Turno</span>
-                <span className="font-medium text-gray-900">
-                  {formatShift(selectedEmployee.shift)}
-                </span>
-              </div>
-            </div>
+            </form>
           ) : (
             <p className="mt-6 text-center text-sm text-gray-500">
               Nenhum colaborador selecionado.
@@ -261,40 +353,46 @@ const Employee: React.FC = () => {
           setIsAddModalOpen(false)
           if (selectedUnregisteredEmployee != null) {
             setSelectedUnregisteredEmployee(null)
-            reset()
+            createReset()
           }
         }}
       >
         <h2 className="text-center">Adicionar Colaborador</h2>
         <form
           className="flex flex-col m-auto mt-10 p-4 bg-gray-100 rounded-lg shadow-lg"
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={createHandleSubmit(createOnSubmit)}
         >
           <div className="flex flex-col gap-2 text-sm">
             <label>Nome:</label>
             <input
               className="bg-white px-4 py-1"
               type="text"
-              {...register('name')}
+              {...createRegister('name')}
               placeholder="Nome completo do operador"
               autoComplete="off"
             />
-            {errors.name && <span className="text-xs text-red-600">{errors.name.message}</span>}
+            {createErrors.name && (
+              <span className="text-xs text-red-600">{createErrors.name.message}</span>
+            )}
             <label>RE:</label>
             <input
               className="bg-white px-4 py-1"
               type="number"
-              {...register('re')}
+              {...createRegister('re')}
               placeholder="RE do operador"
               min={0}
               max={50000}
               autoComplete="off"
             />
-            {errors.re && <span className="text-xs text-red-600">{errors.re.message}</span>}
+            {createErrors.re && (
+              <span className="text-xs text-red-600">{createErrors.re.message}</span>
+            )}
             <DropdownSelect
               label="Cargo"
-              value={roleValue}
-              onChange={(value) => setValue('role', value as CreateEmployeeSchemaInput['role'])}
+              value={createRoleValue}
+              onChange={(value) =>
+                createSetValue('role', value as CreateEmployeeSchemaInput['role'])
+              }
               placeholder="Selecione um cargo"
               options={[
                 { value: 'OPERATOR', label: 'Operador' },
@@ -309,11 +407,15 @@ const Employee: React.FC = () => {
               showEmptyOption={false}
               buttonClassName="bg-white px-4 py-1"
             />
-            {errors.role && <span className="text-xs text-red-600">{errors.role.message}</span>}
+            {createErrors.role && (
+              <span className="text-xs text-red-600">{createErrors.role.message}</span>
+            )}
             <DropdownSelect
               label="Turno"
-              value={shiftValue}
-              onChange={(value) => setValue('shift', value as CreateEmployeeSchemaInput['shift'])}
+              value={createShiftValue}
+              onChange={(value) =>
+                createSetValue('shift', value as CreateEmployeeSchemaInput['shift'])
+              }
               placeholder="Selecione um turno"
               options={[
                 { value: '1', label: '1º' },
@@ -324,16 +426,18 @@ const Employee: React.FC = () => {
               showEmptyOption={false}
               buttonClassName="bg-white px-4 py-1"
             />
-            {errors.shift && <span className="text-xs text-red-600">{errors.shift.message}</span>}
+            {createErrors.shift && (
+              <span className="text-xs text-red-600">{createErrors.shift.message}</span>
+            )}
             <label>Senha:</label>
             <input
               className="bg-white px-4 py-1"
               type="password"
-              {...register('password')}
+              {...createRegister('password')}
               placeholder="Senha do operador"
             />
-            {errors.password && (
-              <span className="text-xs text-red-600">{errors.password.message}</span>
+            {createErrors.password && (
+              <span className="text-xs text-red-600">{createErrors.password.message}</span>
             )}
             <button
               className="hover:cursor-pointer hover:bg-blue-700 transition-all bg-blue-500 text-white py-2 px-4 rounded mt-4"

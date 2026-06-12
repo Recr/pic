@@ -3,6 +3,7 @@ import type {
   CreateEmployee,
   UnregisteredEmployee,
   PasswordResetRequester,
+  UpdateEmployee,
 } from './types'
 import { api } from '../../services/api'
 
@@ -20,10 +21,18 @@ export const employeeAPI = api.injectEndpoints({
       query: () => '/employees/password-reset-requests',
       providesTags: ['Employee'],
     }),
-    createEmployee: builder.mutation<CreateEmployee, Employee>({
+    createEmployee: builder.mutation<Employee, CreateEmployee>({
       query: (body) => ({
         url: '/employees',
         method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Employee'],
+    }),
+    updateEmployee: builder.mutation<Employee, UpdateEmployee>({
+      query: ({ id, ...body }) => ({
+        url: `/employees/${id}`,
+        method: 'PUT',
         body,
       }),
       invalidatesTags: ['Employee'],

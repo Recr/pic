@@ -1,20 +1,13 @@
 import z from 'zod'
+import { Role } from '../types/employees.types'
+
+const ROLES = Object.values(Role) as [string, ...string[]]
 
 export const createEmployeeSchema = z.object({
   body: z.object({
     name: z.string(),
     re: z.number().int(),
-    role: z.enum([
-      'OPERATOR',
-      'TEAM_LEADER',
-      'SUPERVISOR',
-      'MANAGER',
-      'LEADER',
-      'ADMIN',
-      'GENERAL_MANAGER',
-      'HUMAN_RESOURCES',
-      'TECHNICAL_SUPPORT',
-    ]),
+    role: z.enum(ROLES),
     shift: z.enum(['ADM', '1', '2', '3']),
     password: z.string().min(8, 'Password should have at least 8 characters').max(50),
   }),
@@ -39,16 +32,8 @@ export const updateEmployeeSchema = z.object({
   body: z.object({
     name: z.string(),
     re: z.number().int(),
-    role: z.enum([
-      'OPERATOR',
-      'LEADER',
-      'ADMIN',
-      'GENERAL_MANAGER',
-      'HUMAN_RESOURCES',
-      'TECHNICAL_SUPPORT',
-    ]),
+    role: z.enum(ROLES),
     shift: z.enum(['ADM', '1', '2', '3']),
-    password: z.string().min(8, 'Password should have at least 8 characters').max(50),
   }),
 })
 
