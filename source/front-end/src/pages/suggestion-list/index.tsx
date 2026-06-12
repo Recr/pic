@@ -3,7 +3,7 @@ import ProposalItem from './components/ProposalItem'
 import { Skeleton } from '../../components/skeletons/Skeleton'
 import { ToastContainer } from 'react-toastify'
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react'
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
+import { ChevronLeftIcon, ChevronRightIcon, FilterIcon, ListFilterIcon } from 'lucide-react'
 import { translateStatus } from '../../helpers/translateStatus'
 import { areaAPI } from '../../features/area/area-api'
 import { categoryAPI } from '../../features/category/category-api'
@@ -101,6 +101,8 @@ const SuggestionList: React.FC = () => {
   const [filterStatusInput, setFilterStatusInput] = useState('')
   const [filterAreaInput, setFilterAreaInput] = useState('')
   const [filterCategoryInput, setFilterCategoryInput] = useState('')
+  const [isFilterBarVisible, setIsFilterBarVisible] = useState(false)
+
   const presetLimit =
     pageSizeSelection === '50'
       ? 50
@@ -300,10 +302,10 @@ const SuggestionList: React.FC = () => {
                 key={option}
                 type="button"
                 onClick={() => handlePageSizeChange(option)}
-                className={`rounded-full px-3 py-1.5 transition-all ${
+                className={`rounded-full px-3 py-1.5 transition-all border border-gray-200 ${
                   pageSizeSelection === option
                     ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700'
+                    : 'text-gray-700 bg-gray-100 hover:bg-gray-200 hover:shadow-sm hover:cursor-pointer hover:text-blue-700'
                 }`}
                 aria-pressed={pageSizeSelection === option}
               >
@@ -313,10 +315,10 @@ const SuggestionList: React.FC = () => {
             <button
               type="button"
               onClick={() => handlePageSizeChange('more')}
-              className={`rounded-full px-3 py-1.5 transition-all ${
+              className={`rounded-full px-3 py-1.5 transition-all border border-gray-200 ${
                 isMoreOptionsOpen
                   ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700'
+                  : 'text-gray-700 bg-gray-100 hover:bg-gray-200 hover:shadow-sm hover:cursor-pointer hover:text-blue-700'
               }`}
               aria-pressed={isMoreOptionsOpen}
             >
@@ -362,123 +364,138 @@ const SuggestionList: React.FC = () => {
               )}
             </div>
           )}
+          <button
+            type="button"
+            onClick={() => setIsFilterBarVisible((prev) => !prev)}
+            className={`rounded-full px-3 py-1.5 transition-all border border-gray-200 justify-content flex flex-row gap-2 items-center mr-auto sm:ml-auto sm:mr-0 ${
+              isFilterBarVisible
+                ? 'bg-blue-600 text-white shadow-sm hover:cursor-pointer hover:bg-blue-700'
+                : 'text-gray-700 bg-gray-100 hover:bg-gray-200 hover:shadow-sm hover:cursor-pointer hover:text-blue-700'
+            }`}
+            aria-pressed={isFilterBarVisible}
+          >
+            Filtros
+            <ListFilterIcon size={16} />
+          </button>
         </div>
-        <div className="mx-4 mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <span className="text-sm font-semibold text-gray-700">Filtros</span>
-            <button
-              type="button"
-              onClick={handleClearFilters}
-              className="rounded-full border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-white hover:text-blue-700"
-            >
-              Limpar filtros
-            </button>
-          </div>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-              ID
-              <input
-                type="number"
-                min={1}
-                value={filterIdInput}
-                onChange={(event) => setFilterIdInput(event.target.value)}
-                placeholder="Ex.: 123"
-                className="rounded border border-gray-300 px-3 py-2 text-sm"
-              />
-            </label>
-            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-              RE
-              <input
-                type="number"
-                min={1}
-                value={filterReInput}
-                onChange={(event) => setFilterReInput(event.target.value)}
-                placeholder="Ex.: 45678"
-                className="rounded border border-gray-300 px-3 py-2 text-sm"
-              />
-            </label>
-            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-              Nome do funcionário
-              <input
-                type="text"
-                value={filterEmployeeNameInput}
-                onChange={(event) => setFilterEmployeeNameInput(event.target.value)}
-                placeholder="Buscar por nome"
-                className="rounded border border-gray-300 px-3 py-2 text-sm"
-              />
-            </label>
-            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-              Descrição
-              <input
-                type="text"
-                value={filterDescriptionInput}
-                onChange={(event) => setFilterDescriptionInput(event.target.value)}
-                placeholder="Buscar na descrição"
-                className="rounded border border-gray-300 px-3 py-2 text-sm"
-              />
-            </label>
-            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-              De
-              <input
-                type="date"
-                value={filterDateFromInput}
-                onChange={(event) => setFilterDateFromInput(event.target.value)}
-                className="rounded border border-gray-300 px-3 py-2 text-sm"
-              />
-            </label>
-            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-              Até
-              <input
-                type="date"
-                value={filterDateToInput}
-                onChange={(event) => setFilterDateToInput(event.target.value)}
-                className="rounded border border-gray-300 px-3 py-2 text-sm"
-              />
-            </label>
-            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-              Status
+        {isFilterBarVisible && (
+          <div className="mx-4 mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <span className="text-sm font-semibold text-gray-700">Filtros</span>
+              <button
+                type="button"
+                onClick={handleClearFilters}
+                className="rounded-full border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-white hover:text-blue-700 hover:cursor-pointer"
+              >
+                Limpar filtros
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                ID
+                <input
+                  type="number"
+                  min={1}
+                  value={filterIdInput}
+                  onChange={(event) => setFilterIdInput(event.target.value)}
+                  placeholder="Ex.: 123"
+                  className="rounded border border-gray-300 px-3 py-2 text-sm"
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                RE
+                <input
+                  type="number"
+                  min={1}
+                  value={filterReInput}
+                  onChange={(event) => setFilterReInput(event.target.value)}
+                  placeholder="Ex.: 45678"
+                  className="rounded border border-gray-300 px-3 py-2 text-sm"
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Nome do funcionário
+                <input
+                  type="text"
+                  value={filterEmployeeNameInput}
+                  onChange={(event) => setFilterEmployeeNameInput(event.target.value)}
+                  placeholder="Buscar por nome"
+                  className="rounded border border-gray-300 px-3 py-2 text-sm"
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Descrição
+                <input
+                  type="text"
+                  value={filterDescriptionInput}
+                  onChange={(event) => setFilterDescriptionInput(event.target.value)}
+                  placeholder="Buscar na descrição"
+                  className="rounded border border-gray-300 px-3 py-2 text-sm"
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                De
+                <input
+                  type="date"
+                  value={filterDateFromInput}
+                  onChange={(event) => setFilterDateFromInput(event.target.value)}
+                  className="rounded border border-gray-300 px-3 py-2 text-sm"
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Até
+                <input
+                  type="date"
+                  value={filterDateToInput}
+                  onChange={(event) => setFilterDateToInput(event.target.value)}
+                  className="rounded border border-gray-300 px-3 py-2 text-sm"
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Status
+                <DropdownSelect
+                  value={filterStatusInput}
+                  onChange={setFilterStatusInput}
+                  placeholder="Todos"
+                  options={STATUS_OPTIONS.map((status) => ({
+                    label: translateStatus(status),
+                    value: status,
+                  }))}
+                  buttonClassName="rounded border border-gray-300 px-3 py-2 text-sm"
+                />
+              </label>
               <DropdownSelect
-                value={filterStatusInput}
-                onChange={setFilterStatusInput}
-                placeholder="Todos"
-                options={STATUS_OPTIONS.map((status) => ({
-                  label: translateStatus(status),
-                  value: status,
-                }))}
-                buttonClassName="rounded border border-gray-300 px-3 py-2 text-sm"
+                label="Área"
+                value={filterAreaInput}
+                placeholder="Todas"
+                onChange={setFilterAreaInput}
+                options={
+                  areasList?.map((area) => ({
+                    label: area.name,
+                    value: String(area.id),
+                  })) ?? []
+                }
               />
-            </label>
-            <DropdownSelect
-              label="Área"
-              value={filterAreaInput}
-              placeholder="Todas"
-              onChange={setFilterAreaInput}
-              options={
-                areasList?.map((area) => ({
-                  label: area.name,
-                  value: String(area.id),
-                })) ?? []
-              }
-            />
-            <DropdownSelect
-              label="Categoria"
-              value={filterCategoryInput}
-              placeholder="Todas"
-              onChange={setFilterCategoryInput}
-              options={
-                categoryList?.map((category) => ({
-                  label: category.name,
-                  value: String(category.id),
-                })) ?? []
-              }
-            />
+              <DropdownSelect
+                label="Categoria"
+                value={filterCategoryInput}
+                placeholder="Todas"
+                onChange={setFilterCategoryInput}
+                options={
+                  categoryList?.map((category) => ({
+                    label: category.name,
+                    value: String(category.id),
+                  })) ?? []
+                }
+              />
+            </div>
+            {hasActiveFilters && (
+              <p className="mt-3 text-xs text-gray-500">
+                Os filtros são aplicados em todas as propostas que você pode visualizar.
+              </p>
+            )}
           </div>
-          {hasActiveFilters && (
-            <p className="mt-3 text-xs text-gray-500">
-              Os filtros são aplicados em todas as propostas que você pode visualizar.
-            </p>
-          )}
-        </div>
+        )}
         <p className="ml-6 mb-2 text-gray-500">{totalCount} propostas encontradas</p>
         <div className="mx-3 flex flex-col justify-center rounded-lg border border-gray-300 text-sm sm:mx-4">
           <div className="hidden grid-cols-[56px_2fr_2fr_1fr_1fr_1fr] rounded-t-lg bg-gray-300 px-4 py-2 text-left font-semibold md:grid">
