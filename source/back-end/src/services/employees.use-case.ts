@@ -34,8 +34,18 @@ class EmployeesUseCase {
   }
 
   public async executeFindUnregisteredEmployees() {
-    const employees = await this.employeeRepository.findUnregisteredEmployees()
-    return employees
+    const employeesBySuggestions = await this.employeeRepository.findEmployeesOnSuggestions()
+    const registeredEmployeeRes = (await this.employeeRepository.findAll()).map(
+      (employee) => employee.re,
+    )
+
+    const unregisteredEmployees = []
+    for (const employee of employeesBySuggestions) {
+      if (!registeredEmployeeRes.includes(employee.employeeRe)) {
+        unregisteredEmployees.push(employee)
+      }
+    }
+    return unregisteredEmployees
   }
 
   public async executeFindAllPasswordResetRequesters() {
@@ -67,7 +77,7 @@ class EmployeesUseCase {
 
     const employee = await prisma.$transaction(async (tx) => {
       const unregisteredEmployeesRes = (
-        await this.employeeRepository.findUnregisteredEmployees(tx)
+        await this.employeeRepository.findEmployeesOnSuggestions(tx)
       ).map((register) => register.employeeRe)
 
       const createdEmployee = await this.employeeRepository.create(newEmployee, tx)
