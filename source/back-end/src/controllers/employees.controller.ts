@@ -124,7 +124,6 @@ export const EmployeesController = {
         new PrismaEmployeeRepository(),
         new PrismaSuggestionRepository(),
       )
-      console.log('Received update request for employee ID:', employeeId, 'with data:', data)
       const employee = await employeeUseCase.executeUpdate(employeeId, data)
       res.send(employee)
     } catch (error) {

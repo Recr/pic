@@ -165,7 +165,6 @@ class ProposalsUseCase {
         },
       }
     }
-    console.log(filters)
     return await this.proposalRepository.findAllDetailed(pagination, where, reMatcher, idMatcher)
   }
 
