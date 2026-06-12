@@ -14,6 +14,7 @@ const PayoutItem: React.FC<PayoutItemProps> = ({ payout, isSelected, onToggleSel
     <>
       <div className="mx-3 grid grid-cols-1 gap-2 border-t-2 border-gray-200 px-3 py-3 text-sm hover:cursor-pointer hover:bg-blue-100 sm:mx-4 md:grid-cols-[40px_56px_2fr_2fr_1fr_1fr_1fr_1fr] md:gap-0 md:px-4 md:py-2">
         <div className="flex items-center" onClick={(event) => event.stopPropagation()}>
+          {/* TODO: Implement checkbox functionality with shift to select multiple */}
           <input
             type="checkbox"
             checked={isSelected}

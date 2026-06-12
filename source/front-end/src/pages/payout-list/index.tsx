@@ -43,7 +43,14 @@ const PayoutList: React.FC = () => {
   const handleExportExcel = () => {
     if (!payoutData || payoutData.length === 0) return
 
-    const rows = payoutData.map((payout) => ({
+    let selectedPayouts
+
+    if (selectedPayoutIds.length > 0) {
+      selectedPayouts = payoutData.filter((payout) => selectedPayoutIds.includes(payout.id))
+    } else {
+      selectedPayouts = payoutData
+    }
+    const rows = selectedPayouts.map((payout) => ({
       ID: payout.id,
       PropostaID: payout.suggestion.proposal.id,
       Proposta: payout.suggestion.proposal.description,
