@@ -10,8 +10,8 @@ fs.mkdirSync(uploadDir, { recursive: true })
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, uploadDir),
   filename: (_req, file, cb) => {
-    const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_')
-    cb(null, `${Date.now()}-${safeName}`)
+    const filename = Buffer.from(file.originalname, 'latin1').toString('utf8').normalize('NFC')
+    cb(null, `${Date.now()}-${filename}`)
   },
 })
 

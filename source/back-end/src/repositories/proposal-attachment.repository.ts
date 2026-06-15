@@ -1,4 +1,3 @@
-import path from 'node:path'
 import { prisma } from '../lib/prisma'
 
 class PrismaProposalAttachmentRepository {
@@ -8,7 +7,7 @@ class PrismaProposalAttachmentRepository {
         proposalId,
         relativePath: file.filename,
         storedName: file.filename,
-        originalName: file.originalname,
+        originalName: Buffer.from(file.originalname, 'latin1').toString('utf8').normalize('NFC'),
         sizeBytes: file.size,
       },
     })
