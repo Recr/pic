@@ -303,7 +303,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
         </div>
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div className="w-full max-w-[95vw] space-y-4 p-4 sm:max-w-[90vw] sm:p-6 lg:w-152">
+        <div className="w-full sm:max-w-11/12 space-y-4 p-4 md:max-w-[70vw]  sm:p-6 lg:w-152">
           <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:gap-4">
             <div>
               <div className="flex gap-2">
@@ -505,7 +505,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
                     className="flex flex-col gap-2 rounded border border-gray-200 bg-gray-50 p-3 sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div className="flex-1">
-                      <p className="truncate text-sm font-medium text-gray-900">
+                      <p className="truncate text-sm font-medium text-gray-900 whitespace-normal">
                         {attachment.originalName}
                       </p>
                       <p className="text-xs text-gray-500">
@@ -514,7 +514,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 sm:ml-3">
+                    <div className="flex items-center gap-2 sm:ml-3 ml-0">
                       <button
                         type="button"
                         onClick={() =>
