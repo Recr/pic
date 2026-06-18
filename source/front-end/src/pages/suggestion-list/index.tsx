@@ -518,7 +518,7 @@ const SuggestionList: React.FC = () => {
             className="flex items-center gap-1 rounded-lg px-2 py-2 text-gray-700 transition-all hover:bg-gray-100 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ChevronLeftIcon size={20} />
-            <span>Anterior</span>
+            <span className="hidden sm:block">Anterior</span>
           </button>
           {visiblePages.map((pageItem, index) =>
             pageItem === 'ellipsis' ? (
@@ -547,7 +547,7 @@ const SuggestionList: React.FC = () => {
             disabled={!nextPage}
             className="flex items-center gap-1 rounded-lg px-3 py-2 text-gray-700 transition-all hover:bg-gray-100 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            <span>Próximo</span>
+            <span className="hidden sm:block">Próximo</span>
             <ChevronRightIcon size={20} />
           </button>
         </div>

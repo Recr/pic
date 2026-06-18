@@ -708,6 +708,43 @@ class ProposalsUseCase {
       StatusCodes.FORBIDDEN,
     )
   }
+
+  public async executeUpdateProposalManager(proposalId: number, managerRe: number) {
+    const manager = await this.employeeRepository.findByRe(managerRe)
+    if (!manager) throw new AppError('Manager not found', StatusCodes.NOT_FOUND)
+
+    const updatedProposal = await this.proposalRepository.updateProposal(proposalId, {
+      manager: { connect: { id: manager.id } },
+    })
+    return updatedProposal
+  }
+
+  public async executeUpdateProposalChampion(
+    proposalId: number,
+    userId: number,
+    championRe: number,
+  ) {
+    const champion = await this.employeeRepository.findByRe(championRe)
+    if (!champion) throw new AppError('Champion not found', StatusCodes.NOT_FOUND)
+
+    // Check authorization: manager of the proposal or admin
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) throw new AppError('Proposal not found', StatusCodes.NOT_FOUND)
+
+    const user = await this.employeeRepository.findById(userId)
+    if (!user) throw new AppError('User not found', StatusCodes.NOT_FOUND)
+
+    if (user.role !== Role.ADMIN) {
+      if (proposal.managerId !== userId) {
+        throw new AppError('Unauthorized to update this proposal.', StatusCodes.FORBIDDEN)
+      }
+    }
+
+    const updatedProposal = await this.proposalRepository.updateProposal(proposalId, {
+      champion: { connect: { id: champion.id } },
+    })
+    return updatedProposal
+  }
 }
 
 export { ProposalsUseCase }

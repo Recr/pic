@@ -20,3 +20,10 @@ export const updateEmployeeSchema = z.object({
   role: z.string(),
   shift: z.string(),
 })
+
+export const updateManagerOrChampionSchema = z.object({
+  managerOrChampionRe: z.coerce
+    .number('O campo deve ser preenchido com um número.')
+    .int()
+    .positive('RE deve ser um número inteiro positivo'),
+})

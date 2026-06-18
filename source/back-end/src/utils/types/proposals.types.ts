@@ -54,3 +54,5 @@ export interface DetailedProposalFilters {
   categoryId?: number
   areaId?: number
 }
+
+// export interface UpdateProposal

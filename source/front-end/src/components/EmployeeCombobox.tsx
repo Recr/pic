@@ -90,31 +90,33 @@ const EmployeeCombobox = ({
         />
         <span
           aria-hidden
-          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+          className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 ${isOpen ? 'hidden' : 'block'}`}
         >
           ▾
         </span>
 
-        {isOpen && (
-          <ul
-            id={listId}
-            className="absolute z-10 mt-1 max-h-52 w-full overflow-y-auto rounded-[5px] border border-[#ccc] bg-white shadow-sm"
-          >
-            {filteredEmployees.length > 0 ? (
-              filteredEmployees.map((employee) => (
-                <li
-                  key={employee.re}
-                  onMouseDown={() => handleSelect(employee)}
-                  className="cursor-pointer px-3 py-2 text-sm hover:bg-gray-100"
-                >
-                  {employee.re} - {employee.name} ({employee.shift || '-'})
-                </li>
-              ))
-            ) : (
-              <li className="px-3 py-2 text-sm text-gray-500">Nenhum funcionário encontrado</li>
-            )}
-          </ul>
-        )}
+        <ul
+          id={listId}
+          className={` mt-1 w-full rounded-[5px] border border-[#ccc] bg-white shadow-sm transition-all duration-200 ease-out overflow-auto ${
+            isOpen
+              ? 'max-h-52 scale-100 opacity-100 pointer-events-auto'
+              : 'max-h-0 scale-95 opacity-0 pointer-events-none'
+          }`}
+        >
+          {filteredEmployees.length > 0 ? (
+            filteredEmployees.map((employee) => (
+              <li
+                key={employee.re}
+                onMouseDown={() => handleSelect(employee)}
+                className="cursor-pointer px-3 py-2 text-sm hover:bg-gray-100"
+              >
+                {employee.re} - {employee.name} ({employee.shift || '-'})
+              </li>
+            ))
+          ) : (
+            <li className="px-3 py-2 text-sm text-gray-500">Nenhum funcionário encontrado</li>
+          )}
+        </ul>
       </div>
       <p className="text-xs text-gray-500 mt-0.5">Digite o RE ou selecione da lista</p>
     </div>

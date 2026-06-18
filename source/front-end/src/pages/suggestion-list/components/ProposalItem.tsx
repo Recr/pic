@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Modal from '../../../components/modal/Modal'
 import StatusBadge from '../../../components/StatusBadge'
 import type { ProposalDetailed } from '../../../features/proposal/types'
@@ -9,6 +9,13 @@ import type { RootState } from '../../../app/store'
 import { toast } from 'react-toastify'
 import { Undo2, Trash2 } from 'lucide-react'
 import UndoStatusModal from './UndoStatusModal'
+import EmployeeCombobox from '../../../components/EmployeeCombobox'
+import { employeeAPI } from '../../../features/employee/employee-api'
+import type z from 'zod'
+import { updateManagerOrChampionSchema } from '../../../validation/schemas/employee-schemas'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod/src/zod.js'
+import { translateRoles } from '../../../helpers/translateRoles'
 
 const MAX_ATTACHMENTS_PER_UPLOAD = 5
 const MAX_ATTACHMENT_SIZE_BYTES = 10 * 1024 * 1024
@@ -17,6 +24,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [isUndoModalOpen, setIsUndoModalOpen] = React.useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false)
+  const [isUpdateManagerModalOpen, setIsUpdateManagerModalOpen] = React.useState(false)
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
   const [removingAttachmentId, setRemovingAttachmentId] = React.useState<number | null>(null)
   const [selectedUndoType, setSelectedUndoType] = React.useState<
@@ -44,7 +52,12 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
     proposalAPI.useUndoRejectedToDefineChampionMutation()
   const [softDeleteProposal, { isLoading: isSoftDeleteLoading }] =
     proposalAPI.useSoftDeleteProposalMutation()
+  const [updateProposalManager, { isLoading: isUpdatingProposalManager }] =
+    proposalAPI.useUpdateProposalManagerMutation()
+  const [updateProposalChampion, { isLoading: isUpdatingProposalChampion }] =
+    proposalAPI.useUpdateProposalChampionMutation()
   const user = useSelector((state: RootState) => state.auth.user)
+  const { data: employeeList } = employeeAPI.useGetEmployeesQuery()
 
   const isAdmin = user?.role === 'ADMIN'
   const isManager = user?.re !== undefined && proposal.manager?.re === user.re
@@ -260,6 +273,58 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
     }
   }
 
+  type UpdateManagerFormInput = z.input<typeof updateManagerOrChampionSchema>
+  type UpdateManagerFormOutput = z.output<typeof updateManagerOrChampionSchema>
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<UpdateManagerFormInput, unknown, UpdateManagerFormOutput>({
+    resolver: zodResolver(updateManagerOrChampionSchema),
+    defaultValues: {
+      managerOrChampionRe: proposal.manager?.re,
+    },
+  })
+
+  type EmployeeType = 'MANAGER' | 'CHAMPION' | null
+  const [employeeType, setEmployeeType] = useState<EmployeeType>(null)
+
+  const handleUpdateProposalManagerOrChampion = async (data: UpdateManagerFormOutput) => {
+    try {
+      if (employeeType === 'MANAGER') {
+        await updateProposalManager({
+          proposalId: proposal.id.toString(),
+          managerRe: data.managerOrChampionRe,
+        }).unwrap()
+        console.log('Proposal updated successfully')
+      } else if (employeeType === 'CHAMPION') {
+        await updateProposalChampion({
+          proposalId: proposal.id.toString(),
+          championRe: data.managerOrChampionRe,
+        }).unwrap()
+        console.log('Proposal updated successfully')
+      } else {
+        toast.error('Tipo de funcionário não selecionado.')
+        throw new Error('Tipo de funcionário não selecionado.')
+      }
+
+      toast.success('Proposta atualizada com sucesso.')
+    } catch (error) {
+      console.error('Failed to update proposal:', error)
+      toast.error('Erro ao atualizar proposta.')
+    } finally {
+      setEmployeeType(null)
+      setIsUpdateManagerModalOpen(false)
+    }
+  }
+
+  const canEditManager = user?.role === 'ADMIN'
+  const canEditChampion =
+    user?.role === 'ADMIN' ? true : user?.re === proposal.manager?.re ? true : false
+
   return (
     <>
       <div
@@ -387,7 +452,15 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
             <div>
               <p className="text-sm font-semibold mb-2">Gestor</p>
               <div className="flex flex-wrap gap-2">
-                <p className="bg-gray-100 px-2 py-1 rounded text-sm">
+                <p
+                  onClick={() => {
+                    if (canEditManager) {
+                      setEmployeeType('MANAGER')
+                      setIsUpdateManagerModalOpen(true)
+                    }
+                  }}
+                  className={`bg-gray-100 px-2 py-1 rounded text-sm ${canEditManager ? 'border border-blue-300 border-dashed hover:cursor-pointer hover:bg-blue-50 hover:border-blue-400' : ''} transition-colors`}
+                >
                   <span className="text-gray-700 font-bold">{proposal.manager.name}</span>
                   <span className="text-xs text-gray-500 ml-1">
                     {proposal.manager.re}
@@ -402,7 +475,15 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
             <div>
               <p className="text-sm font-semibold mb-2">Executor</p>
               <div className="flex flex-wrap gap-2">
-                <p className="bg-gray-100 px-2 py-1 rounded text-sm">
+                <p
+                  onClick={() => {
+                    if (canEditChampion) {
+                      setEmployeeType('CHAMPION')
+                      setIsUpdateManagerModalOpen(true)
+                    }
+                  }}
+                  className={`bg-gray-100 px-2 py-1 rounded text-sm ${canEditChampion ? 'border border-blue-300 border-dashed hover:cursor-pointer hover:bg-blue-50 hover:border-blue-400' : ''} transition-colors`}
+                >
                   <span className="text-gray-700 font-bold">{proposal.champion.name}</span>
                   <span className="text-xs text-gray-500 ml-1">
                     {proposal.champion.re}
@@ -583,6 +664,53 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
               className="rounded bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSoftDeleteLoading ? 'Deletando...' : 'Deletar'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+      <Modal isOpen={isUpdateManagerModalOpen} onClose={() => setIsUpdateManagerModalOpen(false)}>
+        <div className="w-full max-w-sm space-y-4 p-6">
+          <h3 className="text-lg font-semibold text-blue-600">
+            Atualizar {employeeType ? translateRoles(employeeType) : 'Funcionário'}
+          </h3>
+          <p className="text-gray-700">
+            Selecione o novo {employeeType ? translateRoles(employeeType) : 'Funcionário'} para esta
+            proposta.
+          </p>
+          <label htmlFor={`manager-input-${proposal.id}`}>
+            <strong>Defina o {employeeType ? translateRoles(employeeType) : 'Funcionário'}</strong>
+          </label>
+          <EmployeeCombobox
+            name={`manager-input-${proposal.id}`}
+            listId={`employees-list-${proposal.id}`}
+            employees={employeeList || []}
+            required
+            placeholder="Digite ou selecione o RE"
+            onSelect={(value) => {
+              setValue('managerOrChampionRe', Number(value), { shouldValidate: true })
+            }}
+          />
+          <input type="hidden" {...register('managerOrChampionRe', { valueAsNumber: true })} />
+          {errors.managerOrChampionRe && (
+            <p className="text-sm text-red-600">{errors.managerOrChampionRe.message}</p>
+          )}
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={() => {
+                setIsUpdateManagerModalOpen(false)
+                setEmployeeType(null)
+              }}
+              className="rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:cursor-pointer transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit(handleUpdateProposalManagerOrChampion)}
+              className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 hover:cursor-pointer transition-colors"
+            >
+              Atualizar
             </button>
           </div>
         </div>

@@ -11,6 +11,8 @@ import {
   updateProposalWithChampion,
   updateProposalWithManager,
   softDeleteProposalSchema,
+  updateProposalManager,
+  updateProposalChampion,
 } from '../../utils/schemas/proposal.schemas'
 import { authMiddleware } from '../../middlewares/auth.middeware'
 import { checkRole } from '../../middlewares/role.middleware'
@@ -152,6 +154,21 @@ proposalsRoutes.put(
   '/:id/undo/rejected-to-define-champion',
   authMiddleware,
   ProposalsController.handleUndoRejectedToDefineChampion,
+)
+
+proposalsRoutes.put(
+  '/:id/update-manager',
+  authMiddleware,
+  validate(updateProposalManager),
+  checkRole([Role.ADMIN]),
+  ProposalsController.handleUpdateProposalManager,
+)
+
+proposalsRoutes.put(
+  '/:id/update-champion',
+  authMiddleware,
+  validate(updateProposalChampion),
+  ProposalsController.handleUpdateProposalChampion,
 )
 
 export { proposalsRoutes }

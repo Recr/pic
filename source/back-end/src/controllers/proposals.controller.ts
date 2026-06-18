@@ -672,4 +672,61 @@ export const ProposalsController = {
       next(error)
     }
   },
+
+  async handleUpdateProposalManager(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalId = Number(req.params.id)
+      const userId = Number(req.user?.sub)
+
+      if (Number.isNaN(proposalId) || Number.isNaN(userId)) {
+        return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
+      }
+
+      const data = req.body
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
+      )
+
+      const proposal = await proposalUseCase.executeUpdateProposalManager(
+        proposalId,
+        data.managerRe,
+      )
+      res.send(proposal)
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  async handleUpdateProposalChampion(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalId = Number(req.params.id)
+      const userId = Number(req.user?.sub)
+
+      if (Number.isNaN(proposalId) || Number.isNaN(userId)) {
+        return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
+      }
+
+      const data = req.body
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
+      )
+
+      const proposal = await proposalUseCase.executeUpdateProposalChampion(
+        proposalId,
+        userId,
+        data.championRe,
+      )
+      res.send(proposal)
+    } catch (error) {
+      next(error)
+    }
+  },
 }

@@ -322,5 +322,27 @@ export const proposalAPI = api.injectEndpoints({
         { type: 'Proposal', id: 'LIST' },
       ],
     }),
+    updateProposalManager: builder.mutation<Proposal, { proposalId: string; managerRe: number }>({
+      query: ({ proposalId, managerRe }) => ({
+        url: `/proposals/${proposalId}/update-manager`,
+        method: 'PUT',
+        body: { managerRe },
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
+    updateProposalChampion: builder.mutation<Proposal, { proposalId: string; championRe: number }>({
+      query: ({ proposalId, championRe }) => ({
+        url: `/proposals/${proposalId}/update-champion`,
+        method: 'PUT',
+        body: { championRe },
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
   }),
 })

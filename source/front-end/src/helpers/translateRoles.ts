@@ -8,6 +8,7 @@ export function translateRoles(role: string): string {
     ADMIN: 'Administrador',
     HUMAN_RESOURCES: 'Recursos Humanos',
     TECHNICAL_SUPPORT: 'Suporte Técnico',
+    CHAMPION: 'Executor',
   }
   return translations[role] || role
 }

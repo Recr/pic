@@ -117,3 +117,21 @@ export const softDeleteProposalSchema = z.object({
     id: z.coerce.number(),
   }),
 })
+
+export const updateProposalManager = z.object({
+  params: z.object({
+    id: z.coerce.number(),
+  }),
+  body: z.object({
+    managerRe: z.number(),
+  }),
+})
+
+export const updateProposalChampion = z.object({
+  params: z.object({
+    id: z.coerce.number(),
+  }),
+  body: z.object({
+    championRe: z.number(),
+  }),
+})
