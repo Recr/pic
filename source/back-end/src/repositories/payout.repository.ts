@@ -39,6 +39,16 @@ class PrismaPayoutRepository {
     return payouts
   }
 
+  public async findBySuggestionIds(suggestionIds: number[]) {
+    return await prisma.payout.findMany({
+      where: {
+        suggestionId: {
+          in: suggestionIds,
+        },
+      },
+    })
+  }
+
   public async updateStatusByIds(ids: number[], status: string, payedAt: Date | null) {
     const updateResult = await prisma.payout.updateMany({
       where: {

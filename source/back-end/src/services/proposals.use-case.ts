@@ -28,7 +28,7 @@ class ProposalsUseCase {
     private categoryRepository: PrismaCategoryRepository,
     private suggestionRepository: PrismaSuggestionRepository,
     private proposalAttachmentRepository: PrismaProposalAttachmentRepository,
-    private payoutRepository?: PrismaPayoutRepository,
+    private payoutRepository: PrismaPayoutRepository,
   ) {}
 
   public async executeFindAll() {
@@ -336,14 +336,23 @@ class ProposalsUseCase {
             suggestionId: id,
           }
         })
+        const existingPayouts = await this.payoutRepository.findBySuggestionIds(suggestionIdList)
 
-        const updatedProposal =
-          await this.proposalRepository.updateApprovedProposalAndCreatePayouts(
+        if (existingPayouts.length === 0) {
+          const updatedProposal =
+            await this.proposalRepository.updateApprovedProposalAndCreatePayouts(
+              proposal.id,
+              updatedData,
+              payoutData,
+            )
+          return updatedProposal
+        } else {
+          const updatedProposal = await this.proposalRepository.updateProposal(
             proposal.id,
             updatedData,
-            payoutData,
           )
-        return updatedProposal
+          return updatedProposal
+        }
       }
 
       const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
@@ -672,43 +681,6 @@ class ProposalsUseCase {
     return updatedProposal
   }
 
-  // Helper methods
-
-  private async verifyIsCustomReward(data: UpdateProposalWithChampion | UpdateProposalWithManager) {
-    if (data.isCustomReward) return true
-
-    const category = await this.categoryRepository.findById(data.categoryId)
-    if (!category) throw new AppError('Category not found.', StatusCodes.NOT_FOUND)
-    return (
-      category.categoryReward == null ||
-      category.categoryReward === undefined ||
-      Number(category.categoryReward) === 0.0
-    )
-  }
-
-  private async ensureCanManageAttachments(proposalId: number, userId: number, role: Role) {
-    const proposal = await this.proposalRepository.findById(proposalId)
-    if (!proposal) {
-      throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
-    }
-
-    if (role === Role.ADMIN) {
-      return
-    }
-
-    const isManager = proposal.managerId === userId
-    const isChampion = proposal.championId === userId
-
-    if (isManager || isChampion) {
-      return
-    }
-
-    throw new AppError(
-      'Unauthorized to manage attachments for this proposal. Only manager, champion, or admin can edit attachments.',
-      StatusCodes.FORBIDDEN,
-    )
-  }
-
   public async executeUpdateProposalManager(proposalId: number, managerRe: number) {
     const manager = await this.employeeRepository.findByRe(managerRe)
     if (!manager) throw new AppError('Manager not found', StatusCodes.NOT_FOUND)
@@ -744,6 +716,43 @@ class ProposalsUseCase {
       champion: { connect: { id: champion.id } },
     })
     return updatedProposal
+  }
+
+  // Helper methods
+
+  private async verifyIsCustomReward(data: UpdateProposalWithChampion | UpdateProposalWithManager) {
+    if (data.isCustomReward) return true
+
+    const category = await this.categoryRepository.findById(data.categoryId)
+    if (!category) throw new AppError('Category not found.', StatusCodes.NOT_FOUND)
+    return (
+      category.categoryReward == null ||
+      category.categoryReward === undefined ||
+      Number(category.categoryReward) === 0.0
+    )
+  }
+
+  private async ensureCanManageAttachments(proposalId: number, userId: number, role: Role) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) {
+      throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+    }
+
+    if (role === Role.ADMIN) {
+      return
+    }
+
+    const isManager = proposal.managerId === userId
+    const isChampion = proposal.championId === userId
+
+    if (isManager || isChampion) {
+      return
+    }
+
+    throw new AppError(
+      'Unauthorized to manage attachments for this proposal. Only manager, champion, or admin can edit attachments.',
+      StatusCodes.FORBIDDEN,
+    )
   }
 }
 

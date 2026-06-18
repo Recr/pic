@@ -79,7 +79,7 @@ model Proposal {
 
 model Payout {
   id           Int       @id @default(autoincrement())
-  suggestionId Int       @map("suggestion_id")
+  suggestionId Int       @map("suggestion_id") @unique
   value        Decimal?  @db.Decimal(10, 2)
   status       String    @default("PENDING")
   createdAt    DateTime  @default(now()) @map("created_at") @db.DateTime2

@@ -78,7 +78,7 @@ class EmployeesUseCase {
     const employee = await prisma.$transaction(async (tx) => {
       const unregisteredEmployeesRes = (
         await this.employeeRepository.findEmployeesOnSuggestions(tx)
-      ).map((register) => register.employeeRe)
+      ).map((suggestion) => suggestion.employeeRe)
 
       const createdEmployee = await this.employeeRepository.create(newEmployee, tx)
 

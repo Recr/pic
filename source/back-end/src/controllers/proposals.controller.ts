@@ -24,6 +24,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
       const proposals = await proposalUseCase.executeFindAll()
       res.send(proposals)
@@ -40,6 +41,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
 
       const role = req.user?.role as Role | undefined
@@ -148,6 +150,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
 
       const userId = Number(req.user?.sub)
@@ -170,6 +173,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
       const role = req.user?.role
       const userId = Number(req.user?.sub)
@@ -188,6 +192,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
       const proposals = await proposalUseCase.executeFindAllWithoutManager()
       res.send(proposals)
@@ -205,6 +210,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
       const proposals = await proposalUseCase.executeFindById(proposalId)
       res.send(proposals)
@@ -222,6 +228,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
       const proposal = await proposalUseCase.executeCreate(data)
       res.send(proposal)
@@ -242,6 +249,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
       const updatedProposal = await proposalUseCase.executeDefineChampion(proposalId, data, userId)
       res.send(updatedProposal)
@@ -261,6 +269,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
       const updatedProposal = await proposalUseCase.executeAdminDefineChampion(proposalId, data)
       res.send(updatedProposal)
@@ -279,6 +288,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
       const updatedProposal = await proposalUseCase.executeDefineManager(proposalId, data)
       res.send(updatedProposal)
@@ -297,6 +307,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
       const updatedProposal = await proposalUseCase.executeAdminRejection(proposalId, rejectionNote)
       res.send(updatedProposal)
@@ -317,6 +328,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
 
       const updatedProposal = await proposalUseCase.executeRejectProposal(
@@ -340,6 +352,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
 
       const updatedProposal = await proposalUseCase.executeSoftDeleteProposal(proposalId)
@@ -360,6 +373,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
       const updatedProposal = await proposalUseCase.executeChampionReview(
         proposalId,
@@ -386,6 +400,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
 
       const updatedProposal = await proposalUseCase.executeUpdateChampionNotes(
@@ -409,6 +424,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
 
       const attachment = await proposalUseCase.executeGetAttachment(
@@ -491,6 +507,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
 
       const createdAttachments = await proposalUseCase.executeAddAttachments(
@@ -523,6 +540,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
 
       await proposalUseCase.executeDeleteAttachment(proposalId, attachmentId, userId, role)
@@ -578,6 +596,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
 
       const proposal = await proposalUseCase.executeUndoImplementationToToImplement(
@@ -605,6 +624,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
 
       const proposal = await proposalUseCase.executeUndoToImplementToUnderValidation(
@@ -632,6 +652,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
 
       const proposal = await proposalUseCase.executeUndoRejectedToUnderValidation(
@@ -660,6 +681,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
 
       const proposal = await proposalUseCase.executeUndoRejectedToDefineChampion(
@@ -689,6 +711,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
 
       const proposal = await proposalUseCase.executeUpdateProposalManager(
@@ -717,6 +740,7 @@ export const ProposalsController = {
         new PrismaCategoryRepository(),
         new PrismaSuggestionRepository(),
         new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
       )
 
       const proposal = await proposalUseCase.executeUpdateProposalChampion(
