@@ -7,7 +7,7 @@ import { getStatusColor } from '../../../helpers/getStatusColor'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../../app/store'
 import { toast } from 'react-toastify'
-import { Undo2, Trash2 } from 'lucide-react'
+import { Undo2, Trash2, Undo } from 'lucide-react'
 import UndoStatusModal from './UndoStatusModal'
 import EmployeeCombobox from '../../../components/EmployeeCombobox'
 import { employeeAPI } from '../../../features/employee/employee-api'
@@ -24,6 +24,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [isUndoModalOpen, setIsUndoModalOpen] = React.useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false)
+  const [isRestoreModalOpen, setIsRestoreModalOpen] = React.useState(false)
   const [isUpdateManagerModalOpen, setIsUpdateManagerModalOpen] = React.useState(false)
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
   const [removingAttachmentId, setRemovingAttachmentId] = React.useState<number | null>(null)
@@ -52,6 +53,8 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
     proposalAPI.useUndoRejectedToDefineChampionMutation()
   const [softDeleteProposal, { isLoading: isSoftDeleteLoading }] =
     proposalAPI.useSoftDeleteProposalMutation()
+  const [restoreProposal, { isLoading: isRestoringLoading }] =
+    proposalAPI.useRestoreProposalMutation()
   const [updateProposalManager, { isLoading: isUpdatingProposalManager }] =
     proposalAPI.useUpdateProposalManagerMutation()
   const [updateProposalChampion, { isLoading: isUpdatingProposalChampion }] =
@@ -154,10 +157,6 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
     }
   }
 
-  const handleSoftDelete = () => {
-    setIsDeleteModalOpen(true)
-  }
-
   const handleConfirmDelete = async () => {
     try {
       await softDeleteProposal({ proposalId: proposal.id.toString() }).unwrap()
@@ -166,6 +165,17 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
       toast.success('Proposta deletada com sucesso.')
     } catch (error) {
       toast.error(`Erro ao deletar proposta: ${getErrorMessage(error)}`)
+    }
+  }
+
+  const handleConfirmRestore = async () => {
+    try {
+      await restoreProposal({ proposalId: proposal.id.toString() }).unwrap()
+      setIsModalOpen(false)
+      setIsRestoreModalOpen(false)
+      toast.success('Proposta restaurada com sucesso.')
+    } catch (error) {
+      toast.error(`Erro ao restaurar proposta: ${getErrorMessage(error)}`)
     }
   }
 
@@ -394,15 +404,26 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
                   <Undo2 size={16} />
                 </button>
               )}
-              {isAdmin && (
+              {isAdmin && proposal.isActive && (
                 <button
                   type="button"
-                  onClick={handleSoftDelete}
+                  onClick={() => setIsDeleteModalOpen(true)}
                   disabled={isSoftDeleteLoading}
                   title="Deletar proposta"
                   className="inline-flex h-8 w-8 items-center justify-center rounded border border-red-200 text-red-600 transition-colors hover:cursor-pointer hover:bg-red-50 disabled:cursor-not-allowed disabled:text-gray-400"
                 >
                   <Trash2 size={16} />
+                </button>
+              )}
+              {isAdmin && !proposal.isActive && (
+                <button
+                  type="button"
+                  onClick={() => setIsRestoreModalOpen(true)}
+                  disabled={isRestoringLoading}
+                  title="Restaurar proposta"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded border border-green-200 text-green-600 transition-colors hover:cursor-pointer hover:bg-green-50 disabled:cursor-not-allowed disabled:text-gray-400"
+                >
+                  <Undo size={16} />
                 </button>
               )}
               <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
@@ -653,7 +674,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
               type="button"
               onClick={() => setIsDeleteModalOpen(false)}
               disabled={isSoftDeleteLoading}
-              className="rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer transition-colors"
             >
               Cancelar
             </button>
@@ -661,9 +682,35 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
               type="button"
               onClick={handleConfirmDelete}
               disabled={isSoftDeleteLoading}
-              className="rounded bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer transition-colors"
             >
               {isSoftDeleteLoading ? 'Deletando...' : 'Deletar'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+      <Modal isOpen={isRestoreModalOpen} onClose={() => setIsRestoreModalOpen(false)}>
+        <div className="w-full max-w-sm space-y-4 p-6">
+          <h3 className="text-lg font-semibold text-green-600">Restaurar Proposta</h3>
+          <p className="text-gray-700">
+            Tem certeza que deseja restaurar esta proposta? Esta ação não pode ser desfeita.
+          </p>
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={() => setIsRestoreModalOpen(false)}
+              disabled={isRestoringLoading}
+              className="rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmRestore}
+              disabled={isRestoringLoading}
+              className="rounded bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer transition-colors"
+            >
+              {isRestoringLoading ? 'Restaurando...' : 'Restaurar'}
             </button>
           </div>
         </div>

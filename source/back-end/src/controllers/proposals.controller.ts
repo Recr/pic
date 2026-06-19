@@ -370,6 +370,26 @@ export const ProposalsController = {
     }
   },
 
+  async handleRestoreProposal(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalId = Number(req.params.id)
+
+      const proposalUseCase = new ProposalsUseCase(
+        new PrismaProposalRepository(),
+        new PrismaEmployeeRepository(),
+        new PrismaCategoryRepository(),
+        new PrismaSuggestionRepository(),
+        new PrismaProposalAttachmentRepository(),
+        new PrismaPayoutRepository(),
+      )
+
+      const updatedProposal = await proposalUseCase.executeRestoreProposal(proposalId)
+      res.send(updatedProposal)
+    } catch (error) {
+      next(error)
+    }
+  },
+
   async handleStatusUpdate(req: Request, res: Response, next: NextFunction) {
     try {
       const proposalId = Number(req.params.id)

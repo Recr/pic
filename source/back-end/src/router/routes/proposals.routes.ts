@@ -13,6 +13,7 @@ import {
   softDeleteProposalSchema,
   updateProposalManager,
   updateProposalChampion,
+  restoreProposalSchema,
 } from '../../utils/schemas/proposal.schemas'
 import { authMiddleware } from '../../middlewares/auth.middeware'
 import { checkRole } from '../../middlewares/role.middleware'
@@ -124,6 +125,14 @@ proposalsRoutes.delete(
   authMiddleware,
   checkRole([Role.ADMIN]),
   ProposalsController.handleSoftDeleteProposal,
+)
+
+proposalsRoutes.put(
+  '/:id/restore',
+  validate(restoreProposalSchema),
+  authMiddleware,
+  checkRole([Role.ADMIN]),
+  ProposalsController.handleRestoreProposal,
 )
 
 proposalsRoutes.put(

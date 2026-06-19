@@ -411,13 +411,13 @@ class PrismaProposalRepository {
     return proposals
   }
 
-  public async findById(proposalId: number) {
+  public async findById(proposalId: number, includeInactive?: boolean) {
     const proposal = await prisma.proposal.findUnique({
       where: {
         id: proposalId,
       },
     })
-    if (proposal && !proposal.isActive) {
+    if (proposal && !proposal.isActive && !includeInactive) {
       return null
     }
     return proposal

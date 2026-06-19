@@ -112,11 +112,9 @@ export const adminRejectionSchema = z.object({
   }),
 })
 
-export const softDeleteProposalSchema = z.object({
-  params: z.object({
-    id: z.coerce.number(),
-  }),
-})
+export const softDeleteProposalSchema = proposalIdSchema
+
+export const restoreProposalSchema = proposalIdSchema
 
 export const updateProposalManager = z.object({
   params: z.object({

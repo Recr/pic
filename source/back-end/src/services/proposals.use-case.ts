@@ -498,6 +498,18 @@ class ProposalsUseCase {
     return updatedProposal
   }
 
+  public async executeRestoreProposal(proposalId: number) {
+    const proposal = await this.proposalRepository.findById(proposalId, true)
+    if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+
+    const updatedData: Prisma.ProposalUpdateInput = {
+      isActive: true,
+    }
+
+    const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
+    return updatedProposal
+  }
+
   public async executeGetAttachment(proposalId: number, attachmentId: number) {
     const attachment = await this.proposalAttachmentRepository.findById(attachmentId)
     if (!attachment || attachment.proposalId !== proposalId) {
