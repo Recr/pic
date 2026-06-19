@@ -1,18 +1,14 @@
 import { NextFunction, Request, Response } from 'express'
-import { LoginUseCase } from '../services/login.use-case'
 import { PrismaEmployeeRepository } from '../repositories/employee.repository'
-import { RefreshTokenRepository } from '../repositories/refresh-token.repository'
 import { AppError } from '../errors/AppError'
 import { StatusCodes } from 'http-status-codes'
+import { makeLoginUseCase } from '../factories/make-login-use-case.factory'
 
 export const AuthController = {
   async handleLogin(req: Request, res: Response, next: NextFunction) {
     try {
       const data = req.body
-      const loginUseCase = await new LoginUseCase(
-        new PrismaEmployeeRepository(),
-        new RefreshTokenRepository(),
-      )
+      const loginUseCase = makeLoginUseCase()
       const { accessToken, refreshToken, user } = await loginUseCase.executeLogin(data)
 
       const isProduction = process.env.NODE_ENV === 'production'
@@ -44,6 +40,7 @@ export const AuthController = {
         throw new AppError('Invalid user ID in token.', StatusCodes.UNAUTHORIZED)
       }
 
+      // For simplicity, we're directly using the repository here, but ideally, this should go through a use case.
       const employeeUseCase = new PrismaEmployeeRepository()
       const user = await employeeUseCase.findById(userId)
       if (!user) {
@@ -62,10 +59,7 @@ export const AuthController = {
         throw new AppError('Refresh token is missing.', StatusCodes.BAD_REQUEST)
       }
 
-      const loginUseCase = new LoginUseCase(
-        new PrismaEmployeeRepository(),
-        new RefreshTokenRepository(),
-      )
+      const loginUseCase = makeLoginUseCase()
       const { accessToken, refreshToken: newRefreshToken } =
         await loginUseCase.executeRefreshToken(refreshToken)
 
@@ -97,10 +91,7 @@ export const AuthController = {
       if (!refreshToken) {
         throw new AppError('Refresh token is missing.', StatusCodes.BAD_REQUEST)
       }
-      const loginUseCase = new LoginUseCase(
-        new PrismaEmployeeRepository(),
-        new RefreshTokenRepository(),
-      )
+      const loginUseCase = makeLoginUseCase()
       await loginUseCase.executeLogout(refreshToken)
 
       const isProduction = process.env.NODE_ENV === 'production'
@@ -126,10 +117,7 @@ export const AuthController = {
         throw new AppError('Invalid user ID in token.', StatusCodes.UNAUTHORIZED)
       }
       const { currentPassword, newPassword } = req.body
-      const loginUseCase = new LoginUseCase(
-        new PrismaEmployeeRepository(),
-        new RefreshTokenRepository(),
-      )
+      const loginUseCase = makeLoginUseCase()
       await loginUseCase.executeChangePassword(userId, currentPassword, newPassword)
       res.json({ message: 'Password changed successfully.' })
     } catch (error) {
@@ -140,10 +128,7 @@ export const AuthController = {
   async handleRequestPasswordResetToken(req: Request, res: Response, next: NextFunction) {
     try {
       const { re } = req.body
-      const loginUseCase = new LoginUseCase(
-        new PrismaEmployeeRepository(),
-        new RefreshTokenRepository(),
-      )
+      const loginUseCase = makeLoginUseCase()
       await loginUseCase.executeRequestPasswordResetToken(re)
       res.json({
         message:
@@ -157,10 +142,7 @@ export const AuthController = {
   async handleResetPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { re, passwordToken, newPassword } = req.body
-      const loginUseCase = new LoginUseCase(
-        new PrismaEmployeeRepository(),
-        new RefreshTokenRepository(),
-      )
+      const loginUseCase = makeLoginUseCase()
       await loginUseCase.executeResetPassword(re, passwordToken, newPassword)
       res.json({ message: 'Password reset successfully.' })
     } catch (error) {

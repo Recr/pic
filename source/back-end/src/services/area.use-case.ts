@@ -3,7 +3,7 @@ import { Prisma } from '../../prisma/client/client'
 import { AppError } from '../errors/AppError'
 import { PrismaAreaRepository } from '../repositories/area.repository'
 
-class AreasUseCase {
+class AreaUseCase {
   constructor(private areaRepository: PrismaAreaRepository) {}
 
   public async executeFindAll() {
@@ -37,4 +37,4 @@ class AreasUseCase {
   }
 }
 
-export { AreasUseCase }
+export { AreaUseCase }

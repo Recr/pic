@@ -4,7 +4,7 @@ import { PrismaCategoryRepository } from '../repositories/category.repository'
 import { Prisma } from '../../prisma/client/client'
 import { PrismaProposalRepository } from '../repositories/proposal.repository'
 
-class CategoriesUseCase {
+class CategoryUseCase {
   constructor(
     private categoryRepository: PrismaCategoryRepository,
     private proposalRepository: PrismaProposalRepository,
@@ -48,4 +48,4 @@ class CategoriesUseCase {
   }
 }
 
-export { CategoriesUseCase }
+export { CategoryUseCase }

@@ -1,13 +1,12 @@
 import { NextFunction, Request, Response } from 'express'
-import { AreasUseCase } from '../services/areas.use-case'
-import { PrismaAreaRepository } from '../repositories/area.repository'
 import { StatusCodes } from 'http-status-codes'
 import { Prisma } from '../../prisma/client/client'
+import { makeAreaUseCase } from '../factories/make-area-use-case.factory'
 
 export const AreasController = {
   async handleFindAll(req: Request, res: Response, next: NextFunction) {
     try {
-      const areasUseCase = new AreasUseCase(new PrismaAreaRepository())
+      const areasUseCase = makeAreaUseCase()
       const areas = await areasUseCase.executeFindAll()
       res.send(areas)
     } catch (error) {
@@ -17,7 +16,7 @@ export const AreasController = {
 
   async handleFindById(req: Request, res: Response, next: NextFunction) {
     try {
-      const areasUseCase = new AreasUseCase(new PrismaAreaRepository())
+      const areasUseCase = makeAreaUseCase()
       const areaId = Number(req.body)
 
       const area = await areasUseCase.executeFindById(areaId)
@@ -30,7 +29,7 @@ export const AreasController = {
   async handleCreate(req: Request, res: Response, next: NextFunction) {
     try {
       const data: Prisma.AreaCreateInput = req.body
-      const areasUseCase = new AreasUseCase(new PrismaAreaRepository())
+      const areasUseCase = makeAreaUseCase()
 
       const newArea = await areasUseCase.executeCreate(data)
       res.status(StatusCodes.CREATED).send(newArea)
@@ -48,7 +47,7 @@ export const AreasController = {
         return res.status(400).json({ error: 'Invalid area id' })
       }
 
-      const areasUseCase = new AreasUseCase(new PrismaAreaRepository())
+      const areasUseCase = makeAreaUseCase()
 
       const updatedArea = await areasUseCase.executeUpdate(areaId, data)
 
@@ -65,7 +64,7 @@ export const AreasController = {
       if (isNaN(areaId)) {
         return res.status(400).json({ error: 'Invalid area id' })
       }
-      const areasUseCase = new AreasUseCase(new PrismaAreaRepository())
+      const areasUseCase = makeAreaUseCase()
 
       const deletedArea = await areasUseCase.executeDelete(areaId)
 

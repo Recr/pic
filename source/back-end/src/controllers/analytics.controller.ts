@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { AnalyticsUseCase } from '../services/analytics.use-case'
-import { PrismaProposalRepository } from '../repositories/proposal.repository'
 import { AppError } from '../errors/AppError'
+import { makeAnalyticsUseCase } from '../factories/make-analytics-use-case.factory'
 
 const getQueryStringArray = (value: unknown): string[] => {
   if (typeof value === 'string') {
@@ -52,7 +51,7 @@ const parseDateQuery = (
 export const AnalyticsController = {
   async handleGetProposalAnalytics(req: Request, res: Response, next: NextFunction) {
     try {
-      const analyticsUseCase = new AnalyticsUseCase(new PrismaProposalRepository())
+      const analyticsUseCase = makeAnalyticsUseCase()
       const statuses = getQueryStringArray(req.query.status)
       const startDate = parseDateQuery(req.query.startDate, 'startDate')
       const endDate = parseDateQuery(req.query.endDate, 'endDate')

@@ -1,12 +1,11 @@
 import { NextFunction, Request, Response } from 'express'
-import { PrismaAnnualTargetRepository } from '../repositories/annual-target.repository'
-import { AnnualTargetsUseCase } from '../services/annual-targets.use-case'
+import { makeAnnualTargetUseCase } from '../factories/make-annual-target-use-case.factory'
 
 export const AnnualTargetsController = {
   async handleCreateAnnualTarget(req: Request, res: Response, next: NextFunction) {
     try {
       const data = req.body
-      const annualTargetsUseCase = new AnnualTargetsUseCase(new PrismaAnnualTargetRepository())
+      const annualTargetsUseCase = makeAnnualTargetUseCase()
       const newAnnualTarget = await annualTargetsUseCase.executeCreateAnnualTarget(data)
       res.status(201).send(newAnnualTarget)
     } catch (error) {
@@ -16,7 +15,7 @@ export const AnnualTargetsController = {
 
   async handleGetAllAnnualTargets(req: Request, res: Response, next: NextFunction) {
     try {
-      const annualTargetsUseCase = new AnnualTargetsUseCase(new PrismaAnnualTargetRepository())
+      const annualTargetsUseCase = makeAnnualTargetUseCase()
       const annualTargets = await annualTargetsUseCase.executeGetAllAnnualTargets()
       res.send(annualTargets)
     } catch (error) {
@@ -27,7 +26,7 @@ export const AnnualTargetsController = {
   async handleGetAnnualTargetByYear(req: Request, res: Response, next: NextFunction) {
     try {
       const year = Number(req.params.year)
-      const annualTargetsUseCase = new AnnualTargetsUseCase(new PrismaAnnualTargetRepository())
+      const annualTargetsUseCase = makeAnnualTargetUseCase()
       const annualTarget = await annualTargetsUseCase.executeGetAnnualTargetByYear(year)
       res.send(annualTarget)
     } catch (error) {
@@ -39,7 +38,7 @@ export const AnnualTargetsController = {
     try {
       const year = Number(req.params.year)
       const data = req.body
-      const annualTargetsUseCase = new AnnualTargetsUseCase(new PrismaAnnualTargetRepository())
+      const annualTargetsUseCase = makeAnnualTargetUseCase()
       const updatedAnnualTarget = await annualTargetsUseCase.executeUpdateAnnualTargetByYear(
         year,
         data,
@@ -53,7 +52,7 @@ export const AnnualTargetsController = {
   async handleDeleteAnnualTargetByYear(req: Request, res: Response, next: NextFunction) {
     try {
       const year = Number(req.params.year)
-      const annualTargetsUseCase = new AnnualTargetsUseCase(new PrismaAnnualTargetRepository())
+      const annualTargetsUseCase = makeAnnualTargetUseCase()
       await annualTargetsUseCase.executeDeleteAnnualTargetByYear(year)
       res.status(204).send()
     } catch (error) {

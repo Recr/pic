@@ -1,6 +1,6 @@
 import { prisma } from '../lib/prisma'
 
-class RefreshTokenRepository {
+class PrismaRefreshTokenRepository {
   public async create(tokenHash: string, employeeId: number, expiresAt: Date) {
     prisma.$transaction(async (tx) => {
       await tx.refreshToken.updateMany({
@@ -78,4 +78,4 @@ class RefreshTokenRepository {
   }
 }
 
-export { RefreshTokenRepository }
+export { PrismaRefreshTokenRepository }

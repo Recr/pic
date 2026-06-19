@@ -1,31 +1,18 @@
 import { NextFunction, Request, Response } from 'express'
-import { ProposalsUseCase } from '../services/proposals.use-case'
-import { PrismaProposalRepository } from '../repositories/proposal.repository'
 import { CreateProposalInput } from '../utils/types/proposals.types'
-import { PrismaEmployeeRepository } from '../repositories/employee.repository'
 import { AppError } from '../errors/AppError'
 import { StatusCodes } from 'http-status-codes'
-import { PrismaCategoryRepository } from '../repositories/category.repository'
-import { PrismaSuggestionRepository } from '../repositories/suggestion.repository'
-import { PrismaProposalAttachmentRepository } from '../repositories/proposal-attachment.repository'
-import { PrismaPayoutRepository } from '../repositories/payout.repository'
 import path from 'node:path'
 import { createReadStream } from 'node:fs'
 import fs from 'node:fs/promises'
 import { Role } from '../utils/types/employees.types'
 import { DetailedProposalFilters } from '../utils/types/proposals.types'
+import { makeProposalsUseCase } from '../factories/make-proposal-use-case.factory'
 
 export const ProposalsController = {
   async handleFindAll(req: Request, res: Response, next: NextFunction) {
     try {
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
       const proposals = await proposalUseCase.executeFindAll()
       res.send(proposals)
     } catch (error) {
@@ -35,14 +22,7 @@ export const ProposalsController = {
 
   async handleFindAllProposalsDetailed(req: Request, res: Response, next: NextFunction) {
     try {
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
 
       const role = req.user?.role as Role | undefined
       const userId = Number(req.user?.sub)
@@ -152,14 +132,7 @@ export const ProposalsController = {
 
   async handleFindAllUserProposalsWithEmployees(req: Request, res: Response, next: NextFunction) {
     try {
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
 
       const userId = Number(req.user?.sub)
       if (Number.isNaN(userId)) {
@@ -175,14 +148,7 @@ export const ProposalsController = {
 
   async handleFindAllWithoutChampion(req: Request, res: Response, next: NextFunction) {
     try {
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
       const role = req.user?.role
       const userId = Number(req.user?.sub)
       const proposals = await proposalUseCase.executeFindAllWithoutChampion(role, userId)
@@ -194,14 +160,7 @@ export const ProposalsController = {
 
   async handleFindAllWithoutManager(req: Request, res: Response, next: NextFunction) {
     try {
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
       const proposals = await proposalUseCase.executeFindAllWithoutManager()
       res.send(proposals)
     } catch (error) {
@@ -212,14 +171,7 @@ export const ProposalsController = {
   async handleFindById(req: Request, res: Response, next: NextFunction) {
     try {
       const proposalId = Number(req.params.id)
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
       const proposals = await proposalUseCase.executeFindById(proposalId)
       res.send(proposals)
     } catch (error) {
@@ -230,14 +182,7 @@ export const ProposalsController = {
   async handleCreate(req: Request, res: Response, next: NextFunction) {
     try {
       const data: CreateProposalInput = req.body
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
       const proposal = await proposalUseCase.executeCreate(data)
       res.send(proposal)
     } catch (error) {
@@ -251,14 +196,7 @@ export const ProposalsController = {
       const proposalId = Number(req.params.id)
       const userId = Number(req.user?.sub)
 
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
       const updatedProposal = await proposalUseCase.executeDefineChampion(proposalId, data, userId)
       res.send(updatedProposal)
     } catch (error) {
@@ -271,14 +209,7 @@ export const ProposalsController = {
       const data = req.body
       const proposalId = Number(req.params.id)
 
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
       const updatedProposal = await proposalUseCase.executeAdminDefineChampion(proposalId, data)
       res.send(updatedProposal)
     } catch (error) {
@@ -290,14 +221,7 @@ export const ProposalsController = {
     try {
       const data = req.body
       const proposalId = Number(req.params.id)
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
       const updatedProposal = await proposalUseCase.executeDefineManager(proposalId, data)
       res.send(updatedProposal)
     } catch (error) {
@@ -309,14 +233,7 @@ export const ProposalsController = {
     try {
       const proposalId = Number(req.params.id)
       const rejectionNote = String(req.query.rejectionNote ?? '')
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
       const updatedProposal = await proposalUseCase.executeAdminRejection(proposalId, rejectionNote)
       res.send(updatedProposal)
     } catch (error) {
@@ -330,14 +247,7 @@ export const ProposalsController = {
       const userId = Number(req.user?.sub)
       const rejectionNote = String(req.query.rejectionNote ?? '')
 
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
 
       const updatedProposal = await proposalUseCase.executeRejectProposal(
         proposalId,
@@ -354,14 +264,7 @@ export const ProposalsController = {
     try {
       const proposalId = Number(req.params.id)
 
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
 
       const updatedProposal = await proposalUseCase.executeSoftDeleteProposal(proposalId)
       res.send(updatedProposal)
@@ -374,14 +277,7 @@ export const ProposalsController = {
     try {
       const proposalId = Number(req.params.id)
 
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
 
       const updatedProposal = await proposalUseCase.executeRestoreProposal(proposalId)
       res.send(updatedProposal)
@@ -395,14 +291,7 @@ export const ProposalsController = {
       const proposalId = Number(req.params.id)
       const data = req.body
       const evidenceFiles = Array.isArray(req.files) ? req.files : undefined
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
       const updatedProposal = await proposalUseCase.executeChampionReview(
         proposalId,
         data.status,
@@ -422,14 +311,7 @@ export const ProposalsController = {
       const userId = Number(req.user?.sub)
       const data = req.body
 
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
 
       const updatedProposal = await proposalUseCase.executeUpdateChampionNotes(
         proposalId,
@@ -446,14 +328,7 @@ export const ProposalsController = {
     try {
       const { proposalId, attachmentId } = req.params
 
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
 
       const attachment = await proposalUseCase.executeGetAttachment(
         Number(proposalId),
@@ -529,14 +404,7 @@ export const ProposalsController = {
         return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
       }
 
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
 
       const createdAttachments = await proposalUseCase.executeAddAttachments(
         proposalId,
@@ -562,14 +430,7 @@ export const ProposalsController = {
         return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
       }
 
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
 
       await proposalUseCase.executeDeleteAttachment(proposalId, attachmentId, userId, role)
 
@@ -589,14 +450,7 @@ export const ProposalsController = {
         return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
       }
 
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
 
       const proposal = await proposalUseCase.executeUndoImplementedToImplementation(
         proposalId,
@@ -618,14 +472,7 @@ export const ProposalsController = {
         return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
       }
 
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
 
       const proposal = await proposalUseCase.executeUndoImplementationToToImplement(
         proposalId,
@@ -646,14 +493,7 @@ export const ProposalsController = {
         return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
       }
 
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
 
       const proposal = await proposalUseCase.executeUndoToImplementToUnderValidation(
         proposalId,
@@ -674,14 +514,7 @@ export const ProposalsController = {
         return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
       }
 
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
 
       const proposal = await proposalUseCase.executeUndoRejectedToUnderValidation(
         proposalId,
@@ -703,14 +536,7 @@ export const ProposalsController = {
         return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
       }
 
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
 
       const proposal = await proposalUseCase.executeUndoRejectedToDefineChampion(
         proposalId,
@@ -733,14 +559,7 @@ export const ProposalsController = {
       }
 
       const data = req.body
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
 
       const proposal = await proposalUseCase.executeUpdateProposalManager(
         proposalId,
@@ -762,14 +581,7 @@ export const ProposalsController = {
       }
 
       const data = req.body
-      const proposalUseCase = new ProposalsUseCase(
-        new PrismaProposalRepository(),
-        new PrismaEmployeeRepository(),
-        new PrismaCategoryRepository(),
-        new PrismaSuggestionRepository(),
-        new PrismaProposalAttachmentRepository(),
-        new PrismaPayoutRepository(),
-      )
+      const proposalUseCase = makeProposalsUseCase()
 
       const proposal = await proposalUseCase.executeUpdateProposalChampion(
         proposalId,

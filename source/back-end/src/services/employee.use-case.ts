@@ -10,7 +10,7 @@ import { passwordResetTokenVault } from '../lib/password-reset-token-vault'
 
 const SALT_ROUNDS = 12
 
-class EmployeesUseCase {
+class EmployeeUseCase {
   constructor(
     private employeeRepository: PrismaEmployeeRepository,
     private suggestionRepository: PrismaSuggestionRepository,
@@ -112,4 +112,4 @@ class EmployeesUseCase {
   }
 }
 
-export { EmployeesUseCase }
+export { EmployeeUseCase }

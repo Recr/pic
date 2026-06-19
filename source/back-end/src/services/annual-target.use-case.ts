@@ -3,7 +3,7 @@ import { Prisma } from '../../prisma/client/client'
 import { AppError } from '../errors/AppError'
 import { PrismaAnnualTargetRepository } from '../repositories/annual-target.repository'
 
-class AnnualTargetsUseCase {
+class AnnualTargetUseCase {
   constructor(private readonly annualTargetsRepository: PrismaAnnualTargetRepository) {}
 
   public async executeCreateAnnualTarget(newAnnualTarget: Prisma.AnnualTargetCreateInput) {
@@ -46,7 +46,8 @@ class AnnualTargetsUseCase {
           : undefined
 
     if (typeof requestedYear === 'number' && requestedYear !== year) {
-      const existingRequestedYearTarget = await this.annualTargetsRepository.findByYear(requestedYear)
+      const existingRequestedYearTarget =
+        await this.annualTargetsRepository.findByYear(requestedYear)
 
       if (existingRequestedYearTarget) {
         throw new AppError(
@@ -68,4 +69,4 @@ class AnnualTargetsUseCase {
   }
 }
 
-export { AnnualTargetsUseCase }
+export { AnnualTargetUseCase }

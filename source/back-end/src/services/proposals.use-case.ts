@@ -21,7 +21,7 @@ import { PrismaPayoutRepository } from '../repositories/payout.repository'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-class ProposalsUseCase {
+class ProposalUseCase {
   constructor(
     private proposalRepository: PrismaProposalRepository,
     private employeeRepository: PrismaEmployeeRepository,
@@ -777,4 +777,4 @@ class ProposalsUseCase {
   }
 }
 
-export { ProposalsUseCase }
+export { ProposalUseCase }
