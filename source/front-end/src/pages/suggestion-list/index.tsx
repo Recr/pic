@@ -8,6 +8,8 @@ import { translateStatus } from '../../helpers/translateStatus'
 import { areaAPI } from '../../features/area/area-api'
 import { categoryAPI } from '../../features/category/category-api'
 import DropdownSelect from '../../components/DropdownSelect'
+import type { RootState } from '../../app/store'
+import { useSelector } from 'react-redux'
 
 type PageSizeSelection = '50' | '100' | '200' | 'more'
 type MoreLimitSelection = 'all' | 'custom' | null
@@ -101,7 +103,9 @@ const SuggestionList: React.FC = () => {
   const [filterStatusInput, setFilterStatusInput] = useState('')
   const [filterAreaInput, setFilterAreaInput] = useState('')
   const [filterCategoryInput, setFilterCategoryInput] = useState('')
+  const [filterInactiveInput, setFilterInactiveInput] = useState(false)
   const [isFilterBarVisible, setIsFilterBarVisible] = useState(false)
+  const user = useSelector((state: RootState) => state.auth.user)
 
   const presetLimit =
     pageSizeSelection === '50'
@@ -129,6 +133,7 @@ const SuggestionList: React.FC = () => {
       status: filterStatusInput || undefined,
       areaId: parseOptionalNumber(filterAreaInput),
       categoryId: parseOptionalNumber(filterCategoryInput),
+      includeInactive: filterInactiveInput || undefined,
     }
   }, [
     filterDateFromInput,
@@ -140,6 +145,7 @@ const SuggestionList: React.FC = () => {
     filterCategoryInput,
     filterReInput,
     filterStatusInput,
+    filterInactiveInput,
   ])
   const hasActiveFilters =
     activeFilters.id !== undefined ||
@@ -150,7 +156,8 @@ const SuggestionList: React.FC = () => {
     activeFilters.dateTo !== undefined ||
     activeFilters.status !== undefined ||
     activeFilters.areaId !== undefined ||
-    activeFilters.categoryId !== undefined
+    activeFilters.categoryId !== undefined ||
+    activeFilters.includeInactive !== undefined
   const { data: proposalsResponse, isLoading } = proposalAPI.useGetProposalsDetailedQuery({
     limit: resolvedLimit,
     offset,
@@ -215,6 +222,7 @@ const SuggestionList: React.FC = () => {
     activeFilters.categoryId,
     activeFilters.re,
     activeFilters.status,
+    activeFilters.includeInactive,
   ])
 
   useEffect(() => {
@@ -256,6 +264,7 @@ const SuggestionList: React.FC = () => {
     setFilterStatusInput('')
     setFilterAreaInput('')
     setFilterCategoryInput('')
+    setFilterInactiveInput(false)
   }
 
   if (isLoading) {
@@ -334,7 +343,7 @@ const SuggestionList: React.FC = () => {
                   className={`rounded px-3 py-2 transition-all ${
                     moreLimitSelection === 'all'
                       ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                      : 'text-gray-700 bg-gray-100 hover:bg-gray-200 hover:shadow-sm hover:cursor-pointer hover:text-blue-700'
                   }`}
                 >
                   Mostrar tudo
@@ -345,7 +354,7 @@ const SuggestionList: React.FC = () => {
                   className={`rounded px-3 py-2 transition-all ${
                     moreLimitSelection === 'custom'
                       ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                      : 'text-gray-700 bg-gray-100 hover:bg-gray-200 hover:shadow-sm hover:cursor-pointer hover:text-blue-700'
                   }`}
                 >
                   Escolher
@@ -382,13 +391,23 @@ const SuggestionList: React.FC = () => {
           <div className="mx-4 mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
             <div className="mb-3 flex items-center justify-between gap-3">
               <span className="text-sm font-semibold text-gray-700">Filtros</span>
-              <button
-                type="button"
-                onClick={handleClearFilters}
-                className="rounded-full border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-white hover:text-blue-700 hover:cursor-pointer"
-              >
-                Limpar filtros
-              </button>
+              {user?.role === 'ADMIN' && (
+                <label className="flex items-center gap-3 cursor-pointer select-none">
+                  <span className="text-xs font-medium text-gray-700">Propostas Inativas</span>
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      checked={filterInactiveInput}
+                      onChange={(event) => setFilterInactiveInput(event.target.checked)}
+                      className="sr-only peer"
+                    />
+
+                    <div className="h-6 w-11 rounded-full bg-gray-300 transition-colors peer-checked:bg-blue-600 peer-focus:ring-2 peer-focus:ring-blue-300"></div>
+
+                    <div className="absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
+                  </div>
+                </label>
+              )}
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
               <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
@@ -464,36 +483,51 @@ const SuggestionList: React.FC = () => {
                   buttonClassName="rounded border border-gray-300 px-3 py-2 text-sm"
                 />
               </label>
-              <DropdownSelect
-                label="Área"
-                value={filterAreaInput}
-                placeholder="Todas"
-                onChange={setFilterAreaInput}
-                options={
-                  areasList?.map((area) => ({
-                    label: area.name,
-                    value: String(area.id),
-                  })) ?? []
-                }
-              />
-              <DropdownSelect
-                label="Categoria"
-                value={filterCategoryInput}
-                placeholder="Todas"
-                onChange={setFilterCategoryInput}
-                options={
-                  categoryList?.map((category) => ({
-                    label: category.name,
-                    value: String(category.id),
-                  })) ?? []
-                }
-              />
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Área
+                <DropdownSelect
+                  value={filterAreaInput}
+                  placeholder="Todas"
+                  onChange={setFilterAreaInput}
+                  options={
+                    areasList?.map((area) => ({
+                      label: area.name,
+                      value: String(area.id),
+                    })) ?? []
+                  }
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Categoria
+                <DropdownSelect
+                  value={filterCategoryInput}
+                  placeholder="Todas"
+                  onChange={setFilterCategoryInput}
+                  options={
+                    categoryList?.map((category) => ({
+                      label: category.name,
+                      value: String(category.id),
+                    })) ?? []
+                  }
+                />
+              </label>
             </div>
-            {hasActiveFilters && (
-              <p className="mt-3 text-xs text-gray-500">
-                Os filtros são aplicados em todas as propostas que você pode visualizar.
-              </p>
-            )}
+            <div
+              className={`mt-4 flex flex-row sm:items-start gap-3 ${hasActiveFilters ? 'justify-between' : 'justify-end'} items-center`}
+            >
+              {hasActiveFilters && (
+                <p className="sm:mt-3 text-xs text-gray-500">
+                  Os filtros são aplicados em todas as propostas que você pode visualizar.
+                </p>
+              )}
+              <button
+                type="button"
+                onClick={handleClearFilters}
+                className="rounded-full border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-white hover:text-blue-700 hover:cursor-pointer"
+              >
+                Limpar <span className="hidden sm:inline">filtros</span>
+              </button>
+            </div>
           </div>
         )}
         <p className="ml-6 mb-2 text-gray-500">{totalCount} propostas encontradas</p>

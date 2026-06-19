@@ -49,9 +49,8 @@ class ProposalsUseCase {
   ) {
     const where: Prisma.ProposalWhereInput =
       role === Role.ADMIN
-        ? { isActive: true }
+        ? {}
         : {
-            isActive: true,
             OR: [
               {
                 suggestions: {
@@ -81,6 +80,16 @@ class ProposalsUseCase {
 
     if (filters.areaId !== undefined) {
       where.areaId = filters.areaId
+    }
+
+    if (role === Role.ADMIN) {
+      if (filters.includeInactive === undefined || filters.includeInactive === false) {
+        where.isActive = true
+      } else if (filters.includeInactive === true) {
+        where.OR = [{ isActive: false }, { isActive: true }]
+      }
+    } else {
+      where.isActive = true
     }
 
     const createdAt: { gte?: Date; lte?: Date } = {}

@@ -68,6 +68,7 @@ export interface ProposalDetailed {
   rewardAmount: number | null
   isCustomReward: boolean
   isLegacy: boolean
+  isActive: boolean
   suggestions: [
     {
       employeeName: string
@@ -105,6 +106,7 @@ export interface ProposalDetailedQueryParams extends Pagination {
   status?: string
   categoryId?: number
   areaId?: number
+  includeInactive?: boolean
 }
 
 export interface CreateProposalRequest {

@@ -328,7 +328,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   return (
     <>
       <div
-        className="grid grid-cols-1 gap-2 border-t-2 border-gray-200 px-3 py-3 text-left text-sm hover:cursor-pointer hover:bg-blue-100 sm:px-4 md:grid-cols-[56px_2fr_2fr_1fr_1fr_1fr] md:gap-0 md:py-2 transition-all"
+        className={`grid grid-cols-1 gap-2 border px-3 py-3 text-left text-sm hover:cursor-pointer ${proposal.isActive ? 'hover:bg-blue-100 border-gray-200' : 'bg-red-100  border-red-200 hover:bg-red-300 hover:border-red-400'} sm:px-4 md:grid-cols-[56px_2fr_2fr_1fr_1fr_1fr] md:gap-0 md:py-2 transition-all`}
         onClick={() => setIsModalOpen(true)}
       >
         <p>

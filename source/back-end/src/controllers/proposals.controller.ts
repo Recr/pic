@@ -126,6 +126,14 @@ export const ProposalsController = {
         filters.areaId = areaIdFilter
       }
 
+      const includeInactiveFilter =
+        typeof req.query.includeInactive === 'string' && req.query.includeInactive.trim() !== ''
+          ? req.query.includeInactive.trim().toLowerCase() === 'true'
+          : undefined
+      if (includeInactiveFilter !== undefined) {
+        filters.includeInactive = includeInactiveFilter
+      }
+
       if (!role || Number.isNaN(userId)) {
         return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
       }

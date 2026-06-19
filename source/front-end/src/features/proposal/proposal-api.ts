@@ -52,6 +52,7 @@ export const proposalAPI = api.injectEndpoints({
         status,
         categoryId,
         areaId,
+        includeInactive,
       }) => {
         const params = new URLSearchParams({
           limit: String(limit),
@@ -92,6 +93,10 @@ export const proposalAPI = api.injectEndpoints({
 
         if (areaId !== undefined) {
           params.set('areaId', String(areaId))
+        }
+
+        if (includeInactive !== undefined) {
+          params.set('includeInactive', String(includeInactive))
         }
 
         return {

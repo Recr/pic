@@ -53,6 +53,7 @@ export interface DetailedProposalFilters {
   status?: string
   categoryId?: number
   areaId?: number
+  includeInactive?: boolean
 }
 
 // export interface UpdateProposal

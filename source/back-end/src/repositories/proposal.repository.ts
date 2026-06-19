@@ -26,6 +26,7 @@ class PrismaProposalRepository {
       rejectionNote: true,
       rewardAmount: true,
       isLegacy: true,
+      isActive: true,
       area: {
         select: {
           id: true,
@@ -166,12 +167,7 @@ class PrismaProposalRepository {
       }[]
     }) => boolean,
   ) {
-    const finalWhere: Prisma.ProposalWhereInput = where
-      ? {
-          AND: [{ isActive: true }, where],
-        }
-      : { isActive: true }
-
+    const finalWhere: Prisma.ProposalWhereInput = where ? where : { isActive: true }
     if (!reMatcher && !idMatcher) {
       const [proposals, totalCount] = await Promise.all([
         prisma.proposal.findMany({
@@ -184,7 +180,6 @@ class PrismaProposalRepository {
           where: finalWhere,
         }),
       ])
-
       return {
         proposals,
         totalCount,
