@@ -15,6 +15,7 @@ const updateProposalSchema = z.object({
   areaId: z.coerce.number().int().positive('Selecione uma area.'),
   categoryId: z.coerce.number().int().positive('Selecione uma categoria.'),
   isCustomReward: z.boolean(),
+  isImplemented: z.boolean(),
 })
 
 interface ProposalWithEmployees {
@@ -85,6 +86,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
       areaId: proposal.area?.id,
       categoryId: undefined,
       isCustomReward: false,
+      isImplemented: false,
     },
   })
 
@@ -218,6 +220,14 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
               className="w-4 h-6 hover:cursor-pointer"
             />
             <span>Prêmio a definir</span>
+          </div>
+          <div className="flex gap-4 bg-gray-100 py-2 px-4 rounded-2xl border border-gray-200">
+            <input
+              {...register('isImplemented')}
+              type="checkbox"
+              className="w-4 h-6 hover:cursor-pointer"
+            />
+            <span>Proposta Implementada</span>
           </div>
           <label htmlFor={`manager-input-${proposal.id}`}>
             <strong>Defina o Gestor:</strong>

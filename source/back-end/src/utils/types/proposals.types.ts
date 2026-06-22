@@ -28,10 +28,11 @@ export interface UpdateProposalWithChampion extends UpdateProposal {
 
 export interface UpdateProposalWithManager extends UpdateProposal {
   managerRe: number
+  isImplemented: boolean
 }
 
 export interface UpdateProposalStatus {
-  status: 'TO_IMPLEMENT' | 'REJECTED' | 'UNDER_VALIDATION' | 'NOT_VIABLE'
+  status: 'TO_IMPLEMENT' | 'REJECTED' | 'UNDER_VALIDATION' | 'NOT_VIABLE' | 'WAITING_APPROVAL'
 }
 
 export interface UpdateProposalNotes {

@@ -45,26 +45,27 @@ model Employee {
 }
 
 model Proposal {
-  id                      Int       @id @default(autoincrement())
-  description             String    @db.NVarChar(2000)
-  status                  String    @db.NVarChar(100) @default("DEFINE_CHAMPION")
-  categoryId              Int?      @map("category_id")
-  rewardAmount            Decimal?  @map("reward_amount") @db.Decimal(10, 2)
-  areaId                  Int       @map("area_id")
-  createdAt               DateTime  @default(now()) @map("created_at") @db.DateTime2
-  adminReviewedAt         DateTime? @map("admin_reviewed_at") @db.DateTime2
-  managerReviewedAt       DateTime? @map("manager_reviewed_at") @db.DateTime2
-  championReviewedAt      DateTime? @map("champion_reviewed_at") @db.DateTime2
-  implementationStartedAt DateTime? @map("implementation_started_at") @db.DateTime2
-  completedAt             DateTime? @map("completed_at") @db.DateTime2
-  championId              Int?      @map("champion_id")
-  notes                   String?   @db.NVarChar(1000)
-  managerId               Int?      @map("manager_id")
-  managerNotes            String?   @map("manager_notes") @db.NVarChar(1000)
-  rejectionNote           String?   @map("rejection_note") @db.NVarChar(1000)
-  isCustomReward          Boolean   @map("is_custom_reward") @default(false)
-  isActive                Boolean   @map("is_active") @default(true)
-  isLegacy                Boolean   @map("is_legacy") @default(false)
+  id                        Int       @id @default(autoincrement())
+  description               String    @db.NVarChar(2000)
+  status                    String    @db.NVarChar(100) @default("DEFINE_CHAMPION")
+  categoryId                Int?      @map("category_id")
+  rewardAmount              Decimal?  @map("reward_amount") @db.Decimal(10, 2)
+  areaId                    Int       @map("area_id")
+  createdAt                 DateTime  @default(now()) @map("created_at") @db.DateTime2
+  adminReviewedAt           DateTime? @map("admin_reviewed_at") @db.DateTime2
+  managerReviewedAt         DateTime? @map("manager_reviewed_at") @db.DateTime2
+  championReviewedAt        DateTime? @map("champion_reviewed_at") @db.DateTime2
+  implementationStartedAt   DateTime? @map("implementation_started_at") @db.DateTime2
+  completedAt               DateTime? @map("completed_at") @db.DateTime2
+  championId                Int?      @map("champion_id")
+  notes                     String?   @db.NVarChar(1000)
+  managerId                 Int?      @map("manager_id")
+  managerNotes              String?   @map("manager_notes") @db.NVarChar(1000)
+  rejectionNote             String?   @map("rejection_note") @db.NVarChar(1000)
+  isCustomReward            Boolean   @map("is_custom_reward") @default(false)
+  isActive                  Boolean   @map("is_active") @default(true)
+  isLegacy                  Boolean   @map("is_legacy") @default(false)
+  requiresImplementation    Boolean   @map("requires_implementation") @default(true)
 
 
   area        Area         @relation(fields: [areaId], references: [id])

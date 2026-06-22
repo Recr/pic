@@ -57,6 +57,7 @@ export const updateProposalWithManager = z.object({
     managerRe: z.number(),
     categoryId: z.number(),
     isCustomReward: z.boolean(),
+    isImplemented: z.boolean(),
   }),
   params: z.object({
     id: z.coerce.number(),
@@ -76,6 +77,7 @@ export const updateProposalStatusByChampionSchema = z
         'NOT_VIABLE',
         'IMPLEMENTATION',
         'IMPLEMENTED',
+        'WAITING_APPROVAL',
       ]),
       customRewardAmount: z.coerce.number().positive().optional(),
       rejectionNote: z.string().max(1000).optional(),

@@ -359,5 +359,19 @@ export const proposalAPI = api.injectEndpoints({
         { type: 'Proposal', id: 'LIST' },
       ],
     }),
+    implementedProposalManagerReview: builder.mutation<
+      Proposal,
+      { proposalId: string; data: FinishProposalRequest }
+    >({
+      query: ({ proposalId, data }) => ({
+        url: `/proposals/${proposalId}/implemented-proposal-manager-review`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
   }),
 })

@@ -593,4 +593,27 @@ export const ProposalsController = {
       next(error)
     }
   },
+
+  async handleImplementedProposalManagerReview(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalId = Number(req.params.id)
+      const userId = Number(req.user?.sub)
+
+      if (Number.isNaN(proposalId) || Number.isNaN(userId)) {
+        return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
+      }
+
+      const data = req.body
+      const proposalUseCase = makeProposalsUseCase()
+
+      const proposal = await proposalUseCase.executeImplementedProposalManagerReview(
+        proposalId,
+        data.status,
+        data.rejectionNote,
+      )
+      res.send(proposal)
+    } catch (error) {
+      next(error)
+    }
+  },
 }

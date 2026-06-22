@@ -5,6 +5,7 @@ import ReviewCard from './components/ReviewCard'
 import StartImplementationCard from './components/StartImplementationCard'
 import { Skeleton } from '../../components/skeletons/Skeleton'
 import { ToastContainer } from 'react-toastify'
+import ReviewImplementedProposalCard from './components/ReviewImplementedProposalCard'
 
 type CardRenderer = (proposal: ProposalWithSuggestions) => React.ReactNode
 
@@ -12,6 +13,7 @@ const CardTypes: Record<string, CardRenderer> = {
   UNDER_VALIDATION: (proposal) => <ReviewCard {...proposal} />,
   TO_IMPLEMENT: (proposal) => <StartImplementationCard {...proposal} />,
   IMPLEMENTATION: (proposal) => <ImplementationCard {...proposal} />,
+  WAITING_APPROVAL: (proposal) => <ReviewImplementedProposalCard {...proposal} />,
 }
 function renderProposalCard(proposal: ProposalWithSuggestions) {
   const renderer = CardTypes[proposal.status]

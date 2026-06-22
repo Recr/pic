@@ -180,4 +180,11 @@ proposalsRoutes.put(
   ProposalsController.handleUpdateProposalChampion,
 )
 
+proposalsRoutes.put(
+  '/:id/implemented-proposal-manager-review',
+  authMiddleware,
+  validate(updateProposalStatusByChampionSchema),
+  ProposalsController.handleImplementedProposalManagerReview,
+)
+
 export { proposalsRoutes }

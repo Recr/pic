@@ -214,19 +214,23 @@ class PrismaProposalRepository {
       userId === undefined
         ? {
             isActive: true,
-            OR: [
-              { status: 'UNDER_VALIDATION' },
-              { status: 'TO_IMPLEMENT' },
-              { status: 'IMPLEMENTATION' },
-            ],
+            status: {
+              in: ['UNDER_VALIDATION', 'TO_IMPLEMENT', 'IMPLEMENTATION'],
+            },
           }
         : {
             isActive: true,
-            championId: userId,
             OR: [
-              { status: 'UNDER_VALIDATION' },
-              { status: 'TO_IMPLEMENT' },
-              { status: 'IMPLEMENTATION' },
+              {
+                status: {
+                  in: ['UNDER_VALIDATION', 'TO_IMPLEMENT', 'IMPLEMENTATION'],
+                },
+                championId: userId,
+              },
+              {
+                status: 'WAITING_APPROVAL',
+                managerId: userId,
+              },
             ],
           }
 
