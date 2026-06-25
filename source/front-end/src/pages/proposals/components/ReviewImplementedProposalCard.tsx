@@ -79,6 +79,12 @@ const ReviewImplementedProposalCard: React.FC<ProposalWithSuggestions> = (propos
             <span>{proposal.category.name}</span>
           </div>
         </div>
+        {proposal.rewardAmount && (
+          <div className="flex flex-col">
+            <strong>Recompensa</strong>
+            <span>R$ {Number(proposal.rewardAmount).toFixed(2)}</span>
+          </div>
+        )}
         {proposal.managerNotes && (
           <p className="mt-2 text-sm text-gray-700 ">
             <strong>Obs. Gestor:</strong>{' '}

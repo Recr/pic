@@ -1,3 +1,4 @@
+import { get } from 'react-hook-form'
 import z from 'zod'
 
 const allowedEvidenceFileExtensions = new Set([
@@ -42,6 +43,25 @@ const evidenceFilesInputSchema = z.preprocess((value) => {
 export const getFinishProposalSchema = (requireEvidenceFiles: boolean) =>
   z.object({
     customRewardAmount: z.coerce
+      .number('Valor inválido')
+      .positive('O valor deve ser maior que R$ 0,00.')
+      .min(0.01, 'O valor deve ser maior ou igual a R$ 0,01.')
+      .optional(),
+    evidenceFiles: requireEvidenceFiles
+      ? evidenceFilesInputSchema.refine((files) => files !== undefined, {
+          message: 'Selecione um ou mais arquivos.',
+        })
+      : evidenceFilesInputSchema,
+  })
+
+export const getUpdateProposalWithManagerSchema = (requireEvidenceFiles: boolean) =>
+  z.object({
+    managerRe: z.coerce.number().int().positive('Selecione um RE valido para o gestor.'),
+    areaId: z.coerce.number().int().positive('Selecione uma area.'),
+    categoryId: z.coerce.number().int().positive('Selecione uma categoria.'),
+    isCustomReward: z.boolean(),
+    isImplemented: z.boolean(),
+    customRewardAmount: z
       .number('Valor inválido')
       .positive('O valor deve ser maior que R$ 0,00.')
       .min(0.01, 'O valor deve ser maior ou igual a R$ 0,01.')

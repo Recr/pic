@@ -222,7 +222,12 @@ export const ProposalsController = {
       const data = req.body
       const proposalId = Number(req.params.id)
       const proposalUseCase = makeProposalsUseCase()
-      const updatedProposal = await proposalUseCase.executeDefineManager(proposalId, data)
+      const evidenceFiles = Array.isArray(req.files) ? req.files : undefined
+      const updatedProposal = await proposalUseCase.executeDefineManager(
+        proposalId,
+        data,
+        evidenceFiles,
+      )
       res.send(updatedProposal)
     } catch (error) {
       next(error)

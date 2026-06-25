@@ -244,6 +244,7 @@ class PrismaProposalRepository {
         notes: true,
         managerNotes: true,
         isCustomReward: true,
+        rewardAmount: true,
         suggestions: {
           select: {
             id: false,

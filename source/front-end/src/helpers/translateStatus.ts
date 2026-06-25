@@ -10,6 +10,7 @@ export function translateStatus(status: string): string {
     PENDING: 'Pendente',
     PAID: 'Pago',
     CANCELLED: 'Cancelado',
+    WAITING_APPROVAL: 'Aguardando Aprovação',
   }
   return translations[status] || status
 }

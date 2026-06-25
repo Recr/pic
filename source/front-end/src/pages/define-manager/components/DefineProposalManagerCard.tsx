@@ -6,17 +6,11 @@ import StatusBadge from '../../../components/StatusBadge'
 import { getStatusColor } from '../../../helpers/getStatusColor'
 import EmployeeCombobox from '../../../components/EmployeeCombobox'
 import DropdownSelect from '../../../components/DropdownSelect'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Modal from '../../../components/modal/Modal'
 import type { Category } from '../../../features/category/types'
-
-const updateProposalSchema = z.object({
-  managerRe: z.coerce.number().int().positive('Selecione um RE valido para o gestor.'),
-  areaId: z.coerce.number().int().positive('Selecione uma area.'),
-  categoryId: z.coerce.number().int().positive('Selecione uma categoria.'),
-  isCustomReward: z.boolean(),
-  isImplemented: z.boolean(),
-})
+import { getUpdateProposalWithManagerSchema } from '../../../validation/schemas/proposal-schemas'
+import { toast, ToastContainer } from 'react-toastify'
 
 interface ProposalWithEmployees {
   id: number
@@ -71,8 +65,12 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
   availableAreas,
   categories,
 }) => {
-  type UpdateProposalFormInput = z.input<typeof updateProposalSchema>
-  type UpdateProposalFormOutput = z.output<typeof updateProposalSchema>
+  const [requiresCustomReward, setRequiresCustomReward] = useState(false)
+  const [requiresEvidenceFiles, setRequiresEvidenceFiles] = useState(false)
+
+  type UpdateProposalFormInput = z.input<typeof updateProposalWithManagerSchema>
+  type UpdateProposalFormOutput = z.output<typeof updateProposalWithManagerSchema>
+  const updateProposalWithManagerSchema = getUpdateProposalWithManagerSchema(requiresEvidenceFiles)
 
   const {
     register,
@@ -81,16 +79,18 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
     watch,
     formState: { errors },
   } = useForm<UpdateProposalFormInput, unknown, UpdateProposalFormOutput>({
-    resolver: zodResolver(updateProposalSchema),
+    resolver: zodResolver(updateProposalWithManagerSchema),
     defaultValues: {
       areaId: proposal.area?.id,
       categoryId: undefined,
       isCustomReward: false,
       isImplemented: false,
     },
+    shouldUnregister: true,
   })
 
-  const [updateProposal, { isLoading }] = proposalAPI.useUpdateProposalWithManagerMutation()
+  const [updateProposalWithManager, { isLoading }] =
+    proposalAPI.useUpdateProposalWithManagerMutation()
   const [rejectProposal, { isLoading: isRejecting }] =
     proposalAPI.useRejectProposalAsAdminMutation()
 
@@ -101,10 +101,41 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
 
   const onSubmit = async (data: UpdateProposalFormOutput) => {
     try {
-      await updateProposal({ proposalId: proposal.id.toString(), body: data }).unwrap()
-      console.log('Proposal updated successfully')
+      const formData = new FormData()
+
+      const { evidenceFiles, ...restData } = data
+
+      formData.append(
+        'data',
+        JSON.stringify({
+          ...restData,
+          status: data.isImplemented ? 'WAITING_APPROVAL' : 'DEFINE_CHAMPION',
+        }),
+      )
+
+      if (data.evidenceFiles && data.evidenceFiles.length > 0) {
+        data.evidenceFiles.forEach((file) => {
+          formData.append('evidenceFiles', file)
+        })
+      }
+
+      await updateProposalWithManager({
+        proposalId: proposal.id.toString(),
+        data: formData,
+      }).unwrap()
+
+      if (data.isImplemented) {
+        toast.success('Proposta enviada para avaliação do gestor.')
+        return
+      }
+      toast.success('Gestor definido com sucesso.')
     } catch (error) {
-      console.error('Failed to update proposal:', error)
+      console.log(error)
+      if (data.isImplemented) {
+        toast.error('Erro ao enviar a proposta para avaliação do gestor.')
+        return
+      }
+      toast.error('Erro ao definir gestor.')
     }
   }
 
@@ -128,8 +159,38 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
     }
   }
 
+  const isCustomRewardChecked = watch('isCustomReward')
+  const isImplementedChecked = watch('isImplemented')
+
+  useEffect(() => {
+    if (!watch('isImplemented')) {
+      setRequiresCustomReward(false)
+      setRequiresEvidenceFiles(false)
+      return
+    }
+
+    //TODO: determine if proposals with categories and custom reward should require evidence files. For now, we will require evidence files for all implemented proposals.
+
+    if (isCustomRewardChecked) {
+      setRequiresCustomReward(true)
+      setRequiresEvidenceFiles(true)
+      return
+    }
+
+    const selectedCategory = categories?.find((category) => category.id === Number(categoryIdValue))
+    if (Number(selectedCategory?.categoryReward) === 0) {
+      setRequiresCustomReward(true)
+      setRequiresEvidenceFiles(true)
+      return
+    }
+
+    setRequiresCustomReward(false)
+    setRequiresEvidenceFiles(false)
+  }, [categoryIdValue, categories, isCustomRewardChecked, isImplementedChecked])
+
   return (
     <>
+      <ToastContainer />
       <form
         className="border border-[#ccc] rounded-md p-4 m-2.5 w-87.5 bg-white flex flex-col"
         onSubmit={handleSubmit(onSubmit)}
@@ -198,13 +259,15 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           <DropdownSelect
             id={`category-input-${proposal.id}`}
             value={categoryIdValue}
-            onChange={(value) => setValue('categoryId', Number(value), { shouldValidate: true })}
+            onChange={(value) => {
+              setValue('categoryId', Number(value), { shouldValidate: true })
+            }}
             placeholder="Selecione uma categoria"
             error={errors.categoryId?.message}
             options={
               categories?.map((category) => ({
                 value: String(category.id),
-                label: `${category.name} - Recompensa: R$ ${Number(category.categoryReward).toFixed(2)}`,
+                label: `${category.name} ${category.categoryReward && category.categoryReward > 0 ? '- Recompensa: R$ ' + Number(category.categoryReward).toFixed(2) : ''}`,
               })) ?? []
             }
             showEmptyOption={false}
@@ -213,22 +276,82 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           />
           {errors.categoryId && <p className="text-sm text-red-600">{errors.categoryId.message}</p>}
           <p className="text-xs text-gray-500 mt-0.5">Selecione a categoria da sugestão.</p>
-          <div className="flex gap-4 bg-gray-100 py-2 px-4 rounded-2xl border border-gray-200">
+          {/* <div className="flex gap-4 bg-gray-100 py-2 px-4 rounded-2xl border border-gray-200">
             <input
               {...register('isCustomReward')}
               type="checkbox"
               className="w-4 h-6 hover:cursor-pointer"
             />
             <span>Prêmio a definir</span>
-          </div>
-          <div className="flex gap-4 bg-gray-100 py-2 px-4 rounded-2xl border border-gray-200">
+          </div> */}
+          <label className="flex items-center gap-3 cursor-pointer select-none">
+            <div className="relative">
+              <input
+                type="checkbox"
+                // checked={filterInactiveInput}
+                // onChange={(event) => setFilterInactiveInput(event.target.checked)}
+                className="sr-only peer"
+                {...register('isCustomReward')}
+              />
+              <div className="h-6 w-11 rounded-full bg-gray-300 transition-colors peer-checked:bg-blue-600 peer-focus:ring-2 peer-focus:ring-blue-300"></div>
+              <div className="absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
+            </div>
+            <span className="text-xs font-medium text-gray-700">Prêmio a definir</span>
+          </label>
+          <label className="flex items-center gap-3 cursor-pointer select-none">
+            <div className="relative">
+              <input
+                type="checkbox"
+                // checked={filterInactiveInput}
+                // onChange={(event) => setFilterInactiveInput(event.target.checked)}
+                className="sr-only peer"
+                {...register('isImplemented')}
+              />
+              <div className="h-6 w-11 rounded-full bg-gray-300 transition-colors peer-checked:bg-blue-600 peer-focus:ring-2 peer-focus:ring-blue-300"></div>
+              <div className="absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
+            </div>
+            <span className="text-xs font-medium text-gray-700">Proposta Implementada</span>
+          </label>
+          {/* <div className="flex gap-4 bg-gray-100 py-2 px-4 rounded-2xl border border-gray-200">
             <input
               {...register('isImplemented')}
               type="checkbox"
               className="w-4 h-6 hover:cursor-pointer"
             />
             <span>Proposta Implementada</span>
-          </div>
+          </div> */}
+          {requiresCustomReward && (
+            <div className={`gap-4 bg-gray-100 py-2 px-4 rounded-2xl border border-gray-200 flex`}>
+              <input
+                {...register('customRewardAmount', { valueAsNumber: true })}
+                type="number"
+                placeholder="Valor do prêmio customizado"
+                className="w-full p-2 border border-gray-300 rounded"
+                disabled={!watch('isImplemented')}
+              />
+              <span>Prêmio</span>
+            </div>
+          )}
+          {errors.customRewardAmount && (
+            <p className="text-sm text-red-600">{errors.customRewardAmount.message}</p>
+          )}
+          {isImplementedChecked && (
+            <div className="flex flex-col mt-3 w-2xs">
+              <label htmlFor="rewardAttachment">A3 ou (e) Antes e Depois</label>
+              <input
+                id="rewardAttachment"
+                type="file"
+                accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xlsx,.xls,.ppt,.pptx"
+                onClick={(e) => e.stopPropagation()}
+                className="bg-gray-100 border border-gray-400 rounded-2xl px-4 py-2"
+                multiple={true}
+                {...register('evidenceFiles')}
+              />
+              {errors.evidenceFiles && (
+                <span className="text-xs text-red-600">{errors.evidenceFiles.message}</span>
+              )}
+            </div>
+          )}
           <label htmlFor={`manager-input-${proposal.id}`}>
             <strong>Defina o Gestor:</strong>
           </label>

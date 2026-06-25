@@ -278,20 +278,45 @@ class ProposalUseCase {
     return updatedProposal
   }
 
-  public async executeDefineManager(proposalId: number, data: UpdateProposalWithManager) {
-    const proposal = await this.proposalRepository.findById(proposalId)
+  public async executeDefineManager(
+    proposalId: number,
+    data: UpdateProposalWithManager,
+    files?: Express.Multer.File[],
+  ) {
+    const proposal = await this.proposalRepository.findById(Number(proposalId))
     if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
-    const manager = await this.employeeRepository.findByRe(data.managerRe)
+    const manager = await this.employeeRepository.findByRe(Number(data.managerRe))
     if (!manager) throw new AppError('Manager not found', StatusCodes.NOT_FOUND)
+
+    console.log('data.isImplemented', data.isImplemented)
+    const isCustomReward = await this.verifyIsCustomReward(data)
+    if (isCustomReward && !data.customRewardAmount && data.isImplemented) {
+      throw new AppError(
+        'This proposal needs a custom reward value which was not defined.',
+        StatusCodes.BAD_REQUEST,
+      )
+    }
+
+    if ((!files || files.length === 0) && isCustomReward && data.isImplemented === true)
+      throw new AppError('Evidence file is required for custom rewards.', StatusCodes.BAD_REQUEST)
+
+    if (files && files.length > 0) {
+      await Promise.all(
+        files.map((file) => this.proposalAttachmentRepository.create(file, proposal.id)),
+      )
+    }
+
     const updatedData: Prisma.ProposalUpdateInput = {
-      area: { connect: { id: data.areaId } },
-      category: { connect: { id: data.categoryId } },
+      area: { connect: { id: Number(data.areaId) } },
+      category: { connect: { id: Number(data.categoryId) } },
       manager: { connect: { id: manager.id } },
       adminReviewedAt: new Date(),
       isCustomReward: await this.verifyIsCustomReward(data),
-      status: data.isImplemented ? 'WAITING_APPROVAL' : 'DEFINE_CHAMPION',
-      requiresImplementation: !data.isImplemented,
+      status: Boolean(data.isImplemented) === true ? 'WAITING_APPROVAL' : 'DEFINE_CHAMPION',
+      requiresImplementation: Boolean(!data.isImplemented),
+      rewardAmount: Number(data.customRewardAmount),
     }
+    console.log('updatedData', updatedData)
     const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
     return updatedProposal
   }
@@ -323,7 +348,8 @@ class ProposalUseCase {
 
       // Reward calculation for approved proposals
 
-      updatedData.rewardAmount = await this.calculateRewardAmount(proposal)
+      if (!proposal.isCustomReward && proposal.requiresImplementation)
+        updatedData.rewardAmount = await this.calculateRewardAmount(proposal)
 
       if (!proposal.isCustomReward && !customRewardAmount && newStatus === 'TO_IMPLEMENT') {
         const suggestionIdList = await this.getSuggestionIdList(proposal.id)
@@ -362,9 +388,8 @@ class ProposalUseCase {
       updatedData.completedAt = new Date()
 
       // Reward calculation
-
       if (proposal.isCustomReward) {
-        updatedData.rewardAmount = await this.calculateRewardAmount(proposal)
+        updatedData.rewardAmount = await this.calculateRewardAmount(proposal, customRewardAmount)
 
         const suggestionIdList = await this.getSuggestionIdList(proposal.id)
 
@@ -746,6 +771,9 @@ class ProposalUseCase {
         managerReviewedAt: new Date(),
         manager: { disconnect: true },
       }
+
+      const updatedProposal = await this.proposalRepository.updateProposal(proposalId, updatedData)
+      return updatedProposal
     } else if (newStatus === 'IMPLEMENTED') {
       const suggestionIdList = await this.getSuggestionIdList(proposalId)
 
@@ -787,7 +815,7 @@ class ProposalUseCase {
   private async verifyIsCustomReward(data: UpdateProposalWithChampion | UpdateProposalWithManager) {
     if (data.isCustomReward) return true
 
-    const category = await this.categoryRepository.findById(data.categoryId)
+    const category = await this.categoryRepository.findById(Number(data.categoryId))
     if (!category) throw new AppError('Category not found.', StatusCodes.NOT_FOUND)
     return (
       category.categoryReward == null ||
@@ -797,7 +825,7 @@ class ProposalUseCase {
   }
 
   private async ensureCanManageAttachments(proposalId: number, userId: number, role: Role) {
-    const proposal = await this.proposalRepository.findById(proposalId)
+    const proposal = await this.proposalRepository.findById(Number(proposalId))
     if (!proposal) {
       throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
     }
@@ -819,7 +847,10 @@ class ProposalUseCase {
     )
   }
 
-  private async calculateRewardAmount(proposal: Proposal): Promise<number> {
+  private async calculateRewardAmount(
+    proposal: Proposal,
+    customRewardAmount?: number,
+  ): Promise<number> {
     if (!proposal.categoryId) {
       throw new AppError('Category not defined.', StatusCodes.BAD_REQUEST)
     }
@@ -834,10 +865,14 @@ class ProposalUseCase {
       category.categoryReward == null ||
       Number(category.categoryReward) === 0.0
     ) {
-      if (proposal.rewardAmount == null)
+      if (proposal.rewardAmount !== null && proposal.rewardAmount !== undefined) {
+        return Number(proposal.rewardAmount)
+      }
+      if (customRewardAmount !== null && customRewardAmount !== undefined) {
+        return Number(customRewardAmount)
+      } else {
         throw new AppError('Custom reward amount not defined.', StatusCodes.BAD_REQUEST)
-
-      return Number(proposal.rewardAmount)
+      }
     } else {
       return Number(category.categoryReward)
     }

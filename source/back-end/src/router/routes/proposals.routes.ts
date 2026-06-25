@@ -19,6 +19,7 @@ import { authMiddleware } from '../../middlewares/auth.middeware'
 import { checkRole } from '../../middlewares/role.middleware'
 import { Role } from '../../utils/types/employees.types'
 import { uploadProposalAttachment } from '../../middlewares/upload.middleware'
+import { parseMultipartJson } from '../../middlewares/multipart-json-parser.middleware'
 
 const proposalsRoutes = Router()
 
@@ -91,8 +92,10 @@ proposalsRoutes.put(
 )
 proposalsRoutes.put(
   '/:id/define-manager',
-  validate(updateProposalWithManager),
   authMiddleware,
+  uploadProposalAttachment.array('evidenceFiles', 5),
+  parseMultipartJson('data'),
+  validate(updateProposalWithManager),
   checkRole([Role.ADMIN]),
   ProposalsController.handleDefineManager,
 )
@@ -184,6 +187,7 @@ proposalsRoutes.put(
   '/:id/implemented-proposal-manager-review',
   authMiddleware,
   validate(updateProposalStatusByChampionSchema),
+
   ProposalsController.handleImplementedProposalManagerReview,
 )
 

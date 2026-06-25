@@ -27,6 +27,7 @@ export interface ProposalWithSuggestions {
   notes?: string | null
   managerNotes?: string | null
   isCustomReward: boolean
+  rewardAmount: number
   suggestions: [
     {
       employeeName: string
@@ -119,6 +120,7 @@ export interface UpdateProposalWithManagerRequest {
   managerRe: number
   areaId: number
   categoryId: number
+  isImplemented: boolean
 }
 
 export interface UpdateProposalWithChampionRequest {

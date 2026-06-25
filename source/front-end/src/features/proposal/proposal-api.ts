@@ -166,14 +166,11 @@ export const proposalAPI = api.injectEndpoints({
         { type: 'Proposal', id: 'LIST' },
       ],
     }),
-    updateProposalWithManager: builder.mutation<
-      Proposal,
-      { body: UpdateProposalWithManagerRequest; proposalId: string }
-    >({
-      query: ({ body, proposalId }) => ({
+    updateProposalWithManager: builder.mutation<Proposal, { proposalId: string; data: FormData }>({
+      query: ({ data, proposalId }) => ({
         url: `/proposals/${proposalId}/define-manager`,
         method: 'PUT',
-        body,
+        body: data,
       }),
       invalidatesTags: (_result, _error, { proposalId }) => [
         { type: 'Proposal', id: Number(proposalId) },

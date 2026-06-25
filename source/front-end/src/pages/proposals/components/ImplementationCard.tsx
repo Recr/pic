@@ -96,11 +96,11 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
         proposalId: proposal.id.toString(),
         data: formData as any,
       }).unwrap()
-      toast.success('Proposta enviada para implementação com sucesso.')
+      toast.success('Proposta concluída com sucesso.')
       setIsConfirmationModalOpen(false)
     } catch (error) {
       console.log(error)
-      toast.error('Erro ao enviar a proposta para implementação.')
+      toast.error('Erro ao concluir a proposta.')
     }
   }
 

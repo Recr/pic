@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
 })
 
 export const uploadProposalAttachment = multer({
-  storage,
+  storage, // TODO: Use memoryStorage to store files in memory, validate with zod and then process them in the controller
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (_req, file, cb) => {
     const allowed = [

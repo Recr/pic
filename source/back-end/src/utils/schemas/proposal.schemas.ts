@@ -58,6 +58,7 @@ export const updateProposalWithManager = z.object({
     categoryId: z.number(),
     isCustomReward: z.boolean(),
     isImplemented: z.boolean(),
+    customRewardAmount: z.number().positive().optional(),
   }),
   params: z.object({
     id: z.coerce.number(),

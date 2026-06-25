@@ -29,6 +29,7 @@ export interface UpdateProposalWithChampion extends UpdateProposal {
 export interface UpdateProposalWithManager extends UpdateProposal {
   managerRe: number
   isImplemented: boolean
+  customRewardAmount?: number
 }
 
 export interface UpdateProposalStatus {

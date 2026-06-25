@@ -12,6 +12,7 @@ export function getStatusColor(status: string): StatusBadgeColor {
     PENDING: 'orange',
     PAID: 'green',
     CANCELLED: 'red',
+    WAITING_APPROVAL: 'orange',
   }
   return translations[status] || 'gray'
 }
