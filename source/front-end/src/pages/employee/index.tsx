@@ -307,7 +307,7 @@ const Employee: React.FC = () => {
                     { value: 'ADMIN', label: 'Administrador' },
                   ]}
                   showEmptyOption={false}
-                  buttonClassName="bg-white px-4 py-1"
+                  buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
                 />
                 {updateErrors.role && (
                   <span className="text-xs text-red-600">{updateErrors.role.message}</span>
@@ -326,7 +326,7 @@ const Employee: React.FC = () => {
                     { value: 'ADM', label: 'Administrativo' },
                   ]}
                   showEmptyOption={false}
-                  buttonClassName="bg-white px-4 py-1"
+                  buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
                 />
                 {updateErrors.shift && (
                   <span className="text-xs text-red-600">{updateErrors.shift.message}</span>
@@ -405,7 +405,7 @@ const Employee: React.FC = () => {
                 { value: 'ADMIN', label: 'Administrador' },
               ]}
               showEmptyOption={false}
-              buttonClassName="bg-white px-4 py-1"
+              buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
             />
             {createErrors.role && (
               <span className="text-xs text-red-600">{createErrors.role.message}</span>
@@ -424,7 +424,7 @@ const Employee: React.FC = () => {
                 { value: 'ADM', label: 'Administrativo' },
               ]}
               showEmptyOption={false}
-              buttonClassName="bg-white px-4 py-1"
+              buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
             />
             {createErrors.shift && (
               <span className="text-xs text-red-600">{createErrors.shift.message}</span>

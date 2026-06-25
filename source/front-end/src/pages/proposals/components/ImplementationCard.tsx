@@ -187,14 +187,32 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
           {proposal.isCustomReward && (
             <div className="flex flex-col">
               <label htmlFor="customRewardAmount">Valor da recompensa</label>
-              <input
-                id="customRewardAmount"
-                type="text"
-                inputMode="decimal"
-                onClick={(e) => e.stopPropagation()}
-                className="bg-gray-100 border border-gray-400 rounded-2xl px-4 py-2"
-                {...register('customRewardAmount')}
-              />
+              <div className="relative mt-2">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                  R$
+                </span>
+
+                <input
+                  id={`custom-reward-amount-input-${proposal.id}`}
+                  {...register('customRewardAmount', {
+                    setValueAs: (value) => Number(value.replace(/\./g, '').replace(',', '.')),
+                  })}
+                  type="text"
+                  placeholder="0,00"
+                  className="w-full p-2 pl-10 border border-gray-300 rounded"
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '').replace(/^0+/, '')
+
+                    e.target.value = value
+                      ? (Number(value) / 100).toLocaleString('pt-BR', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })
+                      : ''
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
               {errors.customRewardAmount && (
                 <span className="text-xs text-red-600">{errors.customRewardAmount.message}</span>
               )}
@@ -207,7 +225,7 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
               type="file"
               accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xlsx,.xls,.ppt,.pptx"
               onClick={(e) => e.stopPropagation()}
-              className="bg-gray-100 border border-gray-400 rounded-2xl px-4 py-2"
+              className="border border-gray-300 rounded px-4 py-2 hover:cursor-pointer hover:bg-blue-100 transition-colors"
               multiple={true}
               {...register('evidenceFiles')}
             />
@@ -222,7 +240,7 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
               rows={4}
               value={note}
               onChange={(event) => setNote(event.target.value)}
-              className="bg-gray-100 border border-gray-400 rounded-2xl px-4 py-2"
+              className="border border-gray-300 rounded px-4 py-2"
               placeholder="Digite observacoes da implementacao"
               maxLength={1000}
             />

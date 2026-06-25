@@ -112,7 +112,7 @@ const PayoutList: React.FC = () => {
         <div className="mx-4 my-3 text-left text-xl font-semibold sm:my-4 sm:text-2xl">
           Lista de Pagamentos
         </div>
-        <div className="mx-4 mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="mx-4 mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
           <DropdownSelect
             id="payout-next-status"
             label="Novo status"
@@ -125,14 +125,14 @@ const PayoutList: React.FC = () => {
               { value: 'CANCELLED', label: 'Cancelado' },
             ]}
             className="w-full sm:w-auto"
-            buttonClassName="w-full rounded border border-gray-300 px-2 py-1 text-sm sm:w-auto"
+            buttonClassName="w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
             menuClassName="sm:w-56"
           />
           <button
             type="button"
             onClick={handleUpdateSelectedStatuses}
             disabled={!canUpdate}
-            className="w-full cursor-pointer rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400 sm:w-auto"
+            className="w-full cursor-pointer rounded bg-blue-600 px-3 py-2.25 text-sm text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400 sm:w-auto"
           >
             {isUpdatingStatus
               ? 'Atualizando...'
@@ -142,7 +142,7 @@ const PayoutList: React.FC = () => {
             type="button"
             onClick={handleExportExcel}
             disabled={!payoutData || payoutData.length === 0}
-            className="w-full cursor-pointer rounded bg-emerald-600 px-3 py-1.5 text-sm text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-gray-400 sm:w-auto"
+            className="w-full cursor-pointer rounded bg-emerald-600 px-3 py-2.25 text-sm text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-gray-400 sm:w-auto"
           >
             Exportar Excel
           </button>

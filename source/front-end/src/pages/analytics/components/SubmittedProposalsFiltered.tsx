@@ -74,6 +74,7 @@ const SubmittedProposalsFiltered: React.FC = () => {
           onChange={setStatus}
           placeholder="Tudo"
           options={STATUS_OPTIONS}
+          buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
         />
         <div>
           <label className="mb-1 block text-sm font-medium" htmlFor="analytics-start-date-filter">
@@ -105,6 +106,7 @@ const SubmittedProposalsFiltered: React.FC = () => {
           value={categoryId}
           onChange={setCategoryId}
           placeholder="Tudo"
+          buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
           options={
             categoryList?.map((categoryOption) => ({
               value: String(categoryOption.id),
@@ -118,6 +120,7 @@ const SubmittedProposalsFiltered: React.FC = () => {
           value={areaId}
           onChange={setAreaId}
           placeholder="Tudo"
+          buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
           options={
             areaList?.map((areaOption) => ({
               value: String(areaOption.id),

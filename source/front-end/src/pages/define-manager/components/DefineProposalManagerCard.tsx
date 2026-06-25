@@ -246,7 +246,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
             }
             showEmptyOption={false}
             className="w-full"
-            buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white"
+            buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
           />
           {errors.areaId && <p className="text-sm text-red-600">{errors.areaId.message}</p>}
           <p className="text-xs text-gray-500 mt-0.5">
@@ -272,7 +272,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
             }
             showEmptyOption={false}
             className="w-full"
-            buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white"
+            buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
           />
           {errors.categoryId && <p className="text-sm text-red-600">{errors.categoryId.message}</p>}
           <p className="text-xs text-gray-500 mt-0.5">Selecione a categoria da sugestão.</p>
@@ -293,15 +293,36 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
             <span className="text-xs font-medium text-gray-700">Proposta Implementada</span>
           </label>
           {requiresCustomReward && (
-            <div className={`gap-4 bg-gray-100 py-2 px-4 rounded-2xl border border-gray-200 flex`}>
-              <input
-                {...register('customRewardAmount', { valueAsNumber: true })}
-                type="number"
-                placeholder="Valor do prêmio customizado"
-                className="w-full p-2 border border-gray-300 rounded"
-                disabled={!watch('isImplemented')}
-              />
-              <span>Prêmio</span>
+            <div className={``}>
+              <label htmlFor={`custom-reward-amount-input-${proposal.id}`}>
+                <strong>Prêmio customizado:</strong>
+              </label>
+              <div className="relative mt-2">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                  R$
+                </span>
+
+                <input
+                  id={`custom-reward-amount-input-${proposal.id}`}
+                  {...register('customRewardAmount', {
+                    setValueAs: (value) => Number(value.replace(/\./g, '').replace(',', '.')),
+                  })}
+                  type="text"
+                  placeholder="0,00"
+                  className="w-full p-2 pl-10 border border-gray-300 rounded"
+                  disabled={!watch('isImplemented')}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '').replace(/^0+/, '')
+
+                    e.target.value = value
+                      ? (Number(value) / 100).toLocaleString('pt-BR', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })
+                      : ''
+                  }}
+                />
+              </div>
             </div>
           )}
           {errors.customRewardAmount && (
@@ -315,7 +336,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
                 type="file"
                 accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xlsx,.xls,.ppt,.pptx"
                 onClick={(e) => e.stopPropagation()}
-                className="bg-gray-100 border border-gray-400 rounded-2xl px-4 py-2"
+                className="border border-gray-300 rounded px-4 py-2 cursor-pointer hover:bg-blue-100 transition-colors"
                 multiple={true}
                 {...register('evidenceFiles')}
               />

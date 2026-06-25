@@ -183,7 +183,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
             }
             showEmptyOption={false}
             className="w-full"
-            buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white"
+            buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
           />
           {errors.areaId && <p className="text-sm text-red-600">{errors.areaId.message}</p>}
           <p className="text-xs text-gray-500 mt-0.5">
@@ -206,7 +206,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
             }
             showEmptyOption={false}
             className="w-full"
-            buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white"
+            buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
           />
           {errors.categoryId && <p className="text-sm text-red-600">{errors.categoryId.message}</p>}
           <p className="text-xs text-gray-500 mt-0.5">Selecione a categoria da sugestão.</p>

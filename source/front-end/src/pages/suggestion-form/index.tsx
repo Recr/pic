@@ -290,7 +290,7 @@ const SuggestionForm: React.FC = () => {
               }))}
               required
               className="w-4/5"
-              buttonClassName="w-full p-2.5 my-1.5 rounded-[5px] border border-[#ccc] bg-white"
+              buttonClassName="w-full p-2.5 my-1.5 rounded-[5px] border border-[#ccc] bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
               menuClassName="w-full"
             />
           </div>
