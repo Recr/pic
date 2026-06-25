@@ -210,14 +210,14 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           />
           {errors.categoryId && <p className="text-sm text-red-600">{errors.categoryId.message}</p>}
           <p className="text-xs text-gray-500 mt-0.5">Selecione a categoria da sugestão.</p>
-          <div className="flex gap-4 bg-gray-100 py-2 px-4 rounded-2xl border border-gray-200">
-            <input
-              {...register('isCustomReward')}
-              type="checkbox"
-              className="w-4 h-6 hover:cursor-pointer"
-            />
-            <span>Prêmio a definir</span>
-          </div>
+          <label className="flex items-center gap-3 cursor-pointer select-none">
+            <div className="relative">
+              <input type="checkbox" className="sr-only peer" {...register('isCustomReward')} />
+              <div className="h-6 w-11 rounded-full bg-gray-300 transition-colors peer-checked:bg-blue-600 peer-focus:ring-2 peer-focus:ring-blue-300"></div>
+              <div className="absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
+            </div>
+            <span className="text-xs font-medium text-gray-700">Prêmio a definir</span>
+          </label>
           <label htmlFor={`champion-input-${proposal.id}`}>
             <strong>Defina o Executor:</strong>
           </label>

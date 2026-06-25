@@ -288,7 +288,6 @@ class ProposalUseCase {
     const manager = await this.employeeRepository.findByRe(Number(data.managerRe))
     if (!manager) throw new AppError('Manager not found', StatusCodes.NOT_FOUND)
 
-    console.log('data.isImplemented', data.isImplemented)
     const isCustomReward = await this.verifyIsCustomReward(data)
     if (isCustomReward && !data.customRewardAmount && data.isImplemented) {
       throw new AppError(
@@ -316,7 +315,6 @@ class ProposalUseCase {
       requiresImplementation: Boolean(!data.isImplemented),
       rewardAmount: Number(data.customRewardAmount),
     }
-    console.log('updatedData', updatedData)
     const updatedProposal = await this.proposalRepository.updateProposal(proposal.id, updatedData)
     return updatedProposal
   }
