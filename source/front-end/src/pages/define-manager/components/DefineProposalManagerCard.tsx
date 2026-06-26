@@ -248,7 +248,6 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
             className="w-full"
             buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
           />
-          {errors.areaId && <p className="text-sm text-red-600">{errors.areaId.message}</p>}
           <p className="text-xs text-gray-500 mt-0.5">
             Mantenha a seleção do colaborador ou escolha na lista
           </p>

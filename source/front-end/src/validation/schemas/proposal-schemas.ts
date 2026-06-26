@@ -57,8 +57,11 @@ export const getFinishProposalSchema = (requireEvidenceFiles: boolean) =>
 export const getUpdateProposalWithManagerSchema = (requireEvidenceFiles: boolean) =>
   z.object({
     managerRe: z.coerce.number().int().positive('Selecione um RE valido para o gestor.'),
-    areaId: z.coerce.number().int().positive('Selecione uma area.'),
-    categoryId: z.coerce.number().int().positive('Selecione uma categoria.'),
+    areaId: z.coerce.number('Selecione uma area.').int().positive('Selecione uma area.'),
+    categoryId: z.coerce
+      .number('Selecione uma categoria.')
+      .int()
+      .positive('Selecione uma categoria.'),
     isCustomReward: z.boolean(),
     isImplemented: z.boolean(),
     customRewardAmount: z
