@@ -197,13 +197,13 @@ const SuggestionForm: React.FC = () => {
             id="logo"
             src={logo}
             alt="Logo"
-            className="object-contain w-90 max-w-100 mb-5 border-[5px] border-[#ccc] rounded-[20px]"
+            className="object-contain w-80 sm:w-96 mb-5 border border-[#ccc] rounded"
           />
         </div>
         <form
           key={formKey}
           onSubmit={handleSubmit}
-          className="bg-white flex flex-col items-center w-90 sm:w-auto shadow-custom py-5 px-7.5 mx-auto mb-7.5 rounded-[20px]"
+          className="bg-white flex flex-col items-center w-80 sm:w-auto shadow-custom py-5 px-7.5 mx-auto mb-7.5 rounded"
         >
           {/* employee_amount_radio */}
           <div id="employee_amount_radio" className="my-8 mx-auto flex flex-col items-center">
@@ -271,7 +271,7 @@ const SuggestionForm: React.FC = () => {
           {/* suggestion_area */}
           <div
             id="suggestion_area"
-            className="flex flex-col gap-1.5 justify-center items-center w-90"
+            className="flex flex-col gap-1.5 justify-center items-center w-65 sm:w-80"
           >
             <DropdownSelect
               label="Local"
