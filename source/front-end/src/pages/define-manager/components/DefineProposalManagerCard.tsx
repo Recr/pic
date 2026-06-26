@@ -352,6 +352,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
             employees={availableManagers || []}
             required
             placeholder="Digite ou selecione o RE"
+            dropdownOverlap={true}
             onSelect={(value) => {
               setValue('managerRe', Number(value), { shouldValidate: true })
             }}

@@ -228,6 +228,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
             onSelect={(value) => {
               setValue('championRe', Number(value), { shouldValidate: true })
             }}
+            dropdownOverlap={true}
           />
           <input type="hidden" {...register('championRe', { valueAsNumber: true })} />
           {errors.championRe && <p className="text-sm text-red-600">{errors.championRe.message}</p>}
