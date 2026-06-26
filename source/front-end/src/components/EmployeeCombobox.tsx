@@ -13,6 +13,7 @@ type EmployeeComboboxProps = {
   onSelect: (value: string) => void
   required?: boolean
   placeholder?: string
+  dropdownOverlap?: boolean
 }
 
 const EmployeeCombobox = ({
@@ -22,6 +23,7 @@ const EmployeeCombobox = ({
   onSelect,
   required = false,
   placeholder = 'Digite ou selecione o RE',
+  dropdownOverlap,
 }: EmployeeComboboxProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [value, setValue] = useState('')
@@ -97,7 +99,7 @@ const EmployeeCombobox = ({
 
         <ul
           id={listId}
-          className={` mt-1 w-full rounded-[5px] border border-[#ccc] bg-white shadow-sm transition-all duration-200 ease-out overflow-auto ${
+          className={` mt-1 w-full rounded-[5px] border border-[#ccc] bg-white shadow-sm transition-all duration-200 ease-out overflow-auto ${dropdownOverlap ? 'z-10 absolute' : 'z-0'} ${
             isOpen
               ? 'max-h-52 scale-100 opacity-100 pointer-events-auto'
               : 'max-h-0 scale-95 opacity-0 pointer-events-none'
@@ -118,7 +120,9 @@ const EmployeeCombobox = ({
           )}
         </ul>
       </div>
-      <p className="text-xs text-gray-500 mt-0.5">Digite o RE ou selecione da lista</p>
+      <p className={`text-xs text-gray-500 mt-0.5 ${dropdownOverlap && 'mb-2'}`}>
+        Digite o RE ou selecione da lista
+      </p>
     </div>
   )
 }

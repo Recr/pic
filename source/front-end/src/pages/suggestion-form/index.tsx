@@ -245,6 +245,7 @@ const SuggestionForm: React.FC = () => {
                   employees={employees}
                   required
                   onSelect={(value) => handleEmployeeSelect(num, value)}
+                  dropdownOverlap={true}
                 />
                 <label>Nome:</label>
                 <input
