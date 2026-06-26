@@ -103,7 +103,7 @@ const ReviewImplementedProposalCard: React.FC<ProposalWithSuggestions> = (propos
           </span>
         </p>
         <div
-          className="flex gap-2 items-center pt-4 absolute z-1 bottom-1 w-full"
+          className="flex gap-2 items-center pt-4 absolute z-1 bottom-1 w-full justify-between"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -111,7 +111,7 @@ const ReviewImplementedProposalCard: React.FC<ProposalWithSuggestions> = (propos
               setNewStatus('IMPLEMENTED')
               setIsConfirmationModalOpen(true)
             }}
-            className="py-2 px-2 cursor-pointer rounded border border-green-800 bg-green-500 text-white w-1/3 hover:w-1/2 transition-all"
+            className="py-2 px-2 cursor-pointer rounded border border-green-800 bg-green-500 text-white w-1/2 hover:w-3/4 transition-all"
           >
             Aprovar
           </button>
@@ -122,7 +122,7 @@ const ReviewImplementedProposalCard: React.FC<ProposalWithSuggestions> = (propos
               setRejectionNoteError(null)
               setIsRejectionModalOpen(true)
             }}
-            className="py-2 px-3 cursor-pointer rounded border border-[#c0392b] bg-[#e74c3c] text-white w-1/3 hover:w-1/2 transition-all"
+            className="py-2 px-3 cursor-pointer rounded border border-[#c0392b] bg-[#e74c3c] text-white w-1/2 hover:w-3/4 transition-all"
           >
             Rejeitar
           </button>
