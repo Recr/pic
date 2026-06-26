@@ -273,7 +273,6 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
             className="w-full"
             buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
           />
-          {errors.categoryId && <p className="text-sm text-red-600">{errors.categoryId.message}</p>}
           <p className="text-xs text-gray-500 mt-0.5">Selecione a categoria da sugestão.</p>
           <label className="flex items-center gap-3 cursor-pointer select-none">
             <div className="relative">
