@@ -549,7 +549,7 @@ const SuggestionList: React.FC = () => {
             type="button"
             onClick={() => previousPage && handlePageChange(previousPage)}
             disabled={!previousPage}
-            className="flex items-center gap-1 rounded-lg px-2 py-2 text-gray-700 transition-all hover:bg-gray-100 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex items-center gap-1 rounded-lg px-2 py-2 text-gray-700 transition-all hover:bg-gray-100 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40 hover:cursor-pointer"
           >
             <ChevronLeftIcon size={20} />
             <span className="hidden sm:block">Anterior</span>
@@ -567,7 +567,7 @@ const SuggestionList: React.FC = () => {
                 className={`flex h-9 w-9 items-center justify-center rounded-full transition-all ${
                   pageItem === currentPage
                     ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700'
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700 hover:cursor-pointer'
                 }`}
                 aria-current={pageItem === currentPage ? 'page' : undefined}
               >
@@ -579,7 +579,7 @@ const SuggestionList: React.FC = () => {
             type="button"
             onClick={() => nextPage && handlePageChange(nextPage)}
             disabled={!nextPage}
-            className="flex items-center gap-1 rounded-lg px-3 py-2 text-gray-700 transition-all hover:bg-gray-100 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex items-center gap-1 rounded-lg px-3 py-2 text-gray-700 transition-all hover:bg-gray-100 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40 hover:cursor-pointer"
           >
             <span className="hidden sm:block">Próximo</span>
             <ChevronRightIcon size={20} />
