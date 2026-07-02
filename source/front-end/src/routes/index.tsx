@@ -32,7 +32,7 @@ const AppShell: React.FC = () => {
   return (
     <div className="min-h-screen">
       {isLoggedin && <Sidebar />}
-      <main className="flex-1 ">
+      <main className="flex-1">
         <Routes>
           <Route path="/" element={<SuggestionForm />} />
           <Route path="/login" element={<LoginForm />} />

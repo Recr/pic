@@ -6,6 +6,7 @@ import { getStatusColor } from '../../../helpers/getStatusColor'
 import { useState } from 'react'
 import { Undo2 } from 'lucide-react'
 import { toast } from 'react-toastify'
+import EmployeeInformationBadge from './EmployeeInformationBadge'
 
 const StartImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
   const [proposalChampionReview] = proposalAPI.useProposalChampionReviewMutation()
@@ -64,22 +65,15 @@ const StartImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) =>
         <p>
           <strong>Colaboradores:</strong>
         </p>
-        <ul className="ml-5">
-          {!proposal.suggestions ? (
-            <p>Nenhum colaborador encontrado</p>
-          ) : (
-            proposal.suggestions?.map((suggestion, i) => {
-              const registeredUser = suggestion.employee
-              return (
-                <li key={i}>
-                  {registeredUser ? suggestion.employee?.name : suggestion.employeeName} (RE:{' '}
-                  {registeredUser ? suggestion.employee?.re : suggestion.employeeRe}) - Turno:{' '}
-                  {registeredUser ? suggestion.employee?.shift : suggestion.employeeShift}
-                </li>
-              )
-            })
-          )}
-        </ul>
+        <div className="flex flex-wrap gap-2 py-4">
+          {proposal.suggestions.map((suggestion, index) => (
+            <EmployeeInformationBadge
+              key={`${proposal.id}-${suggestion.employee?.name || suggestion.employeeName}-${index}`}
+              suggestion={suggestion}
+              id={proposal.id}
+            />
+          ))}
+        </div>
         <div className="flex justify-between">
           <div className="flex flex-col">
             <strong>Área</strong>

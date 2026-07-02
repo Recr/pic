@@ -16,6 +16,7 @@ import { updateManagerOrChampionSchema } from '../../../validation/schemas/emplo
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod/src/zod.js'
 import { translateRoles } from '../../../helpers/translateRoles'
+import EmployeeInformationBadge from '../../proposals/components/EmployeeInformationBadge'
 
 const MAX_ATTACHMENTS_PER_UPLOAD = 5
 const MAX_ATTACHMENT_SIZE_BYTES = 10 * 1024 * 1024
@@ -452,20 +453,11 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
             <p className="text-sm font-semibold mb-2">Funcionários</p>
             <div className="flex flex-wrap gap-2">
               {proposal.suggestions.map((suggestion, index) => (
-                <p
+                <EmployeeInformationBadge
                   key={`${proposal.id}-${suggestion.employee?.name || suggestion.employeeName}-${index}`}
-                  className="bg-gray-100 px-2 py-1 rounded text-sm"
-                >
-                  <span className="text-gray-700 font-bold">
-                    {suggestion.employee ? suggestion.employee.name : suggestion.employeeName}
-                  </span>
-                  <span className="text-xs text-gray-500 ml-1">
-                    {suggestion.employee ? suggestion.employee.re : suggestion.employeeRe}
-                    {' - '}
-                    Turno:{' '}
-                    {suggestion.employee ? suggestion.employee.shift : suggestion.employeeShift}
-                  </span>
-                </p>
+                  suggestion={suggestion}
+                  id={proposal.id}
+                />
               ))}
             </div>
           </div>

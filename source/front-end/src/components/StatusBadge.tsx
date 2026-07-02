@@ -32,7 +32,7 @@ const dotColorMap = {
 
 const StatusBadge = (props: StatusBadgeProps) => {
   return (
-    <div className={`flex items-center gap-2 px-2 rounded-xl ${colorMap[props.color]}`}>
+    <div className={`flex items-center gap-2 px-2 rounded-xl ${colorMap[props.color]} text-xs`}>
       <div className={`w-2.5 h-2.5 rounded-full ${dotColorMap[props.color]}`}></div>
       <span>{translateStatus(props.status)}</span>
     </div>

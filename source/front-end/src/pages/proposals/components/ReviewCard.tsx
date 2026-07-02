@@ -4,6 +4,7 @@ import type { ProposalWithSuggestions } from '../../../features/proposal/types'
 import { proposalAPI } from '../../../features/proposal/proposal-api'
 import Modal from '../../../components/modal/Modal'
 import { useState } from 'react'
+import EmployeeInformationBadge from './EmployeeInformationBadge'
 
 const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
   const [proposalChampionReview] = proposalAPI.useProposalChampionReviewMutation()
@@ -51,25 +52,18 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
           <strong>Data: </strong>
           <span>{new Date(proposal.createdAt).toLocaleDateString()}</span>
         </div>
-        <p className="py-2">
+        <p>
           <strong>Colaboradores:</strong>
         </p>
-        <ul className="ml-5 gap-1 flex flex-col py-2">
-          {!proposal.suggestions ? (
-            <p>Nenhum colaborador encontrado</p>
-          ) : (
-            proposal.suggestions?.map((suggestion, i) => {
-              const registeredUser = suggestion.employee
-              return (
-                <li key={i}>
-                  {registeredUser ? suggestion.employee?.name : suggestion.employeeName} (RE:{' '}
-                  {registeredUser ? suggestion.employee?.re : suggestion.employeeRe}) - Turno:{' '}
-                  {registeredUser ? suggestion.employee?.shift : suggestion.employeeShift}
-                </li>
-              )
-            })
-          )}
-        </ul>
+        <div className="flex flex-wrap gap-2 py-4">
+          {proposal.suggestions.map((suggestion, index) => (
+            <EmployeeInformationBadge
+              key={`${proposal.id}-${suggestion.employee?.name || suggestion.employeeName}-${index}`}
+              suggestion={suggestion}
+              id={proposal.id}
+            />
+          ))}
+        </div>
         <div className="flex justify-between">
           <div className="flex flex-col">
             <strong>Área</strong>
