@@ -193,7 +193,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
       >
         <div onClick={() => setIsModalOpen(true)}>
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg m-0">Sugestão #{proposal.id}</h3>
+            <h3 className="text-lg m-0">Proposta #{proposal.id}</h3>
             <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
           </div>
           <p>
@@ -210,7 +210,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           </div>
 
           <p>
-            <strong>Sugestão:</strong>
+            <strong>Proposta:</strong>
             <br />
             <span>
               {proposal.description.length > 100
@@ -265,7 +265,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
             className="w-full"
             buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
           />
-          <p className="text-xs text-gray-500 mt-0.5">Selecione a categoria da sugestão.</p>
+          <p className="text-xs text-gray-500 mt-0.5">Selecione a categoria da proposta.</p>
           <label className="flex items-center gap-3 cursor-pointer select-none">
             <div className="relative">
               <input type="checkbox" className="sr-only peer" {...register('isCustomReward')} />

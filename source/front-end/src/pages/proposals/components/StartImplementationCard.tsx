@@ -42,7 +42,7 @@ const StartImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) =>
     <div className="w-full border border-[#ccc] rounded-md p-4 bg-white flex flex-col justify-between">
       <div onClick={() => setIsModalOpen(true)} className="relative flex h-full flex-col">
         <div className="flex justify-between items-center mb-2">
-          <h3 className="text-lg m-0">Sugestão #{proposal.id}</h3>
+          <h3 className="text-lg m-0">Proposta #{proposal.id}</h3>
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -86,7 +86,7 @@ const StartImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) =>
         </div>
 
         <p className="text-justify overflow-clip">
-          <strong>Sugestão:</strong>
+          <strong>Proposta:</strong>
           <br />
           <span>
             {proposal.description.length > 150

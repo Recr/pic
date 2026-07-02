@@ -105,7 +105,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableC
       >
         <div onClick={() => setIsModalOpen(true)}>
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg m-0">Sugestão #{proposal.id}</h3>
+            <h3 className="text-lg m-0">Proposta #{proposal.id}</h3>
             <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
           </div>
           <p>
@@ -122,7 +122,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableC
           </div>
 
           <p>
-            <strong>Sugestão:</strong>
+            <strong>Proposta:</strong>
             <br />
             <span>
               {proposal.description.length > 100

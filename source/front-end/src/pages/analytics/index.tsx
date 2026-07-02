@@ -127,13 +127,13 @@ const AnalyticsPage: React.FC = () => {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="text-sm text-gray-700">
               <p>
-                Meta anual de sugestões enviadas:{' '}
+                Meta anual de propostas enviadas:{' '}
                 <span className="font-semibold">
                   {currentYearTarget?.annualSubmittedProposalsTarget ?? '-'}
                 </span>
               </p>
               <p>
-                Meta anual de sugestões implementadas:{' '}
+                Meta anual de propostas implementadas:{' '}
                 <span className="font-semibold">
                   {currentYearTarget?.annualImplementedProposalsTarget ?? '-'}
                 </span>
@@ -262,7 +262,7 @@ const AnalyticsPage: React.FC = () => {
               </div>
               <div>
                 <label className="mb-1 block text-sm" htmlFor="annual-submitted-target">
-                  Meta anual de sugestões enviadas
+                  Meta anual de propostas enviadas
                 </label>
                 <input
                   id="annual-submitted-target"
@@ -277,7 +277,7 @@ const AnalyticsPage: React.FC = () => {
               </div>
               <div>
                 <label className="mb-1 block text-sm" htmlFor="annual-implemented-target">
-                  Meta anual de sugestões implementadas
+                  Meta anual de propostas implementadas
                 </label>
                 <input
                   id="annual-implemented-target"
@@ -305,7 +305,7 @@ const AnalyticsPage: React.FC = () => {
               </div>
               <div>
                 <label className="mb-1 block text-sm" htmlFor="communication-days-target">
-                  Meta de dias para resposta de sugestões
+                  Meta de dias para resposta de propostas
                 </label>
                 <input
                   id="communication-days-target"

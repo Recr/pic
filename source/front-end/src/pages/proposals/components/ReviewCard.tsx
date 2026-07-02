@@ -45,7 +45,7 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
     <div className="w-full border border-[#ccc] rounded-md p-4 bg-white flex flex-col">
       <div onClick={() => setIsModalOpen(true)} className="relative">
         <div className="flex justify-between items-center mb-2">
-          <h3 className="text-lg m-0">Sugestão #{proposal.id}</h3>
+          <h3 className="text-lg m-0">Proposta #{proposal.id}</h3>
           <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
         </div>
         <div className="flex justify-between">
@@ -83,7 +83,7 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
           </p>
         )}
         <p className="mt-2 h-50 text-justify overflow-clip">
-          <strong>Sugestão:</strong>
+          <strong>Proposta:</strong>
           <br />
           <span>
             {proposal.description.length > 150

@@ -12,7 +12,8 @@ const AdminDefineChampion: React.FC = () => {
     proposalAPI.useGetProposalsWithoutChampionQuery()
   const { data: categories, isLoading: isLoadingCategories } = categoryAPI.useGetCategoriesQuery()
 
-  const isLoading = isLoadingChampions || isLoadingAreas || isLoadingProposals || isLoadingCategories
+  const isLoading =
+    isLoadingChampions || isLoadingAreas || isLoadingProposals || isLoadingCategories
 
   if (isLoading) {
     return (
@@ -41,7 +42,7 @@ const AdminDefineChampion: React.FC = () => {
       </div>
       <div className="flex flex-wrap">
         {!proposalsList || proposalsList.length === 0 ? (
-          <p className="px-2.5">Nenhuma sugestão encontrada.</p>
+          <p className="px-2.5">Nenhuma proposta encontrada.</p>
         ) : (
           proposalsList
             .filter((proposal) => proposal && proposal.id !== undefined)
