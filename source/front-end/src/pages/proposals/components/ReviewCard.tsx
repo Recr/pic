@@ -1,10 +1,10 @@
-import StatusBadge from '../../../components/StatusBadge'
+import StatusBadge from '../../../components/badges/StatusBadge'
 import { getStatusColor } from '../../../helpers/getStatusColor'
 import type { ProposalWithSuggestions } from '../../../features/proposal/types'
 import { proposalAPI } from '../../../features/proposal/proposal-api'
 import Modal from '../../../components/modal/Modal'
 import { useState } from 'react'
-import EmployeeInformationBadge from './EmployeeInformationBadge'
+import EmployeeInformationBadge from '../../../components/badges/EmployeeInformationBadge'
 
 const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
   const [proposalChampionReview] = proposalAPI.useProposalChampionReviewMutation()

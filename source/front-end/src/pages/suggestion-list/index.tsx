@@ -7,7 +7,7 @@ import { ChevronLeftIcon, ChevronRightIcon, ListFilterIcon } from 'lucide-react'
 import { translateStatus } from '../../helpers/translateStatus'
 import { areaAPI } from '../../features/area/area-api'
 import { categoryAPI } from '../../features/category/category-api'
-import DropdownSelect from '../../components/DropdownSelect'
+import DropdownSelect from '../../components/inputs/DropdownSelect'
 import type { RootState } from '../../app/store'
 import { useSelector } from 'react-redux'
 

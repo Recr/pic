@@ -1,4 +1,4 @@
-import type { Employee } from '../../../features/proposal/types'
+import type { Employee } from '../../features/proposal/types'
 
 interface EmployeeInformationBadgeProps {
   suggestion: {

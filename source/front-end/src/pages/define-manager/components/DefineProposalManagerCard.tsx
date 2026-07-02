@@ -2,15 +2,16 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { proposalAPI } from '../../../features/proposal/proposal-api'
-import StatusBadge from '../../../components/StatusBadge'
+import StatusBadge from '../../../components/badges/StatusBadge'
 import { getStatusColor } from '../../../helpers/getStatusColor'
-import EmployeeCombobox from '../../../components/EmployeeCombobox'
-import DropdownSelect from '../../../components/DropdownSelect'
+import EmployeeCombobox from '../../../components/inputs/EmployeeCombobox'
+import DropdownSelect from '../../../components/inputs/DropdownSelect'
 import { useEffect, useState } from 'react'
 import Modal from '../../../components/modal/Modal'
 import type { Category } from '../../../features/category/types'
 import { getUpdateProposalWithManagerSchema } from '../../../validation/schemas/proposal-schemas'
 import { toast, ToastContainer } from 'react-toastify'
+import EmployeeInformationBadge from '../../../components/badges/EmployeeInformationBadge'
 
 interface ProposalWithEmployees {
   id: number
@@ -139,11 +140,6 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
     }
   }
 
-  const employees = proposal.suggestions?.map((suggestion) => ({
-    name: suggestion.employee ? suggestion.employee.name : suggestion.employeeName,
-    re: suggestion.employee ? suggestion.employee.re : suggestion.employeeRe,
-    shift: suggestion.employee ? suggestion.employee.shift : suggestion.employeeShift,
-  }))
   const areaIdValue = String(watch('areaId') ?? proposal.area?.id ?? '')
   const categoryIdValue = String(watch('categoryId') ?? '')
 
@@ -203,19 +199,15 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           <p>
             <strong>Colaboradores:</strong>
           </p>
-          <ul className="ml-5">
-            {!proposal.suggestions ? (
-              <p>Nenhum colaborador encontrado</p>
-            ) : (
-              employees.map((employee, i) => {
-                return (
-                  <li key={i}>
-                    {employee.name} (RE: {employee.re}) - Turno: {employee.shift}
-                  </li>
-                )
-              })
-            )}
-          </ul>
+          <div className="flex flex-wrap gap-2 py-4">
+            {proposal.suggestions.map((suggestion, index) => (
+              <EmployeeInformationBadge
+                key={`${proposal.id}-${suggestion.employee?.name || suggestion.employeeName}-${index}`}
+                suggestion={suggestion}
+                id={proposal.id}
+              />
+            ))}
+          </div>
 
           <p>
             <strong>Sugestão:</strong>

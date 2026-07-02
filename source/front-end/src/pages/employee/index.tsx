@@ -15,7 +15,7 @@ import {
 } from '../../validation/schemas/employee-schemas'
 import type z from 'zod'
 import { Skeleton } from '../../components/skeletons/Skeleton'
-import DropdownSelect from '../../components/DropdownSelect'
+import DropdownSelect from '../../components/inputs/DropdownSelect'
 
 const Employee: React.FC = () => {
   type CreateEmployeeSchemaInput = z.input<typeof createEmployeeSchema>

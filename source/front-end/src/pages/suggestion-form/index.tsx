@@ -8,8 +8,8 @@ import { ToastContainer, toast } from 'react-toastify'
 import { useNavigate } from 'react-router'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../app/store'
-import EmployeeCombobox from '../../components/EmployeeCombobox'
-import DropdownSelect from '../../components/DropdownSelect'
+import EmployeeCombobox from '../../components/inputs/EmployeeCombobox'
+import DropdownSelect from '../../components/inputs/DropdownSelect'
 import { Skeleton } from '../../components/skeletons/Skeleton'
 
 const EMPLOYEE_OPTIONS = [1, 2, 3] as const

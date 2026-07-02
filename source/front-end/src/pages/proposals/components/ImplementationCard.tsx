@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Modal from '../../../components/modal/Modal'
-import StatusBadge from '../../../components/StatusBadge'
+import StatusBadge from '../../../components/badges/StatusBadge'
 import { proposalAPI } from '../../../features/proposal/proposal-api'
 import type { ProposalWithSuggestions } from '../../../features/proposal/types'
 import { getStatusColor } from '../../../helpers/getStatusColor'
@@ -10,7 +10,7 @@ import type z from 'zod'
 import { getFinishProposalSchema } from '../../../validation/schemas/proposal-schemas'
 import { toast } from 'react-toastify'
 import { Undo2 } from 'lucide-react'
-import EmployeeInformationBadge from './EmployeeInformationBadge'
+import EmployeeInformationBadge from '../../../components/badges/EmployeeInformationBadge'
 
 const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
   const [proposalChampionReview] = proposalAPI.useProposalChampionReviewMutation()

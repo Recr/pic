@@ -1,4 +1,4 @@
-import { translateStatus } from '../helpers/translateStatus'
+import { translateStatus } from '../../helpers/translateStatus'
 
 export type StatusBadgeColor = 'blue' | 'red' | 'yellow' | 'green' | 'orange' | 'cyan' | 'gray'
 

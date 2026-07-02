@@ -1,5 +1,5 @@
 import React from 'react'
-import StatusBadge from '../../../components/StatusBadge'
+import StatusBadge from '../../../components/badges/StatusBadge'
 import { getStatusColor } from '../../../helpers/getStatusColor'
 import type { Payout } from '../../../features/payout/types'
 

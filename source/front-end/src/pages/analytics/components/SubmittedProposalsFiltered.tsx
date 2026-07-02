@@ -3,7 +3,7 @@ import { analyticsAPI } from '../../../features/analytics/analytics-api'
 import { useMemo, useState } from 'react'
 import { categoryAPI } from '../../../features/category/category-api'
 import { areaAPI } from '../../../features/area/area-api'
-import DropdownSelect from '../../../components/DropdownSelect'
+import DropdownSelect from '../../../components/inputs/DropdownSelect'
 import {
   BarElement,
   CategoryScale,

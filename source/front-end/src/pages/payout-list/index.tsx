@@ -4,7 +4,7 @@ import { payoutAPI } from '../../features/payout/payout-api'
 import type { PayoutStatus } from '../../features/payout/types'
 import PayoutItem from './components/PayoutItem'
 import { Skeleton } from '../../components/skeletons/Skeleton'
-import DropdownSelect from '../../components/DropdownSelect'
+import DropdownSelect from '../../components/inputs/DropdownSelect'
 
 const PayoutList: React.FC = () => {
   const { data: payoutData, isLoading } = payoutAPI.useGetPayoutsQuery(undefined)
