@@ -1,20 +1,21 @@
 import { proposalAPI } from '../../features/proposal/proposal-api'
-import type { ProposalWithSuggestions } from '../../features/proposal/types'
 import ImplementationCard from './components/ImplementationCard'
 import ReviewCard from './components/ReviewCard'
 import StartImplementationCard from './components/StartImplementationCard'
 import { Skeleton } from '../../components/skeletons/Skeleton'
 import { ToastContainer } from 'react-toastify'
 import ReviewImplementedProposalCard from './components/ReviewImplementedProposalCard'
+import type { ProposalWithSuggestions, ProposalStatus } from './types'
 
 type CardRenderer = (proposal: ProposalWithSuggestions) => React.ReactNode
 
-const CardTypes: Record<string, CardRenderer> = {
+const CardTypes: Record<ProposalStatus, CardRenderer> = {
   UNDER_VALIDATION: (proposal) => <ReviewCard {...proposal} />,
   TO_IMPLEMENT: (proposal) => <StartImplementationCard {...proposal} />,
   IMPLEMENTATION: (proposal) => <ImplementationCard {...proposal} />,
   WAITING_APPROVAL: (proposal) => <ReviewImplementedProposalCard {...proposal} />,
 }
+
 function renderProposalCard(proposal: ProposalWithSuggestions) {
   const renderer = CardTypes[proposal.status]
   if (!renderer) return null
@@ -23,6 +24,22 @@ function renderProposalCard(proposal: ProposalWithSuggestions) {
 
 const Proposals: React.FC = () => {
   const { data: proposalsList, isLoading } = proposalAPI.useGetProposalsWithEmployeesQuery()
+  const proposalsByStatus = (proposalsList ?? []).reduce<
+    Record<ProposalStatus, ProposalWithSuggestions[]>
+  >(
+    (acc, proposal) => {
+      if (!proposal || proposal.id === undefined) return acc
+      const status = proposal.status as ProposalStatus
+      acc[status].push(proposal)
+      return acc
+    },
+    {
+      UNDER_VALIDATION: [],
+      TO_IMPLEMENT: [],
+      IMPLEMENTATION: [],
+      WAITING_APPROVAL: [],
+    },
+  )
 
   if (isLoading) {
     return (
@@ -45,23 +62,59 @@ const Proposals: React.FC = () => {
   }
 
   return (
-    <div className="bg-[#eee] min-h-screen font-sans">
+    <div className="min-h-screen bg-gray-100 px-3 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8">
       <ToastContainer />
-      <div className="flex justify-between items-center py-2.5 px-5 bg-white shadow-md mb-2.5">
-        <h2 className="ml-8 text-xl">Lista de Propostas</h2>
-      </div>
-      <div className="columns-1 sm:columns-[21rem] gap-4 px-4 pb-4">
-        {!proposalsList || proposalsList.length === 0 ? (
-          <p className="px-2.5">Nenhuma proposta encontrada.</p>
-        ) : (
-          proposalsList
-            .filter((proposal) => proposal && proposal.id !== undefined)
-            .map((proposal) => (
+      <div className="rounded-lg bg-white py-4 shadow-custom sm:py-5">
+        <div className="mx-4 my-3 text-left text-3xl font-semibold sm:my-4 sm:text-2xl">
+          Propostas
+        </div>
+        <div className="grid grid-cols-4 gap-4 px-5 rounded">
+          <div className="bg-gray-100 p-6 rounded-xl">
+            <p className="text-lg font-semibold mb-5">Avaliar</p>
+            {proposalsByStatus.UNDER_VALIDATION.map((proposal) => (
               <div key={proposal.id} className="mb-4 break-inside-avoid">
                 {renderProposalCard(proposal)}
               </div>
-            ))
-        )}
+            ))}
+          </div>
+          <div className="bg-gray-100 p-6 rounded-xl">
+            <p className="text-lg font-semibold mb-5">Iniciar implementação</p>
+            {proposalsByStatus.TO_IMPLEMENT.map((proposal) => (
+              <div key={proposal.id} className="mb-4 break-inside-avoid">
+                {renderProposalCard(proposal)}
+              </div>
+            ))}
+          </div>
+          <div className="bg-gray-100 p-6 rounded-xl">
+            <p className="text-lg font-semibold mb-5">Implementando</p>
+            {proposalsByStatus.IMPLEMENTATION.map((proposal) => (
+              <div key={proposal.id} className="mb-4 break-inside-avoid">
+                {renderProposalCard(proposal)}
+              </div>
+            ))}
+          </div>
+          <div className="bg-gray-100 p-6 rounded-xl">
+            <p className="text-lg font-semibold mb-5">Aguardando aprovação</p>
+            {proposalsByStatus.WAITING_APPROVAL.map((proposal) => (
+              <div key={proposal.id} className="mb-4 break-inside-avoid">
+                {renderProposalCard(proposal)}
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* <div className="columns-1 sm:columns-[21rem] gap-4 px-4 pb-4">
+          {!proposalsList || proposalsList.length === 0 ? (
+            <p className="px-2.5">Nenhuma proposta encontrada.</p>
+          ) : (
+            proposalsList
+              .filter((proposal) => proposal && proposal.id !== undefined)
+              .map((proposal) => (
+                <div key={proposal.id} className="mb-4 break-inside-avoid">
+                  {renderProposalCard(proposal)}
+                </div>
+              ))
+          )}
+        </div> */}
       </div>
     </div>
   )

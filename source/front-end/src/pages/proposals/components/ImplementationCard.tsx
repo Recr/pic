@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import Modal from '../../../components/modal/Modal'
 import StatusBadge from '../../../components/badges/StatusBadge'
 import { proposalAPI } from '../../../features/proposal/proposal-api'
-import type { ProposalWithSuggestions } from '../../../features/proposal/types'
+import type { ProposalWithSuggestions } from '../types'
 import { getStatusColor } from '../../../helpers/getStatusColor'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -117,10 +117,10 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
   }
 
   return (
-    <div className="w-full border border-[#ccc] rounded-md p-4 bg-white flex flex-col justify-between">
+    <div className="w-full rounded-md p-4 bg-white flex flex-col justify-between">
       <div onClick={() => setIsModalOpen(true)} className="relative">
         <div className="flex justify-between items-center mb-2">
-          <h3 className="text-lg m-0">Proposta #{proposal.id}</h3>
+          <h3 className="text-xl font-semibold m-0">Proposta #{proposal.id}</h3>
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -136,14 +136,22 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
             <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
           </div>
         </div>
-        <div className="flex justify-between">
-          <strong>Data: </strong>
-          <span>{new Date(proposal.createdAt).toLocaleDateString()}</span>
+        <div className="flex justify-between text-xs text-gray-600">
+          Criado em: {new Date(proposal.createdAt).toLocaleDateString()}
         </div>
-        <p>
-          <strong>Colaboradores:</strong>
-        </p>
-
+        <div className="grid grid-cols-2 gap-2">
+          <div className="bg-gray-50 rounded p-3">
+            <p className="text-xs text-gray-500">Area</p>
+            <p className="font-medium text-xs wrap-anywhere">{proposal.area.name}</p>
+          </div>
+          <div className="bg-gray-50 rounded p-3">
+            <p className="text-xs text-gray-500">Categoria</p>
+            <p className="font-medium wrap-break-word text-xs">
+              {proposal.category?.name ? proposal.category.name : 'Nenhuma'}
+            </p>
+          </div>
+        </div>
+        <p className="text-sm font-medium text-gray-700 mt-5">Colaboradores:</p>
         <div className="flex flex-wrap gap-2 py-4">
           {proposal.suggestions.map((suggestion, index) => (
             <EmployeeInformationBadge
@@ -153,26 +161,15 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
             />
           ))}
         </div>
-        <div className="flex justify-between">
-          <div className="flex flex-col">
-            <strong>Área</strong>
-            <span>{proposal.area.name}</span>
-          </div>
-          <div className="flex flex-col">
-            <strong>Categoria</strong>
-            <span>{proposal.category.name}</span>
-          </div>
-        </div>
 
-        <p className="text-justify overflow-clip mb-15">
-          <strong>Proposta:</strong>
-          <br />
-          <span>
+        <div className="bg-gray-50 rounded p-3 min-h-20">
+          <p className="text-xs text-gray-500">Descrição</p>
+          <p className="font-medium text-xs wrap-anywhere">
             {proposal.description.length > 150
               ? proposal.description.substring(0, 150).concat('...')
               : proposal.description}
-          </span>
-        </p>
+          </p>
+        </div>
         {proposal.managerNotes && (
           <p className="mt-2 mb-2 text-sm text-gray-700 line-clamp-2">
             <strong>Obs. Gestor:</strong> {proposal.managerNotes}
@@ -229,18 +226,18 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
             )}
           </div>
           <div className="flex flex-col mt-3" onClick={(e) => e.stopPropagation()}>
-            <label htmlFor={`proposal-note-${proposal.id}`}>Notas da implementacao</label>
+            <p className="text-sm font-medium text-gray-700">Colaboradores:</p>
             <textarea
               id={`proposal-note-${proposal.id}`}
               rows={4}
               value={note}
               onChange={(event) => setNote(event.target.value)}
-              className="border border-gray-300 rounded px-4 py-2"
+              className=" bg-gray-50 rounded px-4 py-2 text-xs"
               placeholder="Digite observacoes da implementacao"
               maxLength={1000}
             />
             <span className="text-xs text-gray-500 mt-1">
-              {isSavingNote ? 'Salvando nota...' : 'A nota e salva automaticamente.'}
+              {isSavingNote ? 'Salvando nota...' : 'A nota é salva automaticamente.'}
             </span>
             {noteSaveError && <span className="text-xs text-red-600">{noteSaveError}</span>}
           </div>
@@ -295,7 +292,7 @@ const ImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) => {
           )}
 
           <div>
-            <p className="text-sm font-semibold mb-2">Funcionários</p>
+            <p className="text-sm font-semibold mb-2">Colaboradores</p>
             <div className="flex flex-wrap gap-2">
               {proposal.suggestions.map((suggestion, index) => (
                 <p

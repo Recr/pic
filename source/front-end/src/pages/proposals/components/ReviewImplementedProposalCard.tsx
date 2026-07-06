@@ -1,6 +1,6 @@
 import StatusBadge from '../../../components/badges/StatusBadge'
 import { getStatusColor } from '../../../helpers/getStatusColor'
-import type { ProposalWithSuggestions } from '../../../features/proposal/types'
+import type { ProposalWithSuggestions } from '../types'
 import { proposalAPI } from '../../../features/proposal/proposal-api'
 import Modal from '../../../components/modal/Modal'
 import { useState } from 'react'
@@ -41,19 +41,28 @@ const ReviewImplementedProposalCard: React.FC<ProposalWithSuggestions> = (propos
   const [newStatus, setNewStatus] = useState<StatusOption | ''>('')
 
   return (
-    <div className="w-full border border-[#ccc] rounded-md p-4 bg-white flex flex-col">
+    <div className="w-full rounded-md p-4 bg-white flex flex-col">
       <div onClick={() => setIsModalOpen(true)} className="relative">
         <div className="flex justify-between items-center mb-2">
-          <h3 className="text-lg m-0">Proposta #{proposal.id}</h3>
+          <h3 className="text-xl font-semibold m-0">Proposta #{proposal.id}</h3>
           <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
         </div>
-        <div className="flex justify-between">
-          <strong>Data: </strong>
-          <span>{new Date(proposal.createdAt).toLocaleDateString()}</span>
+        <div className="flex justify-between text-xs text-gray-600">
+          Criado em: {new Date(proposal.createdAt).toLocaleDateString()}
         </div>
-        <p>
-          <strong>Colaboradores:</strong>
-        </p>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="bg-gray-50 rounded p-3">
+            <p className="text-xs text-gray-500">Area</p>
+            <p className="font-medium text-xs wrap-anywhere">{proposal.area.name}</p>
+          </div>
+          <div className="bg-gray-50 rounded p-3">
+            <p className="text-xs text-gray-500">Categoria</p>
+            <p className="font-medium wrap-break-word text-xs">
+              {proposal.category?.name ? proposal.category.name : 'Nenhuma'}
+            </p>
+          </div>
+        </div>
+        <p className="text-sm font-medium text-gray-700 mt-5">Colaboradores:</p>
         <div className="flex flex-wrap gap-2 py-4">
           {proposal.suggestions.map((suggestion, index) => (
             <EmployeeInformationBadge
@@ -62,16 +71,6 @@ const ReviewImplementedProposalCard: React.FC<ProposalWithSuggestions> = (propos
               id={proposal.id}
             />
           ))}
-        </div>
-        <div className="flex justify-between">
-          <div className="flex flex-col">
-            <strong>Área</strong>
-            <span>{proposal.area.name}</span>
-          </div>
-          <div className="flex flex-col">
-            <strong>Categoria</strong>
-            <span>{proposal.category.name}</span>
-          </div>
         </div>
         {proposal.rewardAmount && (
           <div className="flex flex-col">
@@ -87,15 +86,14 @@ const ReviewImplementedProposalCard: React.FC<ProposalWithSuggestions> = (propos
               : proposal.managerNotes}
           </p>
         )}
-        <p className="mt-2 h-50 text-justify overflow-clip">
-          <strong>Proposta:</strong>
-          <br />
-          <span>
+        <div className="bg-gray-50 rounded p-3 min-h-20 mb-16">
+          <p className="text-xs text-gray-500">Descrição</p>
+          <p className="font-medium text-xs wrap-anywhere">
             {proposal.description.length > 150
               ? proposal.description.substring(0, 150).concat('...')
               : proposal.description}
-          </span>
-        </p>
+          </p>
+        </div>
         <div
           className="flex gap-2 items-center pt-4 absolute z-1 bottom-1 w-full justify-between"
           onClick={(e) => e.stopPropagation()}

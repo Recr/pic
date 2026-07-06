@@ -100,7 +100,7 @@ const SuggestionForm: React.FC = () => {
 
     const description = String(formData.get('description') ?? '').trim()
     if (!description) {
-      toast.error('Preencha a sugestão.', TOAST_OPTIONS)
+      toast.error('Preencha a proposta.', TOAST_OPTIONS)
       return
     }
 
@@ -123,7 +123,7 @@ const SuggestionForm: React.FC = () => {
         description,
       }).unwrap()
 
-      toast.success('Sugestão enviada. Obrigado!', TOAST_OPTIONS)
+      toast.success('Proposta enviada. Obrigado!', TOAST_OPTIONS)
 
       setSelectedEmployees({})
       setSelectedAreaId('')
@@ -132,7 +132,7 @@ const SuggestionForm: React.FC = () => {
       setFormKey((prev) => prev + 1)
     } catch (error) {
       toast.error('Ah não. Algo deu errado!', TOAST_OPTIONS)
-      console.error('Erro ao enviar sugestão:', error)
+      console.error('Erro ao enviar proposta:', error)
     }
   }
 
@@ -295,7 +295,7 @@ const SuggestionForm: React.FC = () => {
               menuClassName="w-full"
             />
           </div>
-          <label>Sugestão:</label>
+          <label>Proposta:</label>
           <textarea
             id="description"
             name="description"
