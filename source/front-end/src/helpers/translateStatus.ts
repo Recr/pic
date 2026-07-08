@@ -3,7 +3,7 @@ export function translateStatus(status: string): string {
     DEFINE_CHAMPION: 'Definir Campeão',
     UNDER_VALIDATION: 'Em Validação',
     TO_IMPLEMENT: 'À Implementar',
-    IMPLEMENTATION: 'Em Implementação',
+    IMPLEMENTATION: 'Implementando',
     REJECTED: 'Rejeitado',
     NOT_VIABLE: 'Não Viável',
     IMPLEMENTED: 'Implementado',

@@ -42,29 +42,33 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
   const [newStatus, setNewStatus] = useState<StatusOption | ''>('')
 
   return (
-    <div className="w-full rounded-md p-4 bg-white flex flex-col">
+    <div className="w-full min-w-0 rounded-md bg-white p-4 flex flex-col">
       <div onClick={() => setIsModalOpen(true)} className="relative">
-        <div className="flex justify-between items-center mb-2">
-          <h3 className="text-xl font-semibold">Proposta #{proposal.id}</h3>
-          <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
+        <div className="flex justify-between items-center mb-2 gap-2 flex-row sm:flex-col sm:items-start">
+          <h3 className="text-sm font-semibold">Proposta #{proposal.id}</h3>
+          <StatusBadge
+            status={proposal.status}
+            color={getStatusColor(proposal.status)}
+            className="w-fit overflow-clip"
+          />
         </div>
         <div className="flex justify-between text-xs text-gray-600">
           Criado em: {new Date(proposal.createdAt).toLocaleDateString()}
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="flex flex-row gap-2 sm:flex-col text-[10px]">
           <div className="bg-gray-50 rounded p-3">
-            <p className="text-xs text-gray-500">Area</p>
-            <p className="font-medium text-xs wrap-anywhere">{proposal.area.name}</p>
+            <p className="text-gray-500">Area</p>
+            <p className="font-medium wrap-anywhere">{proposal.area.name}</p>
           </div>
           <div className="bg-gray-50 rounded p-3">
-            <p className="text-xs text-gray-500">Categoria</p>
-            <p className="font-medium wrap-break-word text-xs">
+            <p className="text-gray-500">Categoria</p>
+            <p className="font-medium wrap-break-word">
               {proposal.category?.name ? proposal.category.name : 'Nenhuma'}
             </p>
           </div>
         </div>
-        <p className="text-sm font-medium text-gray-700 mt-5">Colaboradores:</p>
-        <div className="flex flex-wrap gap-2 py-4">
+        <p className="text-sm font-medium text-gray-700 mt-5 sm:text-xs">Colaboradores:</p>
+        <div className="flex flex-wrap gap-2 py-4 text-[10px]">
           {proposal.suggestions.map((suggestion, index) => (
             <EmployeeInformationBadge
               key={`${proposal.id}-${suggestion.employee?.name || suggestion.employeeName}-${index}`}
@@ -81,16 +85,16 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
               : proposal.managerNotes}
           </p>
         )}
-        <div className="bg-gray-50 rounded p-3 min-h-20 mb-16">
-          <p className="text-xs text-gray-500">Descrição</p>
-          <p className="font-medium text-xs wrap-anywhere">
+        <div className="bg-gray-50 rounded p-3 min-h-20 mb-4 sm:mb-16 md:mb-24 w-full text-[10px]">
+          <p className="text-gray-500">Descrição</p>
+          <p className="font-medium wrap-anywhere">
             {proposal.description.length > 150
               ? proposal.description.substring(0, 150).concat('...')
               : proposal.description}
           </p>
         </div>
         <div
-          className="flex gap-2 items-center pt-4 absolute z-1 bottom-1 w-full"
+          className="mt-4 flex flex-col gap-2 sm:absolute sm:bottom-1 sm:z-1 lg:flex-row sm:items-center text-[10px] w-full"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -98,7 +102,7 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
               setNewStatus('TO_IMPLEMENT')
               setIsConfirmationModalOpen(true)
             }}
-            className="py-2 px-2 cursor-pointer rounded border border-green-800 bg-green-500 text-white w-1/3 hover:w-1/2 transition-all"
+            className="cursor-pointer rounded border border-green-800 bg-green-500 px-3 py-2 md:py-0.5 text-white transition-all hover:bg-green-700 w-full sm:flex-1"
           >
             Aprovar
           </button>
@@ -109,9 +113,9 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
               setRejectionNoteError(null)
               setIsRejectionModalOpen(true)
             }}
-            className="py-2 px-2 cursor-pointer rounded border border-orange-600 bg-orange-400 text-white w-1/3 hover:w-1/2 transition-all min-w-24"
+            className="cursor-pointer rounded border border-orange-600 bg-orange-400 px-3 py-2 md:py-0.5 text-white transition-all hover:bg-orange-500 w-full sm:flex-1"
           >
-            Não viável
+            Inviável
           </button>
           <button
             onClick={() => {
@@ -120,7 +124,7 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
               setRejectionNoteError(null)
               setIsRejectionModalOpen(true)
             }}
-            className="py-2 px-3 cursor-pointer rounded border border-[#c0392b] bg-[#e74c3c] text-white w-1/3 hover:w-1/2 transition-all"
+            className="cursor-pointer rounded border border-[#c0392b] bg-[#e74c3c] px-3 py-2 md:py-0.5 text-white transition-all hover:bg-[#c0392b] w-full sm:flex-1"
           >
             Rejeitar
           </button>
