@@ -14,42 +14,73 @@ export const MobileCarouselSection: React.FC<MobileCarouselSectionProps> = ({
 }) => {
   const [activeIndex, setActiveIndex] = useState(0)
   const [cardWidth, setCardWidth] = useState<number | null>(null)
+  const [trailingSpace, setTrailingSpace] = useState(0)
+  const [maxVisibleDots, setMaxVisibleDots] = useState(7)
   const viewportRef = useRef<HTMLDivElement | null>(null)
-  const cardRefs = useRef<Array<HTMLDivElement | null>>([])
 
   useEffect(() => {
     setActiveIndex(0)
+    viewportRef.current?.scrollTo({ left: 0 })
   }, [status, proposals.length])
 
   useEffect(() => {
     const viewport = viewportRef.current
-    const cards = cardRefs.current.filter((card): card is HTMLDivElement => card !== null)
 
-    if (!viewport || cards.length <= 1) return
+    if (!viewport || proposals.length <= 1 || !cardWidth) return
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntries = entries.filter((entry) => entry.isIntersecting)
+    let frameId = 0
+    let settleTimer: ReturnType<typeof setTimeout> | null = null
 
-        if (visibleEntries.length === 0) return
+    const getNextActiveIndex = () => {
+      const gap = Number.parseFloat(getComputedStyle(viewport).columnGap || '0') || 0
+      const step = cardWidth + gap
 
-        const mostVisibleEntry = visibleEntries.reduce((currentBest, entry) =>
-          entry.intersectionRatio > currentBest.intersectionRatio ? entry : currentBest,
-        )
+      if (step <= 0) return 0
 
-        const nextIndex = cards.findIndex((card) => card === mostVisibleEntry.target)
-        if (nextIndex >= 0) setActiveIndex(nextIndex)
-      },
-      {
-        root: viewport,
-        threshold: [0.55, 0.7, 0.85],
-      },
-    )
+      const nextIndex = Math.floor((viewport.scrollLeft + step * 0.1) / step)
+      return Math.min(Math.max(nextIndex, 0), proposals.length - 1)
+    }
 
-    cards.forEach((card) => observer.observe(card))
+    const commitActiveIndex = () => {
+      const nextIndex = getNextActiveIndex()
+      setActiveIndex((current) => (current === nextIndex ? current : nextIndex))
+    }
 
-    return () => observer.disconnect()
-  }, [proposals.length, status])
+    const queueActiveIndexUpdate = () => {
+      if (frameId) cancelAnimationFrame(frameId)
+
+      frameId = requestAnimationFrame(() => {
+        const nextIndex = getNextActiveIndex()
+
+        if (settleTimer) {
+          clearTimeout(settleTimer)
+        }
+
+        settleTimer = setTimeout(() => {
+          setActiveIndex((current) => (current === nextIndex ? current : nextIndex))
+        }, 90)
+      })
+    }
+
+    commitActiveIndex()
+
+    viewport.addEventListener('scroll', queueActiveIndexUpdate, { passive: true })
+    const resizeObserver = new ResizeObserver(commitActiveIndex)
+    resizeObserver.observe(viewport)
+
+    return () => {
+      viewport.removeEventListener('scroll', queueActiveIndexUpdate)
+      resizeObserver.disconnect()
+
+      if (settleTimer) {
+        clearTimeout(settleTimer)
+      }
+
+      if (frameId) {
+        cancelAnimationFrame(frameId)
+      }
+    }
+  }, [cardWidth, proposals.length, status])
 
   useEffect(() => {
     const viewport = viewportRef.current
@@ -59,7 +90,19 @@ export const MobileCarouselSection: React.FC<MobileCarouselSectionProps> = ({
     const updateCardWidth = () => {
       const availableWidth = viewport.clientWidth
       const nextWidth = Math.min(Math.max(availableWidth - 48, 0), 336)
-      setCardWidth(nextWidth > 0 ? nextWidth : null)
+
+      const nextMaxVisibleDots =
+        availableWidth >= 768 ? 11 : availableWidth >= 520 ? 9 : availableWidth >= 380 ? 7 : 5
+      setMaxVisibleDots(nextMaxVisibleDots)
+
+      if (nextWidth > 0) {
+        setCardWidth(nextWidth)
+        setTrailingSpace(Math.max(availableWidth - nextWidth, 0))
+        return
+      }
+
+      setCardWidth(null)
+      setTrailingSpace(0)
     }
 
     updateCardWidth()
@@ -78,28 +121,33 @@ export const MobileCarouselSection: React.FC<MobileCarouselSectionProps> = ({
     )
   }
 
+  const visibleDotsCount = Math.min(proposals.length, maxVisibleDots)
+  const maxWindowStart = proposals.length - visibleDotsCount
+  const rawWindowStart = activeIndex - Math.floor(visibleDotsCount / 2)
+  const windowStart = Math.min(Math.max(rawWindowStart, 0), maxWindowStart)
+  const visibleDotProposals = proposals.slice(windowStart, windowStart + visibleDotsCount)
+
   return (
     <>
       <div
         ref={viewportRef}
         className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-3 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {proposals.map((proposal, index) => (
+        {proposals.map((proposal) => (
           <div
             key={proposal.id}
-            ref={(element) => {
-              cardRefs.current[index] = element
-            }}
-            className="shrink-0 snap-center"
+            className="shrink-0 snap-start"
             style={cardWidth ? { width: `${cardWidth}px` } : undefined}
           >
             {renderProposalCard(proposal)}
           </div>
         ))}
+        <div aria-hidden className="shrink-0" style={{ width: `${trailingSpace}px` }} />
       </div>
       {proposals.length > 1 && (
         <div className="flex items-center justify-center gap-2 pb-1 pt-1">
-          {proposals.map((proposal, index) => {
+          {visibleDotProposals.map((proposal, offset) => {
+            const index = windowStart + offset
             const isActive = index === activeIndex
 
             return (
