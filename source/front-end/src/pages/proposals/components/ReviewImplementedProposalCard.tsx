@@ -52,28 +52,29 @@ const ReviewImplementedProposalCard: React.FC<ProposalWithSuggestions> = (propos
           Criado em: {new Date(proposal.createdAt).toLocaleDateString()}
         </div>
 
-        <div className="flex flex-row gap-2 sm:flex-col text-[10px]">
-          <div className="bg-gray-50 rounded p-3">
+        <div className="flex flex-1 flex-row justify-between gap-2 text-xs mb-2">
+          <div className="bg-gray-50 rounded p-2 w-1/2 flex flex-col justify-center">
             <p className="text-gray-500">Area</p>
             <p className="font-medium wrap-anywhere">{proposal.area.name}</p>
           </div>
-          <div className="bg-gray-50 rounded p-3">
+          <div className="bg-gray-50 rounded p-2 w-1/2 flex flex-col justify-center">
             <p className="text-gray-500">Categoria</p>
             <p className="font-medium wrap-break-word">
               {proposal.category?.name ? proposal.category.name : 'Nenhuma'}
             </p>
           </div>
         </div>
-
-        <p className="text-sm font-medium text-gray-700 mt-5 sm:text-xs">Colaboradores:</p>
-        <div className="flex flex-col w-fit gap-2 py-4 text-[10px]">
-          {proposal.suggestions.map((suggestion, index) => (
-            <EmployeeInformationBadge
-              key={`${proposal.id}-${suggestion.employee?.name || suggestion.employeeName}-${index}`}
-              suggestion={suggestion}
-              id={proposal.id}
-            />
-          ))}
+        <div className="bg-gray-50 rounded p-2 mb-2 flex flex-col justify-center">
+          <p className="text-xs text-gray-500 mb-1">Colaboradores:</p>
+          <div className="flex flex-wrap gap-2 text-xs">
+            {proposal.suggestions.map((suggestion, index) => (
+              <EmployeeInformationBadge
+                key={`${proposal.id}-${suggestion.employee?.name || suggestion.employeeName}-${index}`}
+                suggestion={suggestion}
+                id={proposal.id}
+              />
+            ))}
+          </div>
         </div>
         {proposal.managerNotes && (
           <p className="mt-2 text-sm text-gray-700 ">
@@ -83,7 +84,7 @@ const ReviewImplementedProposalCard: React.FC<ProposalWithSuggestions> = (propos
               : proposal.managerNotes}
           </p>
         )}
-        <div className="bg-gray-50 rounded p-3 min-h-20 mb-4 sm:mb-16 md:mb-24 w-full text-[10px]">
+        <div className="bg-gray-50 rounded p-3 min-h-20 mb-2 w-full text-xs">
           <p className="text-gray-500">Descrição</p>
           <p className="font-medium wrap-anywhere">
             {proposal.description.length > 150
@@ -91,9 +92,9 @@ const ReviewImplementedProposalCard: React.FC<ProposalWithSuggestions> = (propos
               : proposal.description}
           </p>
         </div>
-
+        <hr className="text-gray-300 -mx-4" />
         <div
-          className="mt-4 flex flex-col gap-2 sm:absolute sm:bottom-1 sm:left-4 sm:right-4 sm:z-1 sm:flex-row sm:items-center sm:justify-between"
+          className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-xs md:text-sm"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -101,7 +102,7 @@ const ReviewImplementedProposalCard: React.FC<ProposalWithSuggestions> = (propos
               setNewStatus('IMPLEMENTED')
               setIsConfirmationModalOpen(true)
             }}
-            className="w-full cursor-pointer rounded border border-green-800 bg-green-500 px-3 py-2 text-white transition-all hover:bg-green-700 sm:flex-1"
+            className="w-full cursor-pointer rounded border border-green-800 bg-green-500 px-3 py-2 md:py-0.5 text-white transition-all hover:bg-green-700 sm:flex-1"
           >
             Aprovar
           </button>
@@ -112,7 +113,7 @@ const ReviewImplementedProposalCard: React.FC<ProposalWithSuggestions> = (propos
               setRejectionNoteError(null)
               setIsRejectionModalOpen(true)
             }}
-            className="w-full cursor-pointer rounded border border-[#c0392b] bg-[#e74c3c] px-3 py-2 text-white transition-all hover:bg-[#c0392b] sm:flex-1"
+            className="w-full cursor-pointer rounded border border-[#c0392b] bg-[#e74c3c] px-3 py-2 md:py-0.5 text-white transition-all hover:bg-[#c0392b] sm:flex-1"
           >
             Rejeitar
           </button>

@@ -41,8 +41,8 @@ const StartImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) =>
   return (
     <div className="flex flex-col justify-between rounded-md bg-white p-4 min-w-0 w-full">
       <div onClick={() => setIsModalOpen(true)} className="relative flex h-full flex-col">
-        <div className="flex flex-1 justify-between items-center mb-2 gap-2 flex-row sm:flex-col sm:items-start">
-          <div className="flex w-full items-center justify-between gap-2">
+        <div className="flex flex-1 mb-2 flex-col gap-2">
+          <div className="flex items-center justify-between gap-2">
             <h3 className="text-sm font-semibold">Proposta #{proposal.id}</h3>
             <button
               type="button"
@@ -56,35 +56,40 @@ const StartImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) =>
               <Undo2 size={16} />
             </button>
           </div>
-          <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
+          <StatusBadge
+            status={proposal.status}
+            color={getStatusColor(proposal.status)}
+            className="w-fit"
+          />
         </div>
 
         <div className="flex justify-between text-xs text-gray-600">
           Criado em: {new Date(proposal.createdAt).toLocaleDateString()}
         </div>
 
-        <div className="flex flex-row gap-2 sm:flex-col text-[10px]">
-          <div className="bg-gray-50 rounded p-3">
+        <div className="flex flex-1 flex-row justify-between gap-2 text-xs mb-2">
+          <div className="bg-gray-50 rounded p-2 w-1/2 flex flex-col justify-center">
             <p className="text-gray-500">Area</p>
             <p className="font-medium wrap-anywhere">{proposal.area.name}</p>
           </div>
-          <div className="bg-gray-50 rounded p-3">
+          <div className="bg-gray-50 rounded p-2 w-1/2 flex flex-col justify-center">
             <p className="text-gray-500">Categoria</p>
             <p className="font-medium wrap-break-word">
               {proposal.category?.name ? proposal.category.name : 'Nenhuma'}
             </p>
           </div>
         </div>
-
-        <p className="text-sm font-medium text-gray-700 mt-5 sm:text-xs">Colaboradores:</p>
-        <div className="flex flex-wrap gap-2 py-4 text-[10px]">
-          {proposal.suggestions.map((suggestion, index) => (
-            <EmployeeInformationBadge
-              key={`${proposal.id}-${suggestion.employee?.name || suggestion.employeeName}-${index}`}
-              suggestion={suggestion}
-              id={proposal.id}
-            />
-          ))}
+        <div className="bg-gray-50 rounded p-2 mb-2 flex flex-col justify-center">
+          <p className="text-xs text-gray-500 mb-1">Colaboradores:</p>
+          <div className="flex flex-wrap gap-2 text-xs">
+            {proposal.suggestions.map((suggestion, index) => (
+              <EmployeeInformationBadge
+                key={`${proposal.id}-${suggestion.employee?.name || suggestion.employeeName}-${index}`}
+                suggestion={suggestion}
+                id={proposal.id}
+              />
+            ))}
+          </div>
         </div>
         {proposal.managerNotes && (
           <p className="mt-2 text-sm text-gray-700 ">
@@ -94,7 +99,7 @@ const StartImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) =>
               : proposal.managerNotes}
           </p>
         )}
-        <div className="bg-gray-50 rounded p-3 min-h-20 w-full text-[10px]">
+        <div className="bg-gray-50 rounded p-3 min-h-20 mb-4 w-full text-xs">
           <p className="text-gray-500">Descrição</p>
           <p className="font-medium wrap-anywhere">
             {proposal.description.length > 150
@@ -102,7 +107,7 @@ const StartImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) =>
               : proposal.description}
           </p>
         </div>
-
+        <hr className="text-gray-300 -mx-4" />
         <div
           className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center"
           onClick={(e) => e.stopPropagation()}
@@ -110,7 +115,7 @@ const StartImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) =>
           <button
             type="button"
             onClick={() => handleStatusUpdate('IMPLEMENTATION')}
-            className="w-full cursor-pointer rounded border border-blue-800 bg-blue-500 px-3 py-0.5 text-white transition-all hover:bg-blue-700 sm:w-auto text-[10px]"
+            className="w-full cursor-pointer rounded border border-blue-800 bg-blue-500 px-3 py-2 md:py-0.5  text-white transition-all hover:bg-blue-700 sm:w-auto text-xs md:text-sm"
           >
             Implementar
           </button>

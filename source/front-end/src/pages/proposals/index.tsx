@@ -55,11 +55,17 @@ const Proposals: React.FC = () => {
   )
 
   const renderStatusCards = (status: ProposalStatus) =>
-    proposalsByStatus[status].map((proposal) => (
-      <div key={proposal.id} className="w-full min-w-0 snap-start">
-        {renderProposalCard(proposal)}
+    proposalsByStatus[status].length === 0 ? (
+      <div className="rounded-2xl border border-dashed border-gray-300 bg-white/70 px-4 py-8 text-center text-sm text-gray-500">
+        Nenhuma proposta encontrada.
       </div>
-    ))
+    ) : (
+      proposalsByStatus[status].map((proposal) => (
+        <div key={proposal.id} className="w-full min-w-0 snap-start">
+          {renderProposalCard(proposal)}
+        </div>
+      ))
+    )
 
   if (isLoading) {
     return (
