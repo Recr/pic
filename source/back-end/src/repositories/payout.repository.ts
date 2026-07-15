@@ -30,6 +30,7 @@ class PrismaPayoutRepository {
                 createdAt: true,
                 rewardAmount: true,
                 completedAt: true,
+                isActive: true,
               },
             },
           },

@@ -6,8 +6,9 @@ class PayoutUseCase {
   constructor(private payoutRepository: PrismaPayoutRepository) {}
 
   public async executeFindAll() {
-    const employees = await this.payoutRepository.findAll()
-    return employees
+    const payouts = await this.payoutRepository.findAll()
+    const activePayouts = payouts.filter((payout) => payout.suggestion.proposal.isActive)
+    return activePayouts
   }
 
   public async executeUpdateStatusByIds(ids: number[], status: string) {
