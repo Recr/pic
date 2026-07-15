@@ -4,6 +4,7 @@ import { proposalAPI } from '../../features/proposal/proposal-api'
 import { categoryAPI } from '../../features/category/category-api'
 import { ProposalCard } from './components/DefineProposalManagerCard'
 import { Skeleton } from '../../components/skeletons/Skeleton'
+import { ToastContainer } from 'react-toastify'
 
 const DefineManager: React.FC = () => {
   const { data: managerList, isLoading: isLoadingManagers } = employeeAPI.useGetEmployeesQuery()
@@ -36,6 +37,7 @@ const DefineManager: React.FC = () => {
 
   return (
     <div className="bg-[#eee] min-h-screen font-sans">
+      <ToastContainer />
       <div className="flex justify-between items-center py-2.5 px-5 bg-white shadow-md mb-2.5">
         <h2 className="ml-8 text-xl">Definir Gerente</h2>
       </div>

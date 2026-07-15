@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react'
 import Modal from '../../../components/modal/Modal'
 import type { Category } from '../../../features/category/types'
 import { getUpdateProposalWithManagerSchema } from '../../../validation/schemas/proposal-schemas'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 import EmployeeInformationBadge from '../../../components/badges/EmployeeInformationBadge'
 
 interface ProposalWithEmployees {
@@ -186,7 +186,6 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
 
   return (
     <>
-      <ToastContainer />
       <form
         className="border border-[#ccc] rounded-md p-4 m-2.5 w-87.5 bg-white flex flex-col"
         onSubmit={handleSubmit(onSubmit)}
