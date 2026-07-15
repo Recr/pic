@@ -40,6 +40,8 @@ const ReviewImplementedProposalCard: React.FC<ProposalWithSuggestions> = (propos
 
   const [newStatus, setNewStatus] = useState<StatusOption | ''>('')
 
+  const proposalReward = proposal.rewardAmount || proposal.category?.categoryReward || 0
+
   return (
     <div className="flex min-w-0 flex-col rounded-md bg-white p-4">
       <div onClick={() => setIsModalOpen(true)} className="relative">
@@ -75,6 +77,10 @@ const ReviewImplementedProposalCard: React.FC<ProposalWithSuggestions> = (propos
               />
             ))}
           </div>
+        </div>
+        <div className="bg-gray-50 rounded p-2 w-full flex flex-col justify-center text-xs mb-2">
+          <p className="text-gray-500">Prêmio</p>
+          <p className="font-medium wrap-anywhere">R$ {Number(proposalReward).toFixed(2)}</p>
         </div>
         {proposal.managerNotes && (
           <p className="mt-2 text-sm text-gray-700 ">
@@ -148,6 +154,13 @@ const ReviewImplementedProposalCard: React.FC<ProposalWithSuggestions> = (propos
           <div>
             <p className="mb-1 text-sm font-semibold">Descrição</p>
             <p className="leading-relaxed text-gray-700">{proposal.description}</p>
+          </div>
+
+          <div className="bg-gray-50 rounded p-2 w-full flex flex-col justify-center text-sm mb-2">
+            <p className="text-gray-500 text-xs">Prêmio</p>
+            <p className="font-medium wrap-anywhere text-sm">
+              R$ {Number(proposalReward).toFixed(2)}
+            </p>
           </div>
 
           {proposal.managerNotes && (
