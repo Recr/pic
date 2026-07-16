@@ -158,18 +158,18 @@ model CagysData {
   date                    DateTime? @db.DateTime
   createdAt               DateTime? @db.DateTime
   ManagerName             String?   @db.NVarChar(255)
-  rejectionNote           String?   @db.NVarChar(255)
+  rejectionNote           String?   @db.NVarChar(1000)
   SuggestionCompletedAt   DateTime? @db.DateTime
   ChampionName            String?   @db.NVarChar(255)
-  notes2                  String?   @db.NVarChar(255)
-  notes1                  String?   @db.NVarChar(255)
-  rejectionNote2          String?   @db.NVarChar(255)
+  notes2                  String?   @db.NVarChar(1000)
+  notes1                  String?   @db.NVarChar(1000)
+  rejectionNote2          String?   @db.NVarChar(1000)
   RejectedOrCompltedDate  DateTime? @db.DateTime
   championReviewedAt      DateTime? @db.DateTime
   PayoutAmount            Float?    @db.Float
   managerReviewedAt       DateTime? @db.DateTime
   adminReviewedAt         DateTime? @db.DateTime
-  managerNotes            String?   @db.NVarChar(255)
+  managerNotes            String?   @db.NVarChar(1000)
   CompletedOrTodayDate    DateTime? @db.DateTime
 
   @@ignore
