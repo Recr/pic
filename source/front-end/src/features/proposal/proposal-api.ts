@@ -7,7 +7,6 @@ import type {
   ProposalDetailedPaginationResponse,
   ProposalWithSuggestions,
   ProposalDetailedQueryParams,
-  UpdateProposalWithManagerRequest,
   UpdateProposalWithChampionRequest,
   FinishProposalRequest,
 } from './types'

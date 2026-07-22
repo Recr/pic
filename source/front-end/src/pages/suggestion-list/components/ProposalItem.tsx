@@ -56,10 +56,8 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
     proposalAPI.useSoftDeleteProposalMutation()
   const [restoreProposal, { isLoading: isRestoringLoading }] =
     proposalAPI.useRestoreProposalMutation()
-  const [updateProposalManager, { isLoading: isUpdatingProposalManager }] =
-    proposalAPI.useUpdateProposalManagerMutation()
-  const [updateProposalChampion, { isLoading: isUpdatingProposalChampion }] =
-    proposalAPI.useUpdateProposalChampionMutation()
+  const [updateProposalManager] = proposalAPI.useUpdateProposalManagerMutation()
+  const [updateProposalChampion] = proposalAPI.useUpdateProposalChampionMutation()
   const user = useSelector((state: RootState) => state.auth.user)
   const { data: employeeList } = employeeAPI.useGetEmployeesQuery()
 
@@ -291,7 +289,6 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
     register,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors },
   } = useForm<UpdateManagerFormInput, unknown, UpdateManagerFormOutput>({
     resolver: zodResolver(updateManagerOrChampionSchema),

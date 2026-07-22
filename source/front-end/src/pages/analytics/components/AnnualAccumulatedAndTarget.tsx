@@ -1,9 +1,11 @@
 import { Chart as ReactChart } from 'react-chartjs-2'
 import {
+  BarController,
   BarElement,
   CategoryScale,
   Chart as ChartJS,
   Legend,
+  LineController,
   LineElement,
   LinearScale,
   PointElement,
@@ -23,6 +25,8 @@ const currentMonth = new Date().getMonth()
 type MixedChartType = 'bar' | 'line'
 
 ChartJS.register(
+  BarController,
+  LineController,
   CategoryScale,
   LinearScale,
   BarElement,

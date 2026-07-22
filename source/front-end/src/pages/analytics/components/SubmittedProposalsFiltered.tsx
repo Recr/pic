@@ -5,10 +5,12 @@ import { categoryAPI } from '../../../features/category/category-api'
 import { areaAPI } from '../../../features/area/area-api'
 import DropdownSelect from '../../../components/inputs/DropdownSelect'
 import {
+  BarController,
   BarElement,
   CategoryScale,
   Chart as ChartJS,
   Legend,
+  LineController,
   LineElement,
   LinearScale,
   PointElement,
@@ -32,6 +34,8 @@ const STATUS_OPTIONS = [
 ]
 
 ChartJS.register(
+  BarController,
+  LineController,
   CategoryScale,
   LinearScale,
   BarElement,

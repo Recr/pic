@@ -1,4 +1,4 @@
-import type { StatusBadgeColor } from '../components/StatusBadge'
+import type { StatusBadgeColor } from '../components/badges/StatusBadge'
 
 export function getStatusColor(status: string): StatusBadgeColor {
   const translations: Record<string, StatusBadgeColor> = {
