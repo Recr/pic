@@ -14,6 +14,15 @@ interface GetProposalAnalyticsFilters {
   areaId?: number
 }
 
+interface GetTimeToCommunicationFilters {
+  startDate?: Date
+  endDate?: Date
+}
+
+interface TimeToCommunicationResponse {
+  averageTimeToCommunication: number
+}
+
 interface ProposalAnalyticsResponse {
   labels: string[]
   data: number[]
@@ -134,7 +143,7 @@ class AnalyticsUseCase {
     )
 
     const proposalDates = proposals.map((proposal) =>
-      filters?.completionDate ? proposal.completedAt ?? proposal.createdAt : proposal.createdAt,
+      filters?.completionDate ? (proposal.completedAt ?? proposal.createdAt) : proposal.createdAt,
     )
 
     const minProposalDate = proposalDates.length
@@ -159,7 +168,9 @@ class AnalyticsUseCase {
     const bucket = getBucketByRange(startDate, endDate)
 
     const groupedByBucket = proposals.reduce<Map<string, number>>((acc, proposal) => {
-      const proposalDate = filters?.completionDate ? proposal.completedAt ?? proposal.createdAt : proposal.createdAt
+      const proposalDate = filters?.completionDate
+        ? (proposal.completedAt ?? proposal.createdAt)
+        : proposal.createdAt
       const key = getBucketFromDate(proposalDate, bucket)
       const count = acc.get(key) ?? 0
       acc.set(key, count + 1)
@@ -174,6 +185,43 @@ class AnalyticsUseCase {
       labels,
       data,
       totalProposals: proposals.length,
+    }
+  }
+
+  public async executeGetTimeToCommunication(
+    filters: GetTimeToCommunicationFilters,
+  ): Promise<TimeToCommunicationResponse> {
+    const proposals = await this.proposalsRepository.findAllFiltered(
+      undefined,
+      filters.startDate,
+      filters.endDate,
+    )
+    let totalDaysToCommunication = 0
+    let proposalsAmount = 0
+    const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000
+    for (const proposal of proposals) {
+      if (proposal.requiresImplementation == true) {
+        // proposal that manager reviewed
+        if (proposal.managerId !== null && proposal.managerReviewedAt !== null) {
+          const startDate = proposal.createdAt
+          const approvalDate = proposal.managerReviewedAt
+          totalDaysToCommunication +=
+            (approvalDate.valueOf() - startDate.valueOf()) / MILLISECONDS_IN_DAY
+        }
+        // proposal without manager that champion reviewed
+        if (proposal.championId !== null && proposal.championReviewedAt !== null) {
+          const startDate = proposal.createdAt
+          const approvalDate = proposal.championReviewedAt
+          totalDaysToCommunication +=
+            (approvalDate.valueOf() - startDate.valueOf()) / MILLISECONDS_IN_DAY
+        }
+      }
+      proposalsAmount++
+    }
+    console.log('totalDaysToCommunication', totalDaysToCommunication)
+    console.log('proposalsAmount', proposalsAmount)
+    return {
+      averageTimeToCommunication: Number((totalDaysToCommunication / proposalsAmount).toFixed(2)),
     }
   }
 }

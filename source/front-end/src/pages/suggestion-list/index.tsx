@@ -23,6 +23,7 @@ const STATUS_OPTIONS = [
   'REJECTED',
   'NOT_VIABLE',
   'IMPLEMENTED',
+  'WAITING_APPROVAL',
 ] as const
 
 const parseOptionalNumber = (value: string) => {

@@ -97,4 +97,21 @@ export const AnalyticsController = {
       next(error)
     }
   },
+  async handleGetTimeToCommunication(req: Request, res: Response, next: NextFunction) {
+    try {
+      const analyticsUseCase = makeAnalyticsUseCase()
+      const startDate = parseDateQuery(req.query.startDate, 'startDate')
+      const endDate = parseDateQuery(req.query.endDate, 'endDate')
+      const filters = {
+        ...(startDate ? { startDate } : {}),
+        ...(endDate ? { endDate } : {}),
+      }
+
+      const timeToCommunication = await analyticsUseCase.executeGetTimeToCommunication(filters)
+
+      res.send(timeToCommunication)
+    } catch (error) {
+      next(error)
+    }
+  },
 }
