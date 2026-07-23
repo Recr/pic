@@ -7,6 +7,7 @@ import SubmittedProposalsFiltered from './components/SubmittedProposalsFiltered'
 import MonthlySubmissionAccumulatedAndTarget from './components/MonthlySubmissionAccumulatedAndTarget'
 import { Skeleton } from '../../components/skeletons/Skeleton'
 import AnnualAccumulatedAndTarget from './components/AnnualAccumulatedAndTarget'
+import TimeToCommunication from './components/TimeToCommunication'
 
 const currentYear = new Date().getFullYear()
 
@@ -151,6 +152,7 @@ const AnalyticsPage: React.FC = () => {
           </div>
         </div>
         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <TimeToCommunication />
           <div className="rounded border border-gray-200 bg-gray-50 p-4 shadow-sm">
             <MonthlySubmissionAccumulatedAndTarget />
           </div>
