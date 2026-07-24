@@ -207,10 +207,17 @@ class AnalyticsUseCase {
     for (const proposal of proposals) {
       if (proposal.requiresImplementation == true) {
         totalDaysToCommunication += this.getTimeToCommunication(proposal)
-        if (proposal.status === 'IMPLEMENTED') {
-          totalDaysToImplementation += this.getTimeToImplementation(proposal)
-          implementedProposalsAmount++
+        if (proposal.status !== 'REJECTED' && proposal.status !== 'NOT_VIABLE') {
+          const timeToImplementation = this.getTimeToImplementation(proposal)
+          totalDaysToImplementation += timeToImplementation
+          console.log('timeToImplementation', timeToImplementation)
+          if (timeToImplementation != 0) {
+            implementedProposalsAmount++
+          }
         }
+      }
+      if (proposal.status !== 'REJECTED') {
+        implementedProposalsAmount++
       }
       proposalsAmount++
     }
@@ -240,6 +247,7 @@ class AnalyticsUseCase {
     return ((communicationDate ?? new Date()).valueOf() - startDate.valueOf()) / MILLISECONDS_IN_DAY
   }
 
+  // doesn't work with proposals that requiresImplementation = false
   private getTimeToImplementation(proposal: Proposal): number {
     const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000
     const completionDate = proposal.completedAt
@@ -258,7 +266,11 @@ class AnalyticsUseCase {
       }
     }
 
-    return (completionDate?.valueOf() - (reviewDate ?? new Date()).valueOf()) / MILLISECONDS_IN_DAY
+    if (!reviewDate) {
+      return 0
+    }
+
+    return (completionDate?.valueOf() - reviewDate?.valueOf()) / MILLISECONDS_IN_DAY
   }
 }
 
