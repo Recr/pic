@@ -1,3 +1,4 @@
+import { Proposal } from '../../prisma/client/client'
 import { PrismaProposalRepository } from '../repositories/proposal.repository'
 
 type TimeBucket = 'week' | 'month' | 'year'
@@ -14,13 +15,14 @@ interface GetProposalAnalyticsFilters {
   areaId?: number
 }
 
-interface GetTimeToCommunicationFilters {
+interface GetTimeToCommunicationAndImplementationFilters {
   startDate?: Date
   endDate?: Date
 }
 
-interface TimeToCommunicationResponse {
+interface TimeToCommunicationAndImplementationResponse {
   averageTimeToCommunication: number
+  averageTimeToImplementation: number
 }
 
 interface ProposalAnalyticsResponse {
@@ -188,9 +190,9 @@ class AnalyticsUseCase {
     }
   }
 
-  public async executeGetTimeToCommunication(
-    filters: GetTimeToCommunicationFilters,
-  ): Promise<TimeToCommunicationResponse> {
+  public async executeGetTimeToCommunicationAndImplementation(
+    filters: GetTimeToCommunicationAndImplementationFilters,
+  ): Promise<TimeToCommunicationAndImplementationResponse> {
     const proposals = await this.proposalsRepository.findAllFiltered(
       undefined,
       filters.startDate,
@@ -198,31 +200,65 @@ class AnalyticsUseCase {
     )
     let totalDaysToCommunication = 0
     let proposalsAmount = 0
-    const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000
+
+    let totalDaysToImplementation = 0
+    let implementedProposalsAmount = 0
+
     for (const proposal of proposals) {
       if (proposal.requiresImplementation == true) {
-        // proposal that manager reviewed
-        if (proposal.managerId !== null && proposal.managerReviewedAt !== null) {
-          const startDate = proposal.createdAt
-          const approvalDate = proposal.managerReviewedAt
-          totalDaysToCommunication +=
-            (approvalDate.valueOf() - startDate.valueOf()) / MILLISECONDS_IN_DAY
-        }
-        // proposal without manager that champion reviewed
-        if (proposal.championId !== null && proposal.championReviewedAt !== null) {
-          const startDate = proposal.createdAt
-          const approvalDate = proposal.championReviewedAt
-          totalDaysToCommunication +=
-            (approvalDate.valueOf() - startDate.valueOf()) / MILLISECONDS_IN_DAY
+        totalDaysToCommunication += this.getTimeToCommunication(proposal)
+        if (proposal.status === 'IMPLEMENTED') {
+          totalDaysToImplementation += this.getTimeToImplementation(proposal)
+          implementedProposalsAmount++
         }
       }
       proposalsAmount++
     }
-    console.log('totalDaysToCommunication', totalDaysToCommunication)
-    console.log('proposalsAmount', proposalsAmount)
     return {
-      averageTimeToCommunication: Number((totalDaysToCommunication / proposalsAmount).toFixed(2)),
+      averageTimeToCommunication: Number((totalDaysToCommunication / proposalsAmount).toFixed(0)),
+      averageTimeToImplementation: Number(
+        (totalDaysToImplementation / implementedProposalsAmount).toFixed(0),
+      ),
     }
+  }
+
+  private getTimeToCommunication(proposal: Proposal): number {
+    const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000
+    const startDate = proposal.createdAt
+    let communicationDate
+
+    if (proposal.managerId !== null) {
+      if (proposal.managerReviewedAt) {
+        communicationDate = proposal.managerReviewedAt
+      }
+    } else if (proposal.championId !== null) {
+      if (proposal.championReviewedAt) {
+        communicationDate = proposal.championReviewedAt
+      }
+    }
+
+    return ((communicationDate ?? new Date()).valueOf() - startDate.valueOf()) / MILLISECONDS_IN_DAY
+  }
+
+  private getTimeToImplementation(proposal: Proposal): number {
+    const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000
+    const completionDate = proposal.completedAt
+    if (!completionDate) {
+      return 0
+    }
+    let reviewDate
+
+    if (proposal.managerId !== null) {
+      if (proposal.managerReviewedAt) {
+        reviewDate = proposal.managerReviewedAt
+      }
+    } else if (proposal.championId !== null) {
+      if (proposal.championReviewedAt) {
+        reviewDate = proposal.championReviewedAt
+      }
+    }
+
+    return (completionDate?.valueOf() - (reviewDate ?? new Date()).valueOf()) / MILLISECONDS_IN_DAY
   }
 }
 

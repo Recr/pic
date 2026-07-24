@@ -14,10 +14,10 @@ analyticsRoutes.get(
 )
 
 analyticsRoutes.get(
-  '/time-to-communication',
+  '/time-to-communication-and-implementation',
   authMiddleware,
   checkRole([Role.ADMIN]),
-  AnalyticsController.handleGetTimeToCommunication,
+  AnalyticsController.handleGetTimeToCommunicationAndImplementation,
 )
 
 export { analyticsRoutes }

@@ -1,8 +1,9 @@
-export interface GetTimeToCommunicationFilters {
+export interface GetTimeToCommunicationAndImplementationFilters {
   startDate?: string
   endDate?: string
 }
 
-export interface TimeToCommunicationResponse {
+export interface TimeToCommunicationAndImplementationResponse {
   averageTimeToCommunication: number
+  averageTimeToImplementation: number
 }

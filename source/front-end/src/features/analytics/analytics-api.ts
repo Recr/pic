@@ -1,5 +1,8 @@
 import { api } from '../../services/api'
-import type { GetTimeToCommunicationFilters, TimeToCommunicationResponse } from './types'
+import type {
+  GetTimeToCommunicationAndImplementationFilters,
+  TimeToCommunicationAndImplementationResponse,
+} from './types'
 
 export interface GetProposalAnalyticsFilters {
   status?: string
@@ -62,19 +65,19 @@ export const analyticsAPI = api.injectEndpoints({
         }
       },
     }),
-    getTimeToCommunication: builder.query<
-      TimeToCommunicationResponse,
-      GetTimeToCommunicationFilters
+    getTimeToCommunicationAndImplementation: builder.query<
+      TimeToCommunicationAndImplementationResponse,
+      GetTimeToCommunicationAndImplementationFilters
     >({
       query: (filters) => {
         const params = new URLSearchParams()
 
-        filters?.startDate
-          ? params.set('endDate', filters.startDate)
+        filters?.endDate
+          ? params.set('endDate', filters.endDate)
           : params.set('endDate', new Date().toISOString().split('T')[0])
 
-        filters?.endDate
-          ? params.set('startDate', filters.endDate)
+        filters?.startDate
+          ? params.set('startDate', filters.startDate)
           : params.set(
               'startDate',
               new Date(new Date().setFullYear(new Date().getFullYear() - 1))
@@ -85,7 +88,7 @@ export const analyticsAPI = api.injectEndpoints({
         const queryString = params.toString()
 
         return {
-          url: `/analytics/time-to-communication?${queryString}`,
+          url: `/analytics/time-to-communication-and-implementation?${queryString}`,
           method: 'GET',
         }
       },
