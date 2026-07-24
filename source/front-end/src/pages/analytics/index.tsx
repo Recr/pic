@@ -67,6 +67,7 @@ const AnalyticsPage: React.FC = () => {
 
   const openCreateForm = () => {
     resetAnnualTargetForm()
+    setIsAnnualTargetModalOpen(true)
   }
 
   const openEditForm = (target: {
@@ -120,53 +121,67 @@ const AnalyticsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 px-3 pt-4 sm:px-4 sm:pt-8">
-      <div className="mx-auto w-full max-w-7xl rounded bg-white p-3 sm:p-4 md:p-6">
-        <h1 className="mb-3 text-xl font-bold sm:mb-4 sm:text-2xl">Dashboard</h1>
-        <p>Métrica e KPIs do PIC.</p>
-        <div className="mt-4 rounded border border-gray-200 bg-gray-50 p-3 sm:p-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="text-sm text-gray-700">
-              <p>
-                Meta anual de propostas enviadas:{' '}
-                <span className="font-semibold">
-                  {currentYearTarget?.annualSubmittedProposalsTarget ?? '-'}
-                </span>
-              </p>
-              <p>
-                Meta anual de propostas implementadas:{' '}
-                <span className="font-semibold">
-                  {currentYearTarget?.annualImplementedProposalsTarget ?? '-'}
-                </span>
-              </p>
+    <>
+      <div className="min-h-screen bg-gray-100 px-4 py-6">
+        <div className="mx-auto max-w-7xl space-y-6">
+          <section className="rounded-lg bg-white p-6 shadow-sm">
+            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+              <div>
+                <h1 className="text-2xl font-bold">Dashboard</h1>
+                <p className="mt-1 text-gray-600">Métricas e indicadores do PIC.</p>
+              </div>
+
+              <button
+                type="button"
+                onClick={openCreateForm}
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
+              >
+                <Pen size={16} />
+                Metas anuais
+              </button>
             </div>
-            <button
-              type="button"
-              className="self-start rounded border border-gray-300 bg-white p-2 text-gray-700 transition-colors hover:cursor-pointer hover:bg-gray-100 sm:self-auto"
-              onClick={() => setIsAnnualTargetModalOpen(true)}
-              aria-label="Editar metas anuais"
-              title="Editar metas anuais"
-            >
-              <Pen size={16} />
-            </button>
-          </div>
-        </div>
-        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <TimeToCommunicationAndImplementation />
-          <div className="rounded border border-gray-200 bg-gray-50 p-4 shadow-sm">
-            <MonthlySubmissionAccumulatedAndTarget />
-          </div>
-          <div className="rounded border border-gray-200 bg-gray-50 p-4 shadow-sm">
-            <AnnualImplementationAndTarget />
-          </div>
-          <div className="rounded border border-gray-200 bg-gray-50 p-4 shadow-sm lg:col-span-2">
-            <SubmittedProposalsFiltered />
-          </div>
-          <div className="rounded border border-gray-200 bg-gray-50 p-4 shadow-sm lg:col-span-2">
-            <AnnualAccumulatedAndTarget />
-          </div>
+
+            <div className="mt-6 grid gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 md:grid-cols-2">
+              <div className="space-y-1">
+                <p className="text-sm text-gray-500">Meta anual de propostas enviadas</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {currentYearTarget?.annualSubmittedProposalsTarget ?? '-'}
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-sm text-gray-500">Meta anual de propostas implementadas</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {currentYearTarget?.annualImplementedProposalsTarget ?? '-'}
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <TimeToCommunicationAndImplementation />
+          </section>
+
+          <section className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <div className="rounded border border-gray-50 bg-gray-50 p-4 shadow-sm">
+              <MonthlySubmissionAccumulatedAndTarget />
+            </div>
+
+            <div className="rounded border border-gray-50 bg-gray-50 p-4 shadow-sm">
+              <AnnualImplementationAndTarget />
+            </div>
+
+            <div className="rounded border border-gray-50 bg-gray-50 p-4 shadow-sm xl:col-span-2">
+              <SubmittedProposalsFiltered />
+            </div>
+
+            <div className="rounded border border-gray-50 bg-gray-50 p-4 shadow-sm xl:col-span-2">
+              <AnnualAccumulatedAndTarget />
+            </div>
+          </section>
         </div>
       </div>
+
       <Modal isOpen={isAnnualTargetModalOpen} onClose={() => setIsAnnualTargetModalOpen(false)}>
         <div className="w-auto max-w-4xl rounded-lg bg-white p-3 sm:w-[92vw] sm:p-4">
           <div className="mb-4 flex gap-3 flex-row justify-between">
@@ -339,7 +354,7 @@ const AnalyticsPage: React.FC = () => {
           </div>
         </div>
       </Modal>
-    </div>
+    </>
   )
 }
 

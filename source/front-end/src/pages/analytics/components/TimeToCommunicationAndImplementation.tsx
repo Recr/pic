@@ -24,7 +24,7 @@ const TimeToCommunicationAndImplementation: React.FC = () => {
 
   return (
     <div className="h-full w-full">
-      <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="flex items-start justify-between">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Tempo de Processamento</h2>
