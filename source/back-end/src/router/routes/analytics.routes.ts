@@ -13,4 +13,11 @@ analyticsRoutes.get(
   AnalyticsController.handleGetProposalAnalytics,
 )
 
+analyticsRoutes.get(
+  '/time-to-communication-and-implementation',
+  authMiddleware,
+  checkRole([Role.ADMIN]),
+  AnalyticsController.handleGetTimeToCommunicationAndImplementation,
+)
+
 export { analyticsRoutes }

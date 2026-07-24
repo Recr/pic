@@ -1,4 +1,8 @@
 import { api } from '../../services/api'
+import type {
+  GetTimeToCommunicationAndImplementationFilters,
+  TimeToCommunicationAndImplementationResponse,
+} from './types'
 
 export interface GetProposalAnalyticsFilters {
   status?: string
@@ -57,6 +61,34 @@ export const analyticsAPI = api.injectEndpoints({
 
         return {
           url: queryString ? `/analytics/proposals?${queryString}` : '/analytics/proposals',
+          method: 'GET',
+        }
+      },
+    }),
+    getTimeToCommunicationAndImplementation: builder.query<
+      TimeToCommunicationAndImplementationResponse,
+      GetTimeToCommunicationAndImplementationFilters
+    >({
+      query: (filters) => {
+        const params = new URLSearchParams()
+
+        filters?.endDate
+          ? params.set('endDate', filters.endDate)
+          : params.set('endDate', new Date().toISOString().split('T')[0])
+
+        filters?.startDate
+          ? params.set('startDate', filters.startDate)
+          : params.set(
+              'startDate',
+              new Date(new Date().setFullYear(new Date().getFullYear() - 1))
+                .toISOString()
+                .split('T')[0],
+            )
+
+        const queryString = params.toString()
+
+        return {
+          url: `/analytics/time-to-communication-and-implementation?${queryString}`,
           method: 'GET',
         }
       },

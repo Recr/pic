@@ -1,3 +1,4 @@
+import { Proposal } from '../../prisma/client/client'
 import { PrismaProposalRepository } from '../repositories/proposal.repository'
 
 type TimeBucket = 'week' | 'month' | 'year'
@@ -12,6 +13,16 @@ interface GetProposalAnalyticsFilters {
   category?: string
   categoryId?: number
   areaId?: number
+}
+
+interface GetTimeToCommunicationAndImplementationFilters {
+  startDate?: Date
+  endDate?: Date
+}
+
+interface TimeToCommunicationAndImplementationResponse {
+  averageTimeToCommunication: number
+  averageTimeToImplementation: number
 }
 
 interface ProposalAnalyticsResponse {
@@ -134,7 +145,7 @@ class AnalyticsUseCase {
     )
 
     const proposalDates = proposals.map((proposal) =>
-      filters?.completionDate ? proposal.completedAt ?? proposal.createdAt : proposal.createdAt,
+      filters?.completionDate ? (proposal.completedAt ?? proposal.createdAt) : proposal.createdAt,
     )
 
     const minProposalDate = proposalDates.length
@@ -159,7 +170,9 @@ class AnalyticsUseCase {
     const bucket = getBucketByRange(startDate, endDate)
 
     const groupedByBucket = proposals.reduce<Map<string, number>>((acc, proposal) => {
-      const proposalDate = filters?.completionDate ? proposal.completedAt ?? proposal.createdAt : proposal.createdAt
+      const proposalDate = filters?.completionDate
+        ? (proposal.completedAt ?? proposal.createdAt)
+        : proposal.createdAt
       const key = getBucketFromDate(proposalDate, bucket)
       const count = acc.get(key) ?? 0
       acc.set(key, count + 1)
@@ -175,6 +188,77 @@ class AnalyticsUseCase {
       data,
       totalProposals: proposals.length,
     }
+  }
+
+  public async executeGetTimeToCommunicationAndImplementation(
+    filters: GetTimeToCommunicationAndImplementationFilters,
+  ): Promise<TimeToCommunicationAndImplementationResponse> {
+    const proposals = await this.proposalsRepository.findAllFiltered(
+      undefined,
+      filters.startDate,
+      filters.endDate,
+    )
+    let totalDaysToCommunication = 0
+    let proposalsAmount = 0
+
+    let totalDaysToImplementation = 0
+    let implementedProposalsAmount = 0
+
+    for (const proposal of proposals) {
+      if (proposal.requiresImplementation == true) {
+        totalDaysToCommunication += this.getTimeToCommunication(proposal)
+        if (proposal.status === 'IMPLEMENTED') {
+          totalDaysToImplementation += this.getTimeToImplementation(proposal)
+          implementedProposalsAmount++
+        }
+      }
+      proposalsAmount++
+    }
+    return {
+      averageTimeToCommunication: Number((totalDaysToCommunication / proposalsAmount).toFixed(0)),
+      averageTimeToImplementation: Number(
+        (totalDaysToImplementation / implementedProposalsAmount).toFixed(0),
+      ),
+    }
+  }
+
+  private getTimeToCommunication(proposal: Proposal): number {
+    const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000
+    const startDate = proposal.createdAt
+    let communicationDate
+
+    if (proposal.managerId !== null) {
+      if (proposal.managerReviewedAt) {
+        communicationDate = proposal.managerReviewedAt
+      }
+    } else if (proposal.championId !== null) {
+      if (proposal.championReviewedAt) {
+        communicationDate = proposal.championReviewedAt
+      }
+    }
+
+    return ((communicationDate ?? new Date()).valueOf() - startDate.valueOf()) / MILLISECONDS_IN_DAY
+  }
+
+  private getTimeToImplementation(proposal: Proposal): number {
+    const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000
+    const completionDate = proposal.completedAt
+    if (!completionDate) {
+      return 0
+    }
+    let reviewDate
+
+    if (proposal.managerId !== null) {
+      if (proposal.managerReviewedAt) {
+        reviewDate = proposal.managerReviewedAt
+      }
+    } else if (proposal.championId !== null) {
+      if (proposal.championReviewedAt) {
+        reviewDate = proposal.championReviewedAt
+      }
+    }
+
+    return (completionDate?.valueOf() - (reviewDate ?? new Date()).valueOf()) / MILLISECONDS_IN_DAY
   }
 }
 
