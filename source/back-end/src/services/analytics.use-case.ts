@@ -250,27 +250,12 @@ class AnalyticsUseCase {
   // doesn't work with proposals that requiresImplementation = false
   private getTimeToImplementation(proposal: Proposal): number {
     const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000
-    const completionDate = proposal.completedAt
-    if (!completionDate) {
-      return 0
-    }
-    let reviewDate
+    const creationDate = proposal.createdAt
+    const implementationDate = proposal.completedAt
 
-    if (proposal.managerId !== null) {
-      if (proposal.managerReviewedAt) {
-        reviewDate = proposal.managerReviewedAt
-      }
-    } else if (proposal.championId !== null) {
-      if (proposal.championReviewedAt) {
-        reviewDate = proposal.championReviewedAt
-      }
-    }
-
-    if (!reviewDate) {
-      return 0
-    }
-
-    return (completionDate?.valueOf() - reviewDate?.valueOf()) / MILLISECONDS_IN_DAY
+    return (
+      ((implementationDate ?? new Date()).valueOf() - creationDate.valueOf()) / MILLISECONDS_IN_DAY
+    )
   }
 }
 
