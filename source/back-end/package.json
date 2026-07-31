@@ -11,7 +11,9 @@
     "start:dev": "npx tsx watch ./src/app.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "seed": "npx tsx ./prisma/seeds/seed.ts"
+    "seed": "npx tsx ./prisma/seeds/seed.ts",
+    "seed:admin": "npx tsx ./prisma/seeds/admin.seed.ts",
+    "seed:test-proposals": "npx tsx ./prisma/seeds/test-proposals.seed.ts"
   },
   "keywords": [],
   "author": "",
