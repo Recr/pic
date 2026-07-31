@@ -9,6 +9,7 @@ interface UndoStatusModalProps {
   proposal: ProposalDetailed
   isLoading: boolean
   undoType:
+    | 'IMPLEMENTED_TO_WAITING_APPROVAL'
     | 'IMPLEMENTED_TO_IMPLEMENTATION'
     | 'IMPLEMENTATION_TO_TO_IMPLEMENT'
     | 'TO_IMPLEMENT_TO_UNDER_VALIDATION'
@@ -27,6 +28,14 @@ const UndoStatusModal: React.FC<UndoStatusModalProps> = ({
 }) => {
   const getModalContent = () => {
     switch (undoType) {
+      case 'IMPLEMENTED_TO_WAITING_APPROVAL':
+        return {
+          title: 'Desfazer Implementação',
+          message:
+            'Você tem certeza que deseja desfazer a implementação desta proposta? Os registros de pagamento serão deletados e a data de conclusão será resetada.',
+          fromStatus: 'IMPLEMENTADO',
+          toStatus: 'Aguardando Aprovação',
+        }
       case 'IMPLEMENTED_TO_IMPLEMENTATION':
         return {
           title: 'Desfazer Implementação',

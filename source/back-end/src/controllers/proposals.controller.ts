@@ -445,6 +445,28 @@ export const ProposalsController = {
     }
   },
 
+  async handleUndoImplementedToWaitingApproval(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalId = Number(req.params.id)
+      const userId = Number(req.user?.sub)
+      const role = req.user?.role as Role | undefined
+
+      if (Number.isNaN(proposalId) || Number.isNaN(userId) || !role) {
+        return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
+      }
+
+      const proposalUseCase = makeProposalsUseCase()
+
+      const proposal = await proposalUseCase.executeUndoImplementedToWaitingApproval(
+        proposalId,
+        role,
+      )
+      res.send(proposal)
+    } catch (error) {
+      next(error)
+    }
+  },
+
   async handleUndoImplementedToImplementation(req: Request, res: Response, next: NextFunction) {
     try {
       const proposalId = Number(req.params.id)

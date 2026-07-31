@@ -44,6 +44,7 @@ export interface ProposalDetailed {
   isCustomReward: boolean
   isLegacy: boolean
   isActive: boolean
+  requiresImplementation: boolean
   suggestions: [
     {
       employeeName: string

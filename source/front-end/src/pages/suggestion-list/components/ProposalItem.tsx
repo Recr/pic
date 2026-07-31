@@ -30,6 +30,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
   const [removingAttachmentId, setRemovingAttachmentId] = React.useState<number | null>(null)
   const [selectedUndoType, setSelectedUndoType] = React.useState<
+    | 'IMPLEMENTED_TO_WAITING_APPROVAL'
     | 'IMPLEMENTED_TO_IMPLEMENTATION'
     | 'IMPLEMENTATION_TO_TO_IMPLEMENT'
     | 'TO_IMPLEMENT_TO_UNDER_VALIDATION'
@@ -42,6 +43,10 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
     proposalAPI.useUploadProposalAttachmentsMutation()
   const [deleteAttachment, { isLoading: isDeletingAttachment }] =
     proposalAPI.useDeleteProposalAttachmentMutation()
+  const [
+    undoImplementedToWaitingApproval,
+    { isLoading: isUndoFinishedWithoutImplementationLoading },
+  ] = proposalAPI.useUndoImplementedToWaitingApprovalMutation()
   const [undoImplementedToImplementation, { isLoading: isUndoImplementedLoading }] =
     proposalAPI.useUndoImplementedToImplementationMutation()
   const [undoImplementationToToImplement, { isLoading: isUndoImplementationLoading }] =
@@ -69,6 +74,8 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
 
   const getUndoLoading = () => {
     switch (selectedUndoType) {
+      case 'IMPLEMENTED_TO_WAITING_APPROVAL':
+        return isUndoFinishedWithoutImplementationLoading
       case 'IMPLEMENTED_TO_IMPLEMENTATION':
         return isUndoImplementedLoading
       case 'IMPLEMENTATION_TO_TO_IMPLEMENT':
@@ -86,6 +93,14 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
 
   const getAvailableUndoActions = () => {
     const actions: (typeof selectedUndoType)[] = []
+
+    if (
+      proposal.status === 'IMPLEMENTED' &&
+      !proposal.requiresImplementation &&
+      (isAdmin || isManager)
+    ) {
+      actions.push('IMPLEMENTED_TO_WAITING_APPROVAL')
+    }
 
     if (proposal.status === 'IMPLEMENTED' && (isAdmin || isChampion)) {
       actions.push('IMPLEMENTED_TO_IMPLEMENTATION')
@@ -131,6 +146,9 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
 
     try {
       switch (selectedUndoType) {
+        case 'IMPLEMENTED_TO_WAITING_APPROVAL':
+          await undoImplementedToWaitingApproval({ proposalId: proposal.id.toString() }).unwrap()
+          break
         case 'IMPLEMENTED_TO_IMPLEMENTATION':
           await undoImplementedToImplementation({ proposalId: proposal.id.toString() }).unwrap()
           break

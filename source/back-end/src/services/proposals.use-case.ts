@@ -567,6 +567,44 @@ class ProposalUseCase {
 
   // Undo status methods
 
+  public async executeUndoImplementedToWaitingApproval(proposalId: number, role: Role) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+
+    if (proposal.status !== 'IMPLEMENTED') {
+      throw new AppError('Proposal is not in IMPLEMENTED status.', StatusCodes.BAD_REQUEST)
+    }
+
+    // Check authorization
+    if (role !== Role.ADMIN && role !== Role.MANAGER) {
+      throw new AppError('Unauthorized to undo this proposal.', StatusCodes.FORBIDDEN)
+    }
+
+    // Check if proposal was completed more than 1 week ago
+    if (proposal.completedAt) {
+      const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      if (proposal.completedAt < oneWeekAgo) {
+        throw new AppError(
+          'Cannot undo a proposal that was implemented more than 1 week ago.',
+          StatusCodes.BAD_REQUEST,
+        )
+      }
+    }
+
+    // Delete payouts
+    if (this.payoutRepository) {
+      await this.payoutRepository.deleteByProposalId(proposalId)
+    }
+
+    const updatedData: Prisma.ProposalUpdateInput = {
+      status: 'WAITING_APPROVAL',
+      completedAt: null,
+    }
+
+    const updatedProposal = await this.proposalRepository.updateProposal(proposalId, updatedData)
+    return updatedProposal
+  }
+
   public async executeUndoImplementedToImplementation(
     proposalId: number,
     userId: number,

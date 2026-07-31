@@ -139,6 +139,12 @@ proposalsRoutes.put(
 )
 
 proposalsRoutes.put(
+  '/:id/undo/implemented-to-waiting-approval',
+  authMiddleware,
+  ProposalsController.handleUndoImplementedToWaitingApproval,
+)
+
+proposalsRoutes.put(
   '/:id/undo/implemented-to-implementation',
   authMiddleware,
   ProposalsController.handleUndoImplementedToImplementation,

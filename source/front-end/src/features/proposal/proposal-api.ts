@@ -263,6 +263,16 @@ export const proposalAPI = api.injectEndpoints({
         { type: 'Proposal', id: 'LIST' },
       ],
     }),
+    undoImplementedToWaitingApproval: builder.mutation<Proposal, { proposalId: string }>({
+      query: ({ proposalId }) => ({
+        url: `/proposals/${proposalId}/undo/implemented-to-waiting-approval`,
+        method: 'PUT',
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
     undoImplementedToImplementation: builder.mutation<Proposal, { proposalId: string }>({
       query: ({ proposalId }) => ({
         url: `/proposals/${proposalId}/undo/implemented-to-implementation`,
