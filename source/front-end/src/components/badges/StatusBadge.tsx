@@ -9,6 +9,7 @@ export interface StatusBadgeColors {
 interface StatusBadgeProps extends StatusBadgeColors {
   status: string
   className?: string
+  hasText?: boolean
 }
 
 const colorMap = {
@@ -34,10 +35,12 @@ const dotColorMap = {
 const StatusBadge = (props: StatusBadgeProps) => {
   return (
     <div
-      className={`flex items-center gap-2 px-2 rounded-xl ${colorMap[props.color]} text-xs ${props.className || ''}`}
+      className={`flex items-center gap-2 px-2 rounded-xl ${colorMap[props.color]} text-xs ${props.className || ''} ${props.hasText === false ? 'md:inline md:py-1 md:w-fit md:px-1 md:m-auto lg:m-0 lg:w-full' : 'lg:flex lg:'}`}
     >
       <div className={`w-2.5 h-2.5 rounded-full ${dotColorMap[props.color]}`}></div>
-      <span>{translateStatus(props.status)}</span>
+      <span className={`${props.hasText === false ? 'md:hidden lg:inline' : ''}`}>
+        {translateStatus(props.status)}
+      </span>
     </div>
   )
 }

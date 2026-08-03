@@ -7,7 +7,15 @@ import { getStatusColor } from '../../../helpers/getStatusColor'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../../app/store'
 import { toast } from 'react-toastify'
-import { Undo2, Trash2, Undo } from 'lucide-react'
+import {
+  Undo2,
+  Trash2,
+  Undo,
+  UserIcon,
+  IdCardIcon,
+  CalendarIcon,
+  ChevronRightIcon,
+} from 'lucide-react'
 import UndoStatusModal from './UndoStatusModal'
 import EmployeeCombobox from '../../../components/inputs/EmployeeCombobox'
 import { employeeAPI } from '../../../features/employee/employee-api'
@@ -89,6 +97,20 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
       default:
         return false
     }
+  }
+
+  const borderColors: Record<string, string> = {
+    IMPLEMENTED: 'border-green-300',
+    REJECTED: 'border-red-300',
+    DEFINE_CHAMPION: 'border-blue-300',
+    WAITING_APPROVAL: 'border-orange-300',
+    UNDER_VALIDATION: 'border-orange-300',
+    TO_IMPLEMENT: 'border-yellow-300',
+    IMPLEMENTATION: 'border-cyan-300',
+    NOT_VIABLE: 'border-gray-300',
+    PENDING: 'border-orange-300',
+    PAID: 'border-green-300',
+    CANCELLED: 'border-red-300',
   }
 
   const getAvailableUndoActions = () => {
@@ -353,45 +375,74 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
 
   return (
     <>
+      {/* sm:px-4 md:grid-cols-[56px_2fr_2fr_1fr_1fr_1fr] md:gap-0 md:py-2 */}
+      {/* ${proposal.isActive ? 'hover:bg-blue-100 border-gray-200' : 'bg-red-100  border-red-200 hover:bg-red-300 hover:border-red-400'} */}
       <div
-        className={`grid grid-cols-1 gap-2 border px-3 py-3 text-left text-sm hover:cursor-pointer ${proposal.isActive ? 'hover:bg-blue-100 border-gray-200' : 'bg-red-100  border-red-200 hover:bg-red-300 hover:border-red-400'} sm:px-4 md:grid-cols-[56px_2fr_2fr_1fr_1fr_1fr] md:gap-0 md:py-2 transition-all`}
+        className={`bg-gray-50 rounded-lg md:rounded-none flex flex-1 px-3 py-3 md:py-0 text-left shadow-lg md:shadow-sm hover:bg-blue-50 text-sm hover:cursor-pointer transition-all ${borderColors[proposal.status] ?? 'border-gray-300'} border-l-8 md:border-l-4 hover:translate-y-1 hover:animate-pulse`}
         onClick={() => setIsModalOpen(true)}
       >
-        <p>
-          <span className="font-semibold md:hidden">ID: </span>
-          {proposal.id}
-        </p>
-        <p>
-          <span className="font-semibold md:hidden">Proposta: </span>
-          {proposal.description.length > 45
-            ? `${proposal.description.substring(0, 45)}...`
-            : proposal.description}
-        </p>
-        <p>
-          <span className="font-semibold md:hidden">Funcionários: </span>
-          {proposal.suggestions
-            .map((suggestion) =>
-              suggestion.employee ? suggestion.employee.name : suggestion.employeeName,
-            )
-            .join(', ')
-            .substring(0, 45)}
-        </p>
-        <p>
-          <span className="font-semibold md:hidden">RE: </span>
-          {proposal.suggestions
-            .map((suggestion) =>
-              suggestion.employee ? suggestion.employee.re : suggestion.employeeRe,
-            )
-            .join(', ')}
-        </p>
-        <p>
-          <span className="font-semibold md:hidden">Criado em: </span>
-          {new Date(proposal.createdAt).toLocaleDateString()}
-        </p>
-        <div>
-          <span className="font-semibold md:hidden">Status: </span>
-          <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
+        <div className="flex flex-1 flex-col gap-3 md:grid md:grid-cols-[50px_2fr_2fr_1fr_0.5fr_1fr] md:gap-0 md:py-1">
+          <div className="flex justify-between">
+            <p className="font-semibold text-lg md:text-sm flex items-center">
+              <span className="md:hidden">#</span>
+              {proposal.id}
+            </p>
+            <StatusBadge
+              status={proposal.status}
+              color={getStatusColor(proposal.status)}
+              className="flex md:hidden lg:hidden"
+            />
+          </div>
+          <p className="font-semibold md:font-normal text-md md:text-xs mb-2 md:mb-0 flex items-center md:pr-4">
+            {proposal.description.length > 45
+              ? `${proposal.description.substring(0, 45)}...`
+              : proposal.description}
+          </p>
+          <p className="flex items-center gap-2 text-gray-700 text-xs md:pr-4">
+            <UserIcon size={16} className="text-gray-400 md:hidden" />
+            {proposal.suggestions
+              .map((suggestion) =>
+                suggestion.employee ? suggestion.employee.name : suggestion.employeeName,
+              )
+              .join(', ')
+              .substring(0, 45)}
+          </p>
+          <div className="flex gap-3 md:hidden">
+            <p className="flex items-center gap-2 text-gray-700 text-xs">
+              <IdCardIcon size={16} className="text-gray-400 md:hidden" />
+              <span className="md:hidden">RE</span>
+              {proposal.suggestions
+                .map((suggestion) =>
+                  suggestion.employee ? suggestion.employee.re : suggestion.employeeRe,
+                )
+                .join(', ')}
+            </p>
+            <p className="flex items-center gap-2 text-gray-700 text-xs">
+              <CalendarIcon size={16} className="text-gray-400 md:hidden" />
+              {new Date(proposal.createdAt).toLocaleDateString()}
+            </p>
+          </div>
+          <p className="items-center text-gray-700 text-xs hidden md:flex md:pr-4">
+            <IdCardIcon size={16} className="text-gray-400 md:hidden" />
+            <span className="md:hidden">RE</span>
+            {proposal.suggestions
+              .map((suggestion) =>
+                suggestion.employee ? suggestion.employee.re : suggestion.employeeRe,
+              )
+              .join(', ')}
+          </p>
+          <p className="items-center text-gray-700 text-xs hidden md:flex md:pr-4">
+            <CalendarIcon size={16} className="text-gray-400 md:hidden" />
+            {new Date(proposal.createdAt).toLocaleDateString()}
+          </p>
+          <StatusBadge
+            status={proposal.status}
+            color={getStatusColor(proposal.status)}
+            className="hidden md:flex lg:flex "
+            hasText={false}
+          />
         </div>
+        <ChevronRightIcon size={32} className="text-gray-400 self-center md:hidden" />
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div className="w-full sm:max-w-11/12 space-y-4 p-4 md:max-w-[70vw]  sm:p-6 lg:w-152">

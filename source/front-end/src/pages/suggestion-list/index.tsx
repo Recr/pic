@@ -532,8 +532,8 @@ const SuggestionList: React.FC = () => {
           </div>
         )}
         <p className="ml-6 mb-2 text-gray-500">{totalCount} propostas encontradas</p>
-        <div className="mx-3 flex flex-col justify-center rounded-lg border border-gray-300 text-sm sm:mx-4">
-          <div className="hidden grid-cols-[56px_2fr_2fr_1fr_1fr_1fr] rounded-t-lg bg-gray-300 px-4 py-2 text-left font-semibold md:grid">
+        <div className="mx-3 flex flex-col justify-center rounded-lg md:border md:border-gray-300 text-sm sm:mx-4">
+          <div className="hidden grid-cols-[56px_2fr_2fr_1fr_0.5fr_1fr] rounded-t-lg bg-gray-300 px-4 py-2 text-left font-semibold md:grid">
             <p>ID</p>
             <p>Proposta</p>
             <p>Funcionários</p>
@@ -541,9 +541,11 @@ const SuggestionList: React.FC = () => {
             <p>Criado em</p>
             <p>Status</p>
           </div>
-          {proposalsData.map((proposal) => (
-            <ProposalItem key={proposal.id} proposal={proposal} />
-          ))}
+          <div className="flex flex-col gap-3 md:gap-0">
+            {proposalsData.map((proposal) => (
+              <ProposalItem key={proposal.id} proposal={proposal} />
+            ))}
+          </div>
         </div>
         <div className="mt-4 flex flex-row items-center justify-center gap-2 width-full">
           <button
