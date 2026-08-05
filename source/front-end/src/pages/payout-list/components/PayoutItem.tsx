@@ -25,7 +25,7 @@ const PayoutItem: React.FC<PayoutItemProps> = ({ payout, isSelected, onToggleSel
         </div>
         <p>
           <span className="font-semibold md:hidden">ID: </span>
-          {payout.id}
+          {payout.suggestion.proposal.id}
         </p>
         <p>
           <span className="font-semibold md:hidden">Proposta: </span>
