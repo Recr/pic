@@ -514,10 +514,12 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
             <p className="text-sm font-semibold mb-1">Descrição</p>
             <p className="text-gray-700 leading-relaxed">{proposal.description}</p>
           </div>
-          <div className="bg-red-100 rounded p-2">
-            <p className="text-sm font-semibold mb-1">Motivo de Rejeição</p>
-            <p className="text-gray-700 leading-relaxed">{proposal.rejectionNote}</p>
-          </div>
+          {proposal.rejectionNote && (
+            <div className="bg-red-100 rounded p-2">
+              <p className="text-sm font-semibold mb-1">Motivo de Rejeição</p>
+              <p className="text-gray-700 leading-relaxed">{proposal.rejectionNote}</p>
+            </div>
+          )}
 
           <div>
             <p className="text-sm font-semibold mb-2">Funcionários</p>
