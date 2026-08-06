@@ -381,7 +381,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
         className={`bg-gray-50 rounded-lg md:rounded-none flex flex-1 px-3 py-3 md:py-0 text-left shadow-lg md:shadow-sm hover:bg-blue-50 text-sm hover:cursor-pointer transition-all ${borderColors[proposal.status] ?? 'border-gray-300'} border-l-8 md:border-l-4 hover:translate-y-1 hover:animate-pulse`}
         onClick={() => setIsModalOpen(true)}
       >
-        <div className="flex flex-1 flex-col gap-3 md:grid md:grid-cols-[50px_2fr_2fr_1fr_0.5fr_1fr] md:gap-0 md:py-1">
+        <div className="flex flex-1 flex-col gap-3 md:grid md:grid-cols-[56px_2fr_2fr_1fr_0.8fr_1fr] lg:grid-cols-[56px_2fr_2fr_1fr_0.55fr_1fr] xl:grid-cols-[56px_2fr_2fr_1fr_0.4fr_1fr] md:gap-0 md:py-1">
           <div className="flex justify-between">
             <p className="font-semibold text-lg md:text-sm flex items-center">
               <span className="md:hidden">#</span>

@@ -147,8 +147,8 @@ const PayoutList: React.FC = () => {
             Exportar Excel
           </button>
         </div>
-        <div className="mx-3 flex flex-col justify-center rounded-lg border border-gray-300 text-sm sm:mx-4">
-          <div className="mx-4 hidden grid-cols-[40px_56px_2fr_2fr_1fr_1fr_1fr_1fr] border-b-2 border-gray-200 px-4 py-2 font-semibold md:grid">
+        <div className="mx-3 flex flex-col justify-center rounded-lg md:border border-gray-300 text-sm sm:mx-4">
+          <div className=" hidden grid-cols-[40px_56px_2fr_2fr_1fr_1fr_1fr_1fr] border-b-2 border-gray-200 px-4 py-2 font-semibold md:grid bg-gray-300">
             <input
               type="checkbox"
               checked={
@@ -166,16 +166,18 @@ const PayoutList: React.FC = () => {
             <p>RE</p>
             <p>Data</p>
             <p>Valor</p>
-            <p>Status</p>
+            <p className="text-center lg:text-left">Status</p>
           </div>
-          {payoutData?.map((payout) => (
-            <PayoutItem
-              key={payout.id}
-              payout={payout}
-              isSelected={selectedPayoutIds.includes(payout.id)}
-              onToggleSelect={handleToggleSelect}
-            />
-          ))}
+          <div className="flex flex-col gap-3 md:gap-0">
+            {payoutData?.map((payout) => (
+              <PayoutItem
+                key={payout.id}
+                payout={payout}
+                isSelected={selectedPayoutIds.includes(payout.id)}
+                onToggleSelect={handleToggleSelect}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>
