@@ -210,7 +210,6 @@ class AnalyticsUseCase {
         if (proposal.status !== 'REJECTED' && proposal.status !== 'NOT_VIABLE') {
           const timeToImplementation = this.getTimeToImplementation(proposal)
           totalDaysToImplementation += timeToImplementation
-          console.log('timeToImplementation', timeToImplementation)
           if (timeToImplementation != 0) {
             implementedProposalsAmount++
           }
