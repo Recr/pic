@@ -98,6 +98,8 @@ const SuggestionList: React.FC = () => {
   const [filterIdInput, setFilterIdInput] = useState('')
   const [filterReInput, setFilterReInput] = useState('')
   const [filterEmployeeNameInput, setFilterEmployeeNameInput] = useState('')
+  const [filterManagerNameInput, setFilterManagerNameInput] = useState('')
+  const [filterChampionNameInput, setFilterChampionNameInput] = useState('')
   const [filterDescriptionInput, setFilterDescriptionInput] = useState('')
   const [filterDateFromInput, setFilterDateFromInput] = useState('')
   const [filterDateToInput, setFilterDateToInput] = useState('')
@@ -122,12 +124,16 @@ const SuggestionList: React.FC = () => {
   const offset = (currentPage - 1) * resolvedLimit
   const activeFilters = useMemo(() => {
     const employeeName = filterEmployeeNameInput.trim()
+    const managerName = filterManagerNameInput.trim()
+    const championName = filterChampionNameInput.trim()
     const description = filterDescriptionInput.trim()
 
     return {
       id: parseOptionalNumber(filterIdInput),
       re: parseOptionalNumber(filterReInput),
       employeeName: employeeName || undefined,
+      managerName: managerName || undefined,
+      championName: championName || undefined,
       description: description || undefined,
       dateFrom: filterDateFromInput || undefined,
       dateTo: filterDateToInput || undefined,
@@ -141,6 +147,8 @@ const SuggestionList: React.FC = () => {
     filterDateToInput,
     filterDescriptionInput,
     filterEmployeeNameInput,
+    filterManagerNameInput,
+    filterChampionNameInput,
     filterIdInput,
     filterAreaInput,
     filterCategoryInput,
@@ -152,6 +160,8 @@ const SuggestionList: React.FC = () => {
     activeFilters.id !== undefined ||
     activeFilters.re !== undefined ||
     activeFilters.employeeName !== undefined ||
+    activeFilters.managerName !== undefined ||
+    activeFilters.championName !== undefined ||
     activeFilters.description !== undefined ||
     activeFilters.dateFrom !== undefined ||
     activeFilters.dateTo !== undefined ||
@@ -218,6 +228,8 @@ const SuggestionList: React.FC = () => {
     activeFilters.dateTo,
     activeFilters.description,
     activeFilters.employeeName,
+    activeFilters.managerName,
+    activeFilters.championName,
     activeFilters.id,
     activeFilters.areaId,
     activeFilters.categoryId,
@@ -259,6 +271,8 @@ const SuggestionList: React.FC = () => {
     setFilterIdInput('')
     setFilterReInput('')
     setFilterEmployeeNameInput('')
+    setFilterManagerNameInput('')
+    setFilterChampionNameInput('')
     setFilterDescriptionInput('')
     setFilterDateFromInput('')
     setFilterDateToInput('')
@@ -434,11 +448,31 @@ const SuggestionList: React.FC = () => {
                 />
               </label>
               <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                Nome do funcionário
+                Nome do colaborador
                 <input
                   type="text"
                   value={filterEmployeeNameInput}
                   onChange={(event) => setFilterEmployeeNameInput(event.target.value)}
+                  placeholder="Buscar por nome"
+                  className="rounded border border-gray-300 px-3 py-2 text-sm"
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Nome do gestor
+                <input
+                  type="text"
+                  value={filterManagerNameInput}
+                  onChange={(event) => setFilterManagerNameInput(event.target.value)}
+                  placeholder="Buscar por nome"
+                  className="rounded border border-gray-300 px-3 py-2 text-sm"
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Nome do executor
+                <input
+                  type="text"
+                  value={filterChampionNameInput}
+                  onChange={(event) => setFilterChampionNameInput(event.target.value)}
                   placeholder="Buscar por nome"
                   className="rounded border border-gray-300 px-3 py-2 text-sm"
                 />
@@ -536,7 +570,7 @@ const SuggestionList: React.FC = () => {
           <div className="hidden md:grid-cols-[56px_2fr_2fr_1fr_0.8fr_1fr] lg:grid-cols-[56px_2fr_2fr_1fr_0.55fr_1fr] xl:grid-cols-[56px_2fr_2fr_1fr_0.4fr_1fr] rounded-t-lg bg-gray-300 px-4 py-2 text-left font-semibold md:grid">
             <p>ID</p>
             <p>Proposta</p>
-            <p>Funcionários</p>
+            <p>Colaboradores</p>
             <p>RE</p>
             <p>Criado em</p>
             <p className="text-center">Status</p>

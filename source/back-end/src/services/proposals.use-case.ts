@@ -167,6 +167,22 @@ class ProposalUseCase {
       })
     }
 
+    if (filters.managerName) {
+      where.manager = {
+        name: {
+          contains: filters.managerName,
+        },
+      }
+    }
+
+    if (filters.championName) {
+      where.champion = {
+        name: {
+          contains: filters.championName,
+        },
+      }
+    }
+
     if (suggestionFilters.length > 0) {
       where.suggestions = {
         some: {

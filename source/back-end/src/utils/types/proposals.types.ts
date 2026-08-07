@@ -49,6 +49,8 @@ export interface DetailedProposalFilters {
   id?: number
   re?: number
   employeeName?: string
+  managerName?: string
+  championName?: string
   description?: string
   dateFrom?: Date
   dateTo?: Date

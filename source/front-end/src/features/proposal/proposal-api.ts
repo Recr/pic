@@ -45,6 +45,8 @@ export const proposalAPI = api.injectEndpoints({
         id,
         re,
         employeeName,
+        managerName,
+        championName,
         description,
         dateFrom,
         dateTo,
@@ -68,6 +70,13 @@ export const proposalAPI = api.injectEndpoints({
 
         if (employeeName) {
           params.set('employeeName', employeeName)
+        }
+        if (managerName) {
+          params.set('managerName', managerName)
+        }
+
+        if (championName) {
+          params.set('championName', championName)
         }
 
         if (description) {

@@ -70,6 +70,22 @@ export const ProposalsController = {
         filters.employeeName = employeeNameFilter
       }
 
+      const managerNameFilter =
+        typeof req.query.managerName === 'string' && req.query.managerName.trim() !== ''
+          ? req.query.managerName.trim()
+          : undefined
+      if (managerNameFilter) {
+        filters.managerName = managerNameFilter
+      }
+
+      const championNameFilter =
+        typeof req.query.championName === 'string' && req.query.championName.trim() !== ''
+          ? req.query.championName.trim()
+          : undefined
+      if (championNameFilter) {
+        filters.championName = championNameFilter
+      }
+
       const descriptionFilter =
         typeof req.query.description === 'string' && req.query.description.trim() !== ''
           ? req.query.description.trim()

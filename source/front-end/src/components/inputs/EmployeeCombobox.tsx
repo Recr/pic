@@ -116,7 +116,7 @@ const EmployeeCombobox = ({
               </li>
             ))
           ) : (
-            <li className="px-3 py-2 text-sm text-gray-500">Nenhum funcionário encontrado</li>
+            <li className="px-3 py-2 text-sm text-gray-500">Nenhum colaborador encontrado</li>
           )}
         </ul>
       </div>

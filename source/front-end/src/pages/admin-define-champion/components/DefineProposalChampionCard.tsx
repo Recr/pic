@@ -272,7 +272,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           </div>
 
           <div>
-            <p className="text-sm font-semibold mb-2">Funcionários</p>
+            <p className="text-sm font-semibold mb-2">Colaboradores</p>
             <div className="flex flex-wrap gap-2">
               {proposal.suggestions.map((suggestion, index) => (
                 <p

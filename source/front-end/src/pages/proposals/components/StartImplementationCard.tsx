@@ -162,7 +162,7 @@ const StartImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) =>
           )}
 
           <div>
-            <p className="mb-2 text-sm font-semibold">Funcionários</p>
+            <p className="mb-2 text-sm font-semibold">Colaboradores</p>
             <div className="flex flex-wrap gap-2">
               {proposal.suggestions.map((suggestion, index) => (
                 <p

@@ -355,8 +355,8 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
         }).unwrap()
         console.log('Proposal updated successfully')
       } else {
-        toast.error('Tipo de funcionário não selecionado.')
-        throw new Error('Tipo de funcionário não selecionado.')
+        toast.error('Tipo de colaborador não selecionado.')
+        throw new Error('Tipo de colaborador não selecionado.')
       }
 
       toast.success('Proposta atualizada com sucesso.')
@@ -522,7 +522,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
           )}
 
           <div>
-            <p className="text-sm font-semibold mb-2">Funcionários</p>
+            <p className="text-sm font-semibold mb-2">Colaboradores</p>
             <div className="flex flex-wrap gap-2">
               {proposal.suggestions.map((suggestion, index) => (
                 <EmployeeInformationBadge
@@ -782,14 +782,14 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
       <Modal isOpen={isUpdateManagerModalOpen} onClose={() => setIsUpdateManagerModalOpen(false)}>
         <div className="w-full max-w-sm space-y-4 p-6">
           <h3 className="text-lg font-semibold text-blue-600">
-            Atualizar {employeeType ? translateRoles(employeeType) : 'Funcionário'}
+            Atualizar {employeeType ? translateRoles(employeeType) : 'Colaborador'}
           </h3>
           <p className="text-gray-700">
-            Selecione o novo {employeeType ? translateRoles(employeeType) : 'Funcionário'} para esta
+            Selecione o novo {employeeType ? translateRoles(employeeType) : 'Colaborador'} para esta
             proposta.
           </p>
           <label htmlFor={`manager-input-${proposal.id}`}>
-            <strong>Defina o {employeeType ? translateRoles(employeeType) : 'Funcionário'}</strong>
+            <strong>Defina o {employeeType ? translateRoles(employeeType) : 'Colaborador'}</strong>
           </label>
           <EmployeeCombobox
             name={`manager-input-${proposal.id}`}

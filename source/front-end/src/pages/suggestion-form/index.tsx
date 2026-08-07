@@ -84,7 +84,7 @@ const SuggestionForm: React.FC = () => {
     )
 
     if (employeeRes.some((re) => Number.isNaN(re))) {
-      toast.error('Preencha um RE válido para todos os funcionários.', TOAST_OPTIONS)
+      toast.error('Preencha um RE válido para todos os Colaboradores.', TOAST_OPTIONS)
       return
     }
 
