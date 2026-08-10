@@ -38,7 +38,8 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.0",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "vitest-mock-extended": "^5.1.1"
   },
   "dependencies": {
     "@prisma/adapter-mssql": "7.3.0",
