@@ -13,7 +13,7 @@ export async function seedAdmin() {
   try {
     await prisma.employee.create({
       data: {
-        re: 10283,
+        re: 1028,
         name: 'Eliel da Silva',
         passwordHash,
         role: 'ADMIN',

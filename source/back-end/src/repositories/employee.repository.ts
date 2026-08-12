@@ -85,7 +85,7 @@ class PrismaEmployeeRepository {
     return employees
   }
 
-  public async findEmployeesOnSuggestions(tx?: Prisma.TransactionClient) {
+  public async findUnregisteredEmployeesOnSuggestions(tx?: Prisma.TransactionClient) {
     const db = this.getClient(tx)
     const suggestions = await db.suggestion.findMany({
       where: {
