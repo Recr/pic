@@ -7,7 +7,11 @@ class PrismaEmployeeRepository {
   }
 
   public async findAll() {
-    const employees = await prisma.employee.findMany()
+    const employees = await prisma.employee.findMany({
+      orderBy: {
+        re: 'asc',
+      },
+    })
     return employees
   }
 

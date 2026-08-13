@@ -111,6 +111,7 @@ const Employee: React.FC = () => {
     isLoadingRegisteredEmployees ||
     isLoadingUnregisteredEmployees ||
     isLoadingPasswordResetRequesters
+  const hasUnregisteredEmployees = Boolean(unregisteredEmployees?.length)
   const createRoleValue = createWatch('role') || 'OPERATOR'
   const createShiftValue = createWatch('shift') || '1'
 
@@ -119,30 +120,25 @@ const Employee: React.FC = () => {
 
   if (isLoadingEmployees) {
     return (
-      <div className="font-inter bg-gray-100 min-h-screen p-5">
-        <div className="bg-white rounded-xl m-auto p-8 lg:w-4xl">
-          <Skeleton className="mx-auto h-8 w-56" />
-          <div className="mt-8 flex flex-col gap-4 md:flex-row justify-center">
+      <div className="min-h-screen bg-gray-100 px-3 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8">
+        <div className="mb-7.5 rounded-lg bg-white py-4 shadow-custom sm:py-5">
+          <Skeleton className="mx-4 my-3 h-8 w-56 sm:my-4 sm:h-9" />
+          <div className="mx-4 mt-5 grid gap-4 xl:grid-cols-2">
             {Array.from({ length: 2 }).map((_, columnIndex) => (
-              <div key={columnIndex} className="md:w-sm rounded-lg p-5 shadow-lg">
-                <Skeleton className="mx-auto h-7 w-40" />
-                <div className="mt-6 flex flex-col gap-2">
+              <div key={columnIndex} className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                <Skeleton className="mb-4 h-6 w-32 rounded-md" />
+                <div className="space-y-3">
                   {Array.from({ length: 5 }).map((__, rowIndex) => (
-                    <Skeleton key={rowIndex} className="h-12 w-full rounded-lg" />
+                    <Skeleton key={rowIndex} className="h-11 w-full rounded-lg" />
                   ))}
                 </div>
               </div>
             ))}
           </div>
-          <div className="my-5 flex">
-            <Skeleton className="mx-auto h-10 w-56 rounded-2xl" />
-          </div>
-        </div>
-        <div className="mt-8 mb-8">
-          <Skeleton className="mx-auto h-8 w-80" />
-          <div className="mx-auto mt-4 flex max-w-2xl flex-col gap-3 rounded-lg bg-yellow-50 p-4">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <Skeleton key={index} className="h-20 w-full rounded-lg bg-gray-200/70" />
+          <div className="mx-4 mt-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+            <Skeleton className="mb-3 h-6 w-52 rounded-md" />
+            {Array.from({ length: 2 }).map((_, index) => (
+              <Skeleton key={index} className="mb-3 h-20 w-full rounded-lg bg-gray-200/70" />
             ))}
           </div>
         </div>
@@ -151,42 +147,90 @@ const Employee: React.FC = () => {
   }
 
   return (
-    <div className="font-inter bg-gray-100 min-h-screen p-5">
+    <div className="min-h-screen bg-gray-100 px-3 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8">
       <ToastContainer />
-      <div className="bg-white rounded-xl m-auto p-8 w-fit">
-        <h1 className="font-inter font-light text-3xl py-10 pl-10">Colaboradores</h1>
-        <div className="flex flex-col md:flex-row justify-center gap-4">
-          <div className="md:w-sm shadow-lg rounded-lg p-5">
-            <h2 className="font-inter font-light text-2xl py-10 text-center">Cadastrados</h2>
-            <div className="m-auto rounded-lg p-2 flex flex-col gap-2 max-h-100 overflow-y-auto">
-              {registeredEmployees?.map((employee: EmployeeType) => (
-                <div
-                  key={employee.re}
-                  className="flex justify-between gap-2 bg-gray-100 px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-blue-200 transition-all"
-                  onClick={() => {
-                    setSelectedEmployee(employee)
-                    setIsEditModalOpen(true)
-                    updateSetValue('name', employee.name)
-                    updateSetValue('re', employee.re)
-                    updateSetValue('role', employee.role)
-                    updateSetValue('shift', employee.shift || '1')
-                  }}
-                >
-                  <span>{employee.name}</span>
-                  <span>{employee.re}</span>
-                </div>
-              ))}
+      <div className="mb-7.5 rounded-lg bg-white py-4 shadow-custom sm:py-5">
+        <div className="mx-4 my-3 text-left text-xl font-semibold sm:my-4 sm:text-2xl">
+          Colaboradores
+        </div>
+
+        <div className="mx-4 mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-gray-600">
+            <span className="font-medium text-gray-700">{registeredEmployees?.length ?? 0}</span>{' '}
+            colaboradores cadastrados
+          </p>
+          <button
+            type="button"
+            className="rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all hover:cursor-pointer hover:bg-blue-700"
+            onClick={() => setIsAddModalOpen(true)}
+          >
+            Adicionar colaborador
+          </button>
+        </div>
+
+        <div
+          className={`mx-4 mt-4 grid gap-4 ${hasUnregisteredEmployees ? 'xl:grid-cols-2' : 'xl:grid-cols-1'}`}
+        >
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h2 className="text-lg font-semibold text-gray-800">Cadastrados</h2>
+              <span className="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-semibold text-blue-700">
+                {registeredEmployees?.length ?? 0}
+              </span>
+            </div>
+            <div className="max-h-105 overflow-y-auto pr-1">
+              <div className="grid grid-cols-[0.75fr_2.5fr_1fr] gap-2 rounded-t-lg bg-gray-300 px-3 py-2 text-xs font-semibold text-gray-700">
+                <span>RE</span>
+                <span>Nome</span>
+                <span>Turno</span>
+              </div>
+              <div className="flex flex-col gap-2 pt-2">
+                {registeredEmployees?.map((employee: EmployeeType) => (
+                  <div
+                    key={employee.re}
+                    className="grid cursor-pointer grid-cols-[0.75fr_2.5fr_1fr] gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 transition-all hover:border-blue-200 hover:bg-blue-50"
+                    onClick={() => {
+                      setSelectedEmployee(employee)
+                      setIsEditModalOpen(true)
+                      updateSetValue('name', employee.name)
+                      updateSetValue('re', employee.re)
+                      updateSetValue('role', employee.role)
+                      updateSetValue('shift', employee.shift || '1')
+                    }}
+                  >
+                    <span className="font-medium">{employee.re}</span>
+                    <span className="truncate">{employee.name}</span>
+                    <span>{employee.shift}</span>
+                  </div>
+                ))}
+                {!registeredEmployees?.length && (
+                  <div className="rounded-lg border border-dashed border-gray-300 bg-white px-3 py-8 text-center text-sm text-gray-500">
+                    Nenhum colaborador cadastrado.
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-          {unregisteredEmployees && unregisteredEmployees.length > 0 && (
-            <div className="md:w-sm shadow-lg rounded-lg p-5 hover:">
-              <h2 className="font-inter font-light text-2xl py-10 text-center">Não Cadastrados</h2>
-              <div className="m-auto rounded-lg p-2 flex flex-col gap-2 max-h-100 overflow-y-auto">
-                {unregisteredEmployees.length > 0 &&
-                  unregisteredEmployees.map((employee: UnregisteredEmployee) => (
+
+          {hasUnregisteredEmployees && (
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <h2 className="text-lg font-semibold text-gray-800">Não cadastrados</h2>
+                <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                  {unregisteredEmployees.length}
+                </span>
+              </div>
+              <div className="max-h-105 overflow-y-auto pr-1">
+                <div className="grid grid-cols-[0.75fr_2.5fr_1fr] gap-2 rounded-t-lg bg-gray-300 px-3 py-2 text-xs font-semibold text-gray-700">
+                  <span>RE</span>
+                  <span>Nome</span>
+                  <span>Turno</span>
+                </div>
+                <div className="flex flex-col gap-2 pt-2">
+                  {unregisteredEmployees.map((employee: UnregisteredEmployee) => (
                     <div
                       key={employee.employeeRe}
-                      className="flex justify-between gap-2 bg-gray-100 px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-blue-200 transition-all"
+                      className="grid cursor-pointer grid-cols-[0.75fr_2.5fr_1fr] gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 transition-all hover:border-blue-200 hover:bg-blue-50"
                       onClick={() => {
                         setSelectedUnregisteredEmployee(employee)
                         setIsAddModalOpen(true)
@@ -198,43 +242,43 @@ const Employee: React.FC = () => {
                         )
                       }}
                     >
-                      <span>{employee.employeeName}</span>
-                      <span>{employee.employeeRe}</span>
+                      <span className="font-medium">{employee.employeeRe}</span>
+                      <span className="truncate">{employee.employeeName}</span>
+                      <span>{employee.employeeShift || '1'}</span>
                     </div>
                   ))}
+                </div>
               </div>
             </div>
           )}
         </div>
-        <div className="flex my-5">
-          <button
-            className="bg-blue-400 text-white py-2 px-4 rounded-2xl m-auto hover:bg-blue-700 transition-all hover:cursor-pointer"
-            onClick={() => setIsAddModalOpen(true)}
-          >
-            Adicionar Colaborador
-          </button>
-        </div>
-      </div>
-      {passwordResetRequesters && passwordResetRequesters.length > 0 && (
-        <div className="mt-8 mb-8">
-          <h2 className="font-inter font-light text-2xl py-10 text-center">
-            Solicitações de Recuperação de Senha
-          </h2>
-          <div className="max-w-2xl mx-auto rounded-lg p-4 bg-yellow-50">
+
+        {passwordResetRequesters && passwordResetRequesters.length > 0 && (
+          <div className="mx-4 mt-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h2 className="text-lg font-semibold text-gray-800">
+                Solicitações de recuperação de senha
+              </h2>
+              <span className="rounded-full bg-yellow-100 px-2.5 py-1 text-xs font-semibold text-yellow-700">
+                {passwordResetRequesters.length}
+              </span>
+            </div>
             <div className="flex flex-col gap-3">
               {passwordResetRequesters.map((requester: PasswordResetRequester) => (
                 <div
                   key={requester.id}
-                  className="bg-white px-4 py-3 rounded-lg border-l-4 border-yellow-400 shadow-sm"
+                  className="rounded-lg border border-yellow-200 bg-white px-4 py-3 shadow-sm"
                 >
-                  <div className="flex justify-between items-center">
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-800">{requester.name}</p>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-semibold text-gray-800">{requester.name}</p>
                       <p className="text-sm text-gray-600">RE: {requester.re}</p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-xs text-gray-500 mb-1">Token de Recuperação:</p>
-                      <p className="font-mono text-lg font-bold text-yellow-600 bg-yellow-100 px-3 py-2 rounded">
+                    <div className="text-left sm:text-right">
+                      <p className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-500">
+                        Token
+                      </p>
+                      <p className="inline-flex rounded bg-yellow-100 px-3 py-2 font-mono text-sm font-bold text-yellow-700">
                         {requester.passwordToken}
                       </p>
                     </div>
@@ -243,8 +287,8 @@ const Employee: React.FC = () => {
               ))}
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => {
@@ -267,7 +311,7 @@ const Employee: React.FC = () => {
               <div className="flex flex-col gap-2 text-sm">
                 <label>Nome:</label>
                 <input
-                  className="bg-white px-4 py-1"
+                  className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   type="text"
                   {...updateRegister('name')}
                   placeholder="Nome completo do operador"
@@ -278,7 +322,7 @@ const Employee: React.FC = () => {
                 )}
                 <label>RE:</label>
                 <input
-                  className="bg-white px-4 py-1"
+                  className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   type="number"
                   {...updateRegister('re')}
                   placeholder="RE do operador"
@@ -307,7 +351,7 @@ const Employee: React.FC = () => {
                     { value: 'ADMIN', label: 'Administrador' },
                   ]}
                   showEmptyOption={false}
-                  buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
+                  buttonClassName="w-full rounded border border-gray-300 bg-white px-3 py-2 text-left text-sm text-gray-700 transition hover:cursor-pointer hover:border-blue-300 hover:bg-blue-50"
                 />
                 {updateErrors.role && (
                   <span className="text-xs text-red-600">{updateErrors.role.message}</span>
@@ -326,13 +370,13 @@ const Employee: React.FC = () => {
                     { value: 'ADM', label: 'Administrativo' },
                   ]}
                   showEmptyOption={false}
-                  buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
+                  buttonClassName="w-full rounded border border-gray-300 bg-white px-3 py-2 text-left text-sm text-gray-700 transition hover:cursor-pointer hover:border-blue-300 hover:bg-blue-50"
                 />
                 {updateErrors.shift && (
                   <span className="text-xs text-red-600">{updateErrors.shift.message}</span>
                 )}
                 <button
-                  className="hover:cursor-pointer hover:bg-blue-700 transition-all bg-blue-500 text-white py-2 px-4 rounded mt-4"
+                  className="mt-4 rounded-full bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:cursor-pointer hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
                   type="submit"
                   disabled={isUpdating}
                 >
@@ -365,7 +409,7 @@ const Employee: React.FC = () => {
           <div className="flex flex-col gap-2 text-sm">
             <label>Nome:</label>
             <input
-              className="bg-white px-4 py-1"
+              className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               type="text"
               {...createRegister('name')}
               placeholder="Nome completo do operador"
@@ -376,7 +420,7 @@ const Employee: React.FC = () => {
             )}
             <label>RE:</label>
             <input
-              className="bg-white px-4 py-1"
+              className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               type="number"
               {...createRegister('re')}
               placeholder="RE do operador"
@@ -405,7 +449,7 @@ const Employee: React.FC = () => {
                 { value: 'ADMIN', label: 'Administrador' },
               ]}
               showEmptyOption={false}
-              buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
+              buttonClassName="w-full rounded border border-gray-300 bg-white px-3 py-2 text-left text-sm text-gray-700 transition hover:cursor-pointer hover:border-blue-300 hover:bg-blue-50"
             />
             {createErrors.role && (
               <span className="text-xs text-red-600">{createErrors.role.message}</span>
@@ -424,14 +468,14 @@ const Employee: React.FC = () => {
                 { value: 'ADM', label: 'Administrativo' },
               ]}
               showEmptyOption={false}
-              buttonClassName="p-2.5 w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
+              buttonClassName="w-full rounded border border-gray-300 bg-white px-3 py-2 text-left text-sm text-gray-700 transition hover:cursor-pointer hover:border-blue-300 hover:bg-blue-50"
             />
             {createErrors.shift && (
               <span className="text-xs text-red-600">{createErrors.shift.message}</span>
             )}
             <label>Senha:</label>
             <input
-              className="bg-white px-4 py-1"
+              className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               type="password"
               {...createRegister('password')}
               placeholder="Senha do operador"
@@ -440,7 +484,7 @@ const Employee: React.FC = () => {
               <span className="text-xs text-red-600">{createErrors.password.message}</span>
             )}
             <button
-              className="hover:cursor-pointer hover:bg-blue-700 transition-all bg-blue-500 text-white py-2 px-4 rounded mt-4"
+              className="mt-4 rounded-full bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:cursor-pointer hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
               type="submit"
               disabled={isLoading}
             >
