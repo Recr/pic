@@ -9,14 +9,14 @@ const analyticsRoutes = Router()
 analyticsRoutes.get(
   '/proposals',
   authMiddleware,
-  checkRole([Role.ADMIN]),
+  checkRole([Role.ADMIN, Role.GENERAL_MANAGER]),
   AnalyticsController.handleGetProposalAnalytics,
 )
 
 analyticsRoutes.get(
   '/time-to-communication-and-implementation',
   authMiddleware,
-  checkRole([Role.ADMIN]),
+  checkRole([Role.ADMIN, Role.GENERAL_MANAGER]),
   AnalyticsController.handleGetTimeToCommunicationAndImplementation,
 )
 

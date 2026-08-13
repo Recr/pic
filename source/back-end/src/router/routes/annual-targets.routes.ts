@@ -15,34 +15,34 @@ const annualTargetRoutes = Router()
 annualTargetRoutes.post(
   '/',
   authMiddleware,
-  checkRole([Role.ADMIN]),
+  checkRole([Role.ADMIN, Role.GENERAL_MANAGER]),
   validate(createAnnualTargetSchema),
   AnnualTargetsController.handleCreateAnnualTarget,
 )
 annualTargetRoutes.get(
   '/',
   authMiddleware,
-  checkRole([Role.ADMIN]),
+  checkRole([Role.ADMIN, Role.GENERAL_MANAGER]),
   AnnualTargetsController.handleGetAllAnnualTargets,
 )
 annualTargetRoutes.get(
   '/:year',
   authMiddleware,
-  checkRole([Role.ADMIN]),
+  checkRole([Role.ADMIN, Role.GENERAL_MANAGER]),
   validate(yearParamSchema),
   AnnualTargetsController.handleGetAnnualTargetByYear,
 )
 annualTargetRoutes.put(
   '/:year',
   authMiddleware,
-  checkRole([Role.ADMIN]),
+  checkRole([Role.ADMIN, Role.GENERAL_MANAGER]),
   validate(updateAnnualTargetSchema),
   AnnualTargetsController.handleUpdateAnnualTargetByYear,
 )
 annualTargetRoutes.delete(
   '/:year',
   authMiddleware,
-  checkRole([Role.ADMIN]),
+  checkRole([Role.ADMIN, Role.GENERAL_MANAGER]),
   validate(yearParamSchema),
   AnnualTargetsController.handleDeleteAnnualTargetByYear,
 )
