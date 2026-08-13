@@ -7,7 +7,7 @@ import { Banknote, CalendarIcon, IdCardIcon, UserIcon } from 'lucide-react'
 type PayoutItemProps = {
   payout: Payout
   isSelected: boolean
-  onToggleSelect: (id: number) => void
+  onToggleSelect: (id: number, isShiftPressed: boolean) => void
 }
 
 const borderColors: Record<string, string> = {
@@ -31,11 +31,11 @@ const PayoutItem: React.FC<PayoutItemProps> = ({ payout, isSelected, onToggleSel
         className={`grid grid-cols-1 gap-2 border-gray-200 border-l-8 md:border-l-4  ${borderColors[payout.status] ?? 'border-gray-300'} px-3 py-3 text-sm hover:cursor-pointer hover:bg-blue-100  md:grid-cols-[40px_56px_2fr_2fr_1fr_1fr_1fr_1fr] md:gap-0 md:px-4 md:py-2 hover:translate-y-1 hover:animate-pulse transition-all shadow-lg md:shadow-none rounded-md md:rounded-none`}
       >
         <div className="flex items-center" onClick={(event) => event.stopPropagation()}>
-          {/* TODO: Implement checkbox functionality with shift to select multiple */}
           <input
             type="checkbox"
             checked={isSelected}
-            onChange={() => onToggleSelect(payout.id)}
+            onClick={(event) => onToggleSelect(payout.id, event.shiftKey)}
+            readOnly
             aria-label={`Selecionar payout ${payout.id}`}
             className="w-4 h-4 cursor-pointer"
           />
