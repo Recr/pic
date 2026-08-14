@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
+import type { GetPendingAndCompletedPaymentsFilters } from '../../../features/analytics/types'
 import { analyticsAPI } from '../../../features/analytics/analytics-api'
-import type { GetTimeToCommunicationAndImplementationFilters } from '../../../features/analytics/types'
 
-const TimeToCommunicationAndImplementation: React.FC = () => {
+const PendingAndCompletedPayments: React.FC = () => {
   const [filterDateFromInput, setFilterDateFromInput] = useState<string>(
     new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().split('T')[0],
   )
@@ -10,25 +10,25 @@ const TimeToCommunicationAndImplementation: React.FC = () => {
     new Date().toISOString().split('T')[0],
   )
 
-  const activeFilters: GetTimeToCommunicationAndImplementationFilters = useMemo(() => {
+  const activeFilters: GetPendingAndCompletedPaymentsFilters = useMemo(() => {
     return {
       startDate: filterDateFromInput || undefined,
       endDate: filterDateToInput || undefined,
     }
   }, [filterDateFromInput, filterDateToInput])
 
-  const { data: timeToCommunicationAndImplementation } =
-    analyticsAPI.useGetTimeToCommunicationAndImplementationQuery(activeFilters)
+  const { data: pendingAndCompletedPayments } =
+    analyticsAPI.useGetPendingAndCompletedPaymentsQuery(activeFilters)
 
   return (
     <div className="h-full w-full">
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Tempo de Processamento</h2>
-            <p className="mt-1 text-sm text-gray-500">
-              Médias calculadas para o período selecionado.
-            </p>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Pagamentos Pendentes e Concluídos
+            </h2>
+            <p className="mt-1 text-sm text-gray-500">Calculados para o período selecionado.</p>
           </div>
         </div>
 
@@ -54,26 +54,26 @@ const TimeToCommunicationAndImplementation: React.FC = () => {
           </label>
         </div>
 
-        {timeToCommunicationAndImplementation ? (
+        {pendingAndCompletedPayments ? (
           <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="rounded-xl border border-blue-100 bg-blue-50 p-6 text-center">
-              <p className="text-sm font-medium text-blue-700">Tempo médio de comunicação</p>
-
-              <p className="mt-3 text-5xl font-bold text-blue-600">
-                {timeToCommunicationAndImplementation.averageTimeToCommunication}
+            <div className="rounded-xl border border-green-100 bg-green-50 p-6 text-center">
+              <p className="text-sm font-medium text-green-700">Total de Pagamentos Concluídos</p>
+              <p className="mt-3 text-5xl font-bold text-green-600">
+                R$ {pendingAndCompletedPayments.completedPaymentsAmount}
               </p>
-
-              <p className="mt-1 text-sm text-blue-700">dias</p>
+              <p className="mt-1 text-sm text-green-700">
+                {pendingAndCompletedPayments.completedPaymentsCount} pagamentos individuais
+              </p>
             </div>
 
-            <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-6 text-center">
-              <p className="text-sm font-medium text-emerald-700">Tempo médio de implementação</p>
-
-              <p className="mt-3 text-5xl font-bold text-emerald-600">
-                {timeToCommunicationAndImplementation.averageTimeToImplementation}
+            <div className="rounded-xl border border-yellow-100 bg-yellow-50 p-6 text-center">
+              <p className="text-sm font-medium text-yellow-700">Total de Pagamentos Pendentes</p>
+              <p className="mt-3 text-5xl font-bold text-yellow-600">
+                R$ {pendingAndCompletedPayments.pendingPaymentsAmount}
               </p>
-
-              <p className="mt-1 text-sm text-emerald-700">dias</p>
+              <p className="mt-1 text-sm text-yellow-700">
+                {pendingAndCompletedPayments.pendingPaymentsCount} pagamentos individuais
+              </p>
             </div>
           </div>
         ) : (
@@ -86,4 +86,4 @@ const TimeToCommunicationAndImplementation: React.FC = () => {
   )
 }
 
-export default TimeToCommunicationAndImplementation
+export default PendingAndCompletedPayments

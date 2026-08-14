@@ -20,4 +20,11 @@ analyticsRoutes.get(
   AnalyticsController.handleGetTimeToCommunicationAndImplementation,
 )
 
+analyticsRoutes.get(
+  '/pending-and-completed-payments',
+  authMiddleware,
+  checkRole([Role.ADMIN, Role.GENERAL_MANAGER]),
+  AnalyticsController.handleGetPendingAndCompletedPayments,
+)
+
 export { analyticsRoutes }

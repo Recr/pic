@@ -1,4 +1,5 @@
 import { Proposal } from '../../prisma/client/client'
+import { PrismaPayoutRepository } from '../repositories/payout.repository'
 import { PrismaProposalRepository } from '../repositories/proposal.repository'
 
 type TimeBucket = 'week' | 'month' | 'year'
@@ -23,6 +24,15 @@ interface GetTimeToCommunicationAndImplementationFilters {
 interface TimeToCommunicationAndImplementationResponse {
   averageTimeToCommunication: number
   averageTimeToImplementation: number
+}
+
+type GetPendingAndCompletedPaymentsFilters = GetTimeToCommunicationAndImplementationFilters
+
+interface GetPendingAndCompletedPaymentsResponse {
+  pendingPaymentsAmount: number
+  pendingPaymentsCount: number
+  completedPaymentsAmount: number
+  completedPaymentsCount: number
 }
 
 interface ProposalAnalyticsResponse {
@@ -129,7 +139,10 @@ const getBucketByRange = (startDate: Date, endDate: Date): TimeBucket => {
 }
 
 class AnalyticsUseCase {
-  constructor(private proposalsRepository: PrismaProposalRepository) {}
+  constructor(
+    private proposalsRepository: PrismaProposalRepository,
+    private payoutsRepository: PrismaPayoutRepository,
+  ) {}
 
   public async executeGetProposalAnalytics(
     filters?: GetProposalAnalyticsFilters,
@@ -225,6 +238,28 @@ class AnalyticsUseCase {
       averageTimeToImplementation: Number(
         (totalDaysToImplementation / implementedProposalsAmount).toFixed(0),
       ),
+    }
+  }
+
+  public async executeGetPendingAndCompletedPayments(
+    filters: GetPendingAndCompletedPaymentsFilters,
+  ): Promise<GetPendingAndCompletedPaymentsResponse> {
+    const payouts = await this.payoutsRepository.findAllFiltered(filters.startDate, filters.endDate)
+    const pendingPayments = payouts.filter((payout) => payout.status === 'PENDING')
+    const completedPayments = payouts.filter((payout) => payout.status === 'PAID')
+
+    const pendingPaymentsAmount = Number(
+      pendingPayments.reduce((acc, payout) => acc + Number(payout.value), 0).toFixed(2),
+    )
+    const completedPaymentsAmount = Number(
+      completedPayments.reduce((acc, payout) => acc + Number(payout.value), 0).toFixed(2),
+    )
+
+    return {
+      pendingPaymentsAmount,
+      pendingPaymentsCount: pendingPayments.length,
+      completedPaymentsCount: completedPayments.length,
+      completedPaymentsAmount,
     }
   }
 

@@ -110,11 +110,27 @@ export const AnalyticsController = {
         ...(startDate ? { startDate } : {}),
         ...(endDate ? { endDate: endOfUtcDay(endDate) } : {}),
       }
-      console.log('filters', filters)
       const timeToCommunicationAndImplementation =
         await analyticsUseCase.executeGetTimeToCommunicationAndImplementation(filters)
 
       res.send(timeToCommunicationAndImplementation)
+    } catch (error) {
+      next(error)
+    }
+  },
+  async handleGetPendingAndCompletedPayments(req: Request, res: Response, next: NextFunction) {
+    try {
+      const analyticsUseCase = makeAnalyticsUseCase()
+      const startDate = parseDateQuery(req.query.startDate, 'startDate')
+      const endDate = parseDateQuery(req.query.endDate, 'endDate')
+      const filters = {
+        ...(startDate ? { startDate } : {}),
+        ...(endDate ? { endDate: endOfUtcDay(endDate) } : {}),
+      }
+      const pendingAndCompletedPayments =
+        await analyticsUseCase.executeGetPendingAndCompletedPayments(filters)
+
+      res.send(pendingAndCompletedPayments)
     } catch (error) {
       next(error)
     }
