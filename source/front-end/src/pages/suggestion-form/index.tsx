@@ -11,6 +11,7 @@ import type { RootState } from '../../app/store'
 import EmployeeCombobox from '../../components/inputs/EmployeeCombobox'
 import DropdownSelect from '../../components/inputs/DropdownSelect'
 import { Skeleton } from '../../components/skeletons/Skeleton'
+import { MapPinIcon } from 'lucide-react'
 
 const EMPLOYEE_OPTIONS = [1, 2, 3] as const
 
@@ -197,13 +198,20 @@ const SuggestionForm: React.FC = () => {
             id="logo"
             src={logo}
             alt="Logo"
-            className="object-contain w-80 sm:w-96 mb-5 border border-[#ccc] rounded"
+            className="object-contain w-80 sm:w-100 shadow-xl rounded"
           />
+          <div className="sm:w-100 w-80 flex gap-6 bg-white rounded py-2 shadow-md my-2 px-4 items-center">
+            <MapPinIcon size={42} className="bg-blue-100 text-blue-700 p-2 rounded-full" />
+            <div className="flex flex-col">
+              <p className="font-medium text-gray-500">Local</p>
+              <h2 className="text-xl font-medium text-center w-full">São Bernardo do Campo</h2>
+            </div>
+          </div>
         </div>
         <form
           key={formKey}
           onSubmit={handleSubmit}
-          className="bg-white flex flex-col items-center w-80 sm:w-auto shadow-custom py-5 px-7.5 mx-auto mb-7.5 rounded"
+          className="bg-white flex flex-col items-center w-80 sm:w-100 shadow-custom py-5 px-7.5 mx-auto mb-7.5 rounded shadow-md"
         >
           {/* employee_amount_radio */}
           <div id="employee_amount_radio" className="my-8 mx-auto flex flex-col items-center">
