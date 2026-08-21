@@ -169,7 +169,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableC
               disabled={isLoading || isRejecting}
               className="py-2 px-3 cursor-pointer rounded border bg-blue-500 text-white w-1/2 hover:cursor-pointer hover:bg-blue-700 transition-colors"
             >
-              {isLoading ? 'Salvando...' : 'Definir dados'}
+              {isLoading ? 'Salvando...' : 'Definir Executor'}
             </button>
             <button
               type="button"
