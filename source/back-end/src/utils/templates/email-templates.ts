@@ -152,7 +152,7 @@ export const buildEmailWithEmployeeInformation = (
                 font-size:12px;
                 color:#9ca3af;
               ">
-                © 2026 ePIC
+                2026 ePIC
               </p>
 
               <p style="
