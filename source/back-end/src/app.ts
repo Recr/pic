@@ -3,10 +3,13 @@ import { appRoutes } from './router'
 import cors, { CorsOptions } from 'cors'
 import cookieParser from 'cookie-parser'
 import { startEmailJob } from './jobs/email-job'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const app = express()
-const port = process.env.PORT || 3030
-const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173'
+const port = process.env.PORT
+const corsOrigin = `${process.env.CORS_ORIGIN}`
 
 const corsOptions: CorsOptions = {
   origin: corsOrigin,

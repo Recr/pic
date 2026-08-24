@@ -27,14 +27,15 @@ model Category {
 }
 
 model Employee {
-  id           Int     @id @default(autoincrement())
-  name         String  @db.NVarChar(100)
-  role         String  @default("OPERATOR")
-  re           Int?    @unique
-  shift        String? @db.NVarChar(20)
-  passwordHash String  @map("password_hash") @db.NVarChar(100)
+  id                 Int     @id @default(autoincrement())
+  name               String  @db.NVarChar(100)
+  role               String  @default("OPERATOR")
+  re                 Int?    @unique
+  shift              String? @db.NVarChar(20)
+  email              String? @unique @db.NVarChar(100)
+  passwordHash       String  @map("password_hash") @db.NVarChar(100)
   mustChangePassword Boolean @map("must_change_password") @default(true)
-  passwordToken String? @map("password_token") @db.NVarChar(100)
+  passwordToken      String? @map("password_token") @db.NVarChar(100)
 
   proposalsChampion Proposal[]   @relation("ChampionReviewProposal")
   proposalsManager  Proposal[]   @relation("ManagerReviewProposal")
@@ -92,11 +93,11 @@ model Payout {
 }
 
 model Suggestion {
-  id         Int @id @default(autoincrement())
-  employeeId Int? @map("employee_id")
-  proposalId Int @map("proposal_id")
-  employeeRe Int @map("employee_re")
-  employeeName String? @map("employee_name") @db.NVarChar(100)
+  id            Int     @id @default(autoincrement())
+  employeeId    Int?    @map("employee_id")
+  proposalId    Int     @map("proposal_id")
+  employeeRe    Int     @map("employee_re")
+  employeeName  String? @map("employee_name") @db.NVarChar(100)
   employeeShift String? @map("employee_shift") @db.NVarChar(20)
 
   payout   Payout[]
@@ -108,11 +109,11 @@ model Suggestion {
 }
 
 model RefreshToken {
-  id         Int      @id @default(autoincrement())
-  employeeId Int      @map("employee_id")
-  tokenHash  String   @db.NVarChar(255)
-  expiresAt  DateTime @map("expires_at") @db.DateTime2
-  createdAt  DateTime @default(now()) @map("created_at") @db.DateTime2
+  id         Int       @id @default(autoincrement())
+  employeeId Int       @map("employee_id")
+  tokenHash  String    @db.NVarChar(255)
+  expiresAt  DateTime  @map("expires_at") @db.DateTime2
+  createdAt  DateTime  @default(now()) @map("created_at") @db.DateTime2
   revokedAt  DateTime? @map("revoked_at") @db.DateTime2
 
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -121,13 +122,13 @@ model RefreshToken {
 }
 
 model ProposalAttachment {
-  id          Int      @id @default(autoincrement())
-  proposalId  Int      @map("proposal_id")
-  relativePath    String   @map("relative_path") @db.NVarChar(255)
-  storedName    String   @map("stored_name") @db.NVarChar(255)
+  id           Int      @id @default(autoincrement())
+  proposalId   Int      @map("proposal_id")
+  relativePath String   @map("relative_path") @db.NVarChar(255)
+  storedName   String   @map("stored_name") @db.NVarChar(255)
   originalName String   @map("original_name") @db.NVarChar(255)
-  sizeBytes   Int      @map("size_bytes")
-  uploadedAt  DateTime @default(now()) @map("uploaded_at") @db.DateTime2
+  sizeBytes    Int      @map("size_bytes")
+  uploadedAt   DateTime @default(now()) @map("uploaded_at") @db.DateTime2
 
   proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
@@ -135,12 +136,12 @@ model ProposalAttachment {
 }
 
 model AnnualTarget {
-  id Int @id @default(autoincrement())
-  annualSubmittedProposalsTarget Int @map("annual_submited_proposals_target")
+  id                               Int @id @default(autoincrement())
+  annualSubmittedProposalsTarget   Int @map("annual_submited_proposals_target")
   annualImplementedProposalsTarget Int @map("annual_implemented_proposals_target")
-  annualHeadCount Int @map("annual_head_count")
-  communicationDaysTarget Int @map("communication_days_target")
-  year Int @map("year") @unique
+  annualHeadCount                  Int @map("annual_head_count")
+  communicationDaysTarget          Int @map("communication_days_target")
+  year                             Int @map("year") @unique
 
   @@map("annual_target")
 }
