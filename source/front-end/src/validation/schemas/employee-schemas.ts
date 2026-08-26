@@ -9,6 +9,7 @@ export const createEmployeeSchema = z.object({
   role: z.string(),
   shift: z.string('É necessário selecionar um turno.'),
   password: z.string().min(8, 'A senha deve ter no mínimo 8 caractéres.'),
+  email: z.email({ message: 'E-mail inválido.', pattern: z.regexes.rfc5322Email }).optional(),
 })
 
 export const updateEmployeeSchema = z.object({
@@ -19,6 +20,7 @@ export const updateEmployeeSchema = z.object({
     .positive('RE deve ser um número inteiro positivo'),
   role: z.string(),
   shift: z.string('É necessário selecionar um turno.'),
+  email: z.email({ message: 'E-mail inválido.', pattern: z.regexes.rfc5322Email }).optional(),
 })
 
 export const updateManagerOrChampionSchema = z.object({

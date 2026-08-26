@@ -4,6 +4,7 @@ export interface CreateEmployeeInput {
   role: Role
   shift: string
   password: string
+  email?: string
 }
 
 export enum Role {

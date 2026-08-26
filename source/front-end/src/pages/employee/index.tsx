@@ -194,6 +194,7 @@ const Employee: React.FC = () => {
                       setIsEditModalOpen(true)
                       updateSetValue('name', employee.name)
                       updateSetValue('re', employee.re)
+                      updateSetValue('email', employee.email)
                       updateSetValue('role', employee.role)
                       updateSetValue('shift', employee.shift || '1')
                     }}
@@ -212,7 +213,7 @@ const Employee: React.FC = () => {
             </div>
           </div>
 
-          {hasUnregisteredEmployees && (
+          {unregisteredEmployees && hasUnregisteredEmployees && (
             <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <h2 className="text-lg font-semibold text-gray-800">Não cadastrados</h2>
@@ -333,6 +334,17 @@ const Employee: React.FC = () => {
                 {updateErrors.re && (
                   <span className="text-xs text-red-600">{updateErrors.re.message}</span>
                 )}
+                <label>Email:</label>
+                <input
+                  className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  type="text"
+                  {...updateRegister('email')}
+                  placeholder="Email do colaborador"
+                  autoComplete="off"
+                />
+                {updateErrors.email && (
+                  <span className="text-xs text-red-600">{updateErrors.email.message}</span>
+                )}
                 <DropdownSelect
                   label="Cargo"
                   value={updateRoleValue}
@@ -430,6 +442,17 @@ const Employee: React.FC = () => {
             />
             {createErrors.re && (
               <span className="text-xs text-red-600">{createErrors.re.message}</span>
+            )}
+            <label>Email:</label>
+            <input
+              className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              type="text"
+              {...createRegister('email')}
+              placeholder="Email do colaborador"
+              autoComplete="off"
+            />
+            {createErrors.email && (
+              <span className="text-xs text-red-600">{createErrors.email.message}</span>
             )}
             <DropdownSelect
               label="Cargo"

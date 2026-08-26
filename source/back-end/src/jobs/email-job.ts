@@ -6,7 +6,7 @@ import { buildEmailWithEmployeeInformation } from '../utils/templates/email-temp
 const url = process.env.CORS_ORIGIN
 
 export async function startEmailJob() {
-  cron.schedule('21 13 * * 1', async () => {
+  cron.schedule('0 8 * * 1', async () => {
     try {
       const employeeUseCase = makeEmployeeUseCase()
       const employees = await employeeUseCase.executeFindAllWithUnansweredProposals()

@@ -3,6 +3,7 @@ export interface User {
   name: string
   role: Role
   re: number
+  email: string
   shift: string
   mustChangePassword: boolean
 }
