@@ -111,6 +111,11 @@ class EmployeeUseCase {
     const updatedEmployee = await this.employeeRepository.update(employeeId, updatedEmployeeData)
     return updatedEmployee
   }
+
+  public async executeFindAllWithUnansweredProposals() {
+    const employees = await this.employeeRepository.findAllWithUnansweredProposals()
+    return employees
+  }
 }
 
 export { EmployeeUseCase }

@@ -4,6 +4,7 @@ export interface Employee {
   name: string
   role: string
   shift?: string
+  email?: string
 }
 
 export interface UnregisteredEmployee {
