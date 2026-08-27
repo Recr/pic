@@ -245,45 +245,12 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
     try {
       console.log('Starting download:', { proposalId, attachmentId, filename })
 
-      const response = await fetch(
-        `/api/proposals/${proposalId}/attachments/${attachmentId}/download`,
-        {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            Accept: 'application/octet-stream',
-          },
-        },
-      )
-
-      // console.log('Response received:', {
-      //   status: response.status,
-      //   statusText: response.statusText,
-      //   contentType: response.headers.get('content-type'),
-      //   contentLength: response.headers.get('content-length'),
-      // })
-      {
-        /* TODO: refactor to use toast */
-      }
-      if (!response.ok) {
-        const errorText = await response.text()
-        toast.error(`Erro ao baixar arquivo (${response.status}): ${errorText || 'Falha.'}`)
-        return
-      }
-
-      const blob = await response.blob()
-      console.log('Blob received:', { size: blob.size, type: blob.type })
-
-      const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
-      link.href = url
+      link.href = `/api/proposals/${proposalId}/attachments/${attachmentId}/download`
       link.download = filename
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
-      window.setTimeout(() => window.URL.revokeObjectURL(url), 1000)
-
-      // console.log('Download triggered successfully')
     } catch (error) {
       console.error('Download error:', error)
       toast.error(`Erro ao baixar arquivo: ${getErrorMessage(error)}`)
