@@ -7,6 +7,7 @@ import { getStatusColor } from '../../../helpers/getStatusColor'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../../app/store'
 import { toast } from 'react-toastify'
+import { API_BASE_URL } from '../../../services/base-query-with-auth'
 import {
   Undo2,
   Trash2,
@@ -246,7 +247,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
       console.log('Starting download:', { proposalId, attachmentId, filename })
 
       const link = document.createElement('a')
-      link.href = `/api/proposals/${proposalId}/attachments/${attachmentId}/download`
+      link.href = `${API_BASE_URL.replace(/\/$/, '')}/proposals/${proposalId}/attachments/${attachmentId}/download`
       link.download = filename
       document.body.appendChild(link)
       link.click()
