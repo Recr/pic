@@ -198,9 +198,9 @@ const SuggestionForm: React.FC = () => {
             id="logo"
             src={logo}
             alt="Logo"
-            className="object-contain w-80 sm:w-100 shadow-xl rounded"
+            className="object-contain w-80 sm:w-95 shadow-xl rounded"
           />
-          <div className="sm:w-100 w-80 flex gap-6 bg-white rounded py-2 shadow-md my-2 px-4 items-center">
+          <div className="sm:w-95 w-80 flex gap-6 bg-white rounded py-2 shadow-md my-2 px-4 items-center">
             <MapPinIcon size={42} className="bg-blue-100 text-blue-700 p-2 rounded-full" />
             <div className="flex flex-col">
               <p className="font-medium text-gray-500">Local</p>
@@ -211,7 +211,7 @@ const SuggestionForm: React.FC = () => {
         <form
           key={formKey}
           onSubmit={handleSubmit}
-          className="bg-white flex flex-col items-center w-80 sm:w-100 shadow-custom py-5 px-7.5 mx-auto mb-7.5 rounded shadow-md"
+          className="bg-white flex flex-col items-center shadow-custom py-5 px-7.5 mx-auto mb-7.5 rounded shadow-md"
         >
           {/* employee_amount_radio */}
           <div id="employee_amount_radio" className="my-8 mx-auto flex flex-col items-center">
@@ -238,7 +238,7 @@ const SuggestionForm: React.FC = () => {
           {/* employee_information */}
           <div
             id="employee_information"
-            className="flex flex-col md:flex-row items-center gap-5 w-full mb-7.5 md:max-w-175 md:justify-center"
+            className="flex flex-col md:flex-row items-center gap-5  mb-7.5 "
           >
             {Array.from({ length: employeeCount }, (_, i) => i + 1).map((num) => (
               <div
