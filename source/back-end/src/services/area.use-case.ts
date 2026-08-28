@@ -4,7 +4,7 @@ import { AppError } from '../errors/AppError'
 import { PrismaAreaRepository } from '../repositories/area.repository'
 
 class AreaUseCase {
-  constructor(private areaRepository: PrismaAreaRepository) {}
+  constructor(private readonly areaRepository: PrismaAreaRepository) {}
 
   public async executeFindAll() {
     const areas = await this.areaRepository.findAll()

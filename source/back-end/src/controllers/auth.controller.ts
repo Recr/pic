@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express'
-import { PrismaEmployeeRepository } from '../repositories/employee.repository'
 import { AppError } from '../errors/AppError'
 import { StatusCodes } from 'http-status-codes'
 import { makeLoginUseCase } from '../factories/make-login-use-case.factory'
+import { makeEmployeeUseCase } from '../factories/make-employee-use-case.factory'
 
 export const AuthController = {
   async handleLogin(req: Request, res: Response, next: NextFunction) {
@@ -36,13 +36,12 @@ export const AuthController = {
   async handleGetCurrentUser(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = Number(req.user?.sub)
-      if (isNaN(userId)) {
+      if (Number.isNaN(userId)) {
         throw new AppError('Invalid user ID in token.', StatusCodes.UNAUTHORIZED)
       }
 
-      // For simplicity, we're directly using the repository here, but ideally, this should go through a use case.
-      const employeeUseCase = new PrismaEmployeeRepository()
-      const user = await employeeUseCase.findById(userId)
+      const employeeUseCase = makeEmployeeUseCase()
+      const user = await employeeUseCase.executeFindById(userId)
       if (!user) {
         throw new AppError('User not found.', StatusCodes.NOT_FOUND)
       }
@@ -113,7 +112,7 @@ export const AuthController = {
   async handleChangePassword(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = Number(req.user?.sub)
-      if (isNaN(userId)) {
+      if (Number.isNaN(userId)) {
         throw new AppError('Invalid user ID in token.', StatusCodes.UNAUTHORIZED)
       }
       const { currentPassword, newPassword } = req.body

@@ -4,13 +4,13 @@ import { PrismaEmployeeRepository } from '../repositories/employee.repository'
 import { LoginInput } from '../utils/types/login.types'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { RefreshTokenRepository } from '../repositories/refresh-token.repository'
+import { PrismaRefreshTokenRepository } from '../repositories/refresh-token.repository'
 import { passwordResetTokenVault } from '../lib/password-reset-token-vault'
 
 class LoginUseCase {
   constructor(
-    private employeeRepository: PrismaEmployeeRepository,
-    private refreshTokenRepository: RefreshTokenRepository,
+    private readonly employeeRepository: PrismaEmployeeRepository,
+    private readonly refreshTokenRepository: PrismaRefreshTokenRepository,
   ) {}
 
   public async executeLogin(loginData: LoginInput) {
@@ -70,7 +70,7 @@ class LoginUseCase {
       const payload = jwt.verify(oldRefreshToken, refreshTokenSecret) as jwt.JwtPayload
       const employeeId = Number(payload.sub)
 
-      if (isNaN(employeeId)) {
+      if (Number.isNaN(employeeId)) {
         throw new AppError('Invalid refresh token.', StatusCodes.UNAUTHORIZED)
       }
 
@@ -135,7 +135,7 @@ class LoginUseCase {
       const payload = jwt.verify(refreshToken, refreshTokenSecret) as jwt.JwtPayload
       const employeeId = Number(payload.sub)
 
-      if (isNaN(employeeId)) {
+      if (Number.isNaN(employeeId)) {
         throw new AppError('Invalid refresh token.', StatusCodes.UNAUTHORIZED)
       }
 

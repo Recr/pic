@@ -4,7 +4,7 @@ import { PrismaSuggestionRepository } from '../repositories/suggestion.repositor
 import { Prisma } from '../../prisma/client/client'
 
 class SuggestionUseCase {
-  constructor(private suggestionRepository: PrismaSuggestionRepository) {}
+  constructor(private readonly suggestionRepository: PrismaSuggestionRepository) {}
 
   public async executeFindAll() {
     const suggestions = await this.suggestionRepository.findAll()

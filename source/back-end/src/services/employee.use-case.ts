@@ -12,8 +12,8 @@ const SALT_ROUNDS = 12
 
 class EmployeeUseCase {
   constructor(
-    private employeeRepository: PrismaEmployeeRepository,
-    private suggestionRepository: PrismaSuggestionRepository,
+    private readonly employeeRepository: PrismaEmployeeRepository,
+    private readonly suggestionRepository: PrismaSuggestionRepository,
   ) {}
 
   public async executeFindAll() {

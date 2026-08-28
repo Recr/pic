@@ -167,7 +167,7 @@ class PrismaProposalRepository {
       }[]
     }) => boolean,
   ) {
-    const finalWhere: Prisma.ProposalWhereInput = where ? where : { isActive: true }
+    const finalWhere: Prisma.ProposalWhereInput = where ?? { isActive: true }
     if (!reMatcher && !idMatcher) {
       const [proposals, totalCount] = await Promise.all([
         prisma.proposal.findMany({

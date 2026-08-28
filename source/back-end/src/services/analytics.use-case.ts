@@ -140,8 +140,8 @@ const getBucketByRange = (startDate: Date, endDate: Date): TimeBucket => {
 
 class AnalyticsUseCase {
   constructor(
-    private proposalsRepository: PrismaProposalRepository,
-    private payoutsRepository: PrismaPayoutRepository,
+    private readonly proposalsRepository: PrismaProposalRepository,
+    private readonly payoutsRepository: PrismaPayoutRepository,
   ) {}
 
   public async executeGetProposalAnalytics(
@@ -218,7 +218,7 @@ class AnalyticsUseCase {
     let implementedProposalsAmount = 0
 
     for (const proposal of proposals) {
-      if (proposal.requiresImplementation == true) {
+      if (proposal.requiresImplementation) {
         totalDaysToCommunication += this.getTimeToCommunication(proposal)
         if (proposal.status !== 'REJECTED' && proposal.status !== 'NOT_VIABLE') {
           const timeToImplementation = this.getTimeToImplementation(proposal)

@@ -43,7 +43,7 @@ export const AreasController = {
       const data: Prisma.AreaUpdateInput = req.body
       const areaId = Number(req.params.id)
 
-      if (isNaN(areaId)) {
+      if (Number.isNaN(areaId)) {
         return res.status(400).json({ error: 'Invalid area id' })
       }
 
@@ -61,7 +61,7 @@ export const AreasController = {
     try {
       const areaId = Number(req.params.id)
 
-      if (isNaN(areaId)) {
+      if (Number.isNaN(areaId)) {
         return res.status(400).json({ error: 'Invalid area id' })
       }
       const areasUseCase = makeAreaUseCase()

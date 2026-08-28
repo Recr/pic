@@ -23,12 +23,12 @@ import path from 'node:path'
 
 class ProposalUseCase {
   constructor(
-    private proposalRepository: PrismaProposalRepository,
-    private employeeRepository: PrismaEmployeeRepository,
-    private categoryRepository: PrismaCategoryRepository,
-    private suggestionRepository: PrismaSuggestionRepository,
-    private proposalAttachmentRepository: PrismaProposalAttachmentRepository,
-    private payoutRepository: PrismaPayoutRepository,
+    private readonly proposalRepository: PrismaProposalRepository,
+    private readonly employeeRepository: PrismaEmployeeRepository,
+    private readonly categoryRepository: PrismaCategoryRepository,
+    private readonly suggestionRepository: PrismaSuggestionRepository,
+    private readonly proposalAttachmentRepository: PrismaProposalAttachmentRepository,
+    private readonly payoutRepository: PrismaPayoutRepository,
   ) {}
 
   public async executeFindAll() {

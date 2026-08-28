@@ -1,12 +1,11 @@
 import { NextFunction, Request, Response } from 'express'
-import { CreateProposalInput } from '../utils/types/proposals.types'
+import { CreateProposalInput, DetailedProposalFilters } from '../utils/types/proposals.types'
 import { AppError } from '../errors/AppError'
 import { StatusCodes } from 'http-status-codes'
 import path from 'node:path'
 import { createReadStream } from 'node:fs'
 import fs from 'node:fs/promises'
 import { Role } from '../utils/types/employees.types'
-import { DetailedProposalFilters } from '../utils/types/proposals.types'
 import { makeProposalsUseCase } from '../factories/make-proposal-use-case.factory'
 
 export const ProposalsController = {
@@ -253,7 +252,7 @@ export const ProposalsController = {
   async handleAdminRejection(req: Request, res: Response, next: NextFunction) {
     try {
       const proposalId = Number(req.params.id)
-      const rejectionNote = String(req.query.rejectionNote ?? '')
+      const rejectionNote = String(req.query.rejectionNote)
       const proposalUseCase = makeProposalsUseCase()
       const updatedProposal = await proposalUseCase.executeAdminRejection(proposalId, rejectionNote)
       res.send(updatedProposal)
