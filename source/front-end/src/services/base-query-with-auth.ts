@@ -11,7 +11,7 @@ const baseQuery = fetchBaseQuery({
 export const baseQueryWithAuth = async (args: any, api: any, extraOptions: any) => {
   let result = await baseQuery(args, api, extraOptions)
 
-  if (result.error && result.error.status === 401) {
+  if (result.error?.status === 401) {
     const isRefreshRequest =
       typeof args === 'object' && args !== null && 'url' in args && args.url === '/auth/refresh'
 

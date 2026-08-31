@@ -78,8 +78,6 @@ const DropdownSelect = ({
           className={`flex w-full items-center justify-between rounded border bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 ${error ? 'border-red-400 focus:ring-red-500/20' : 'border-gray-300'} ${buttonClassName}`}
           aria-expanded={isOpen}
           aria-haspopup="listbox"
-          aria-required={required}
-          aria-invalid={Boolean(error)}
         >
           <span className={selectedOption ? '' : 'text-gray-400'}>
             {selectedOption?.label ?? placeholder}

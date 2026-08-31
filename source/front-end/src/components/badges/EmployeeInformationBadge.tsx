@@ -4,8 +4,8 @@ interface EmployeeInformationBadgeProps {
   suggestion: {
     employeeName: string
     employeeRe: number
-    employeeShift?: string | undefined
-    employee?: Employee | undefined
+    employeeShift?: string
+    employee?: Employee
   }
   id: number
   className?: string
