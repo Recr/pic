@@ -7,7 +7,7 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-const app = express()
+const app = express().disable('x-powered-by')
 const port = process.env.PORT
 const corsOrigin = `${process.env.CORS_ORIGIN}`
 
