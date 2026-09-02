@@ -15,6 +15,20 @@ class PrismaEmployeeRepository {
     return employees
   }
 
+  public async findAllForForms() {
+    const employees = await prisma.employee.findMany({
+      select: {
+        re: true,
+        name: true,
+        shift: true,
+      },
+      orderBy: {
+        re: 'asc',
+      },
+    })
+    return employees
+  }
+
   public async findAllWithToken() {
     const employees = await prisma.employee.findMany({
       where: {

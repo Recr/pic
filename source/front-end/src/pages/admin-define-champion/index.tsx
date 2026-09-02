@@ -6,7 +6,8 @@ import { ProposalCard } from './components/DefineProposalChampionCard'
 import { Skeleton } from '../../components/skeletons/Skeleton'
 
 const AdminDefineChampion: React.FC = () => {
-  const { data: championList, isLoading: isLoadingChampions } = employeeAPI.useGetEmployeesQuery()
+  const { data: championList, isLoading: isLoadingChampions } =
+    employeeAPI.useGetEmployeesForFormsQuery()
   const { data: areas, isLoading: isLoadingAreas } = areaAPI.useGetAreasQuery()
   const { data: proposalsList, isLoading: isLoadingProposals } =
     proposalAPI.useGetProposalsWithoutChampionQuery()

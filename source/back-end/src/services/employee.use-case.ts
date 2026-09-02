@@ -21,6 +21,11 @@ class EmployeeUseCase {
     return employees
   }
 
+  public async executeFindAllForForms() {
+    const employees = await this.employeeRepository.findAllForForms()
+    return employees
+  }
+
   public async executeFindById(employeeId: number) {
     const employee = await this.employeeRepository.findById(employeeId)
     if (!employee) throw new AppError('Employee not found.', StatusCodes.NOT_FOUND)

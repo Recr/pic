@@ -32,7 +32,8 @@ const SuggestionForm: React.FC = () => {
   const [areaError, setAreaError] = useState<string | null>(null)
   const [createProposal] = proposalAPI.useCreateProposalMutation()
 
-  const { data: employees = [], isLoading: isLoadingEmployees } = employeeAPI.useGetEmployeesQuery()
+  const { data: employees = [], isLoading: isLoadingEmployees } =
+    employeeAPI.useGetEmployeesForFormsQuery()
   const { data: areas = [], isLoading: isLoadingAreas } = areaAPI.useGetAreasQuery()
 
   const navigate = useNavigate()

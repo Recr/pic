@@ -14,6 +14,16 @@ export const EmployeesController = {
     }
   },
 
+  async handleFindAllForForms(req: Request, res: Response, next: NextFunction) {
+    try {
+      const employeeUseCase = makeEmployeeUseCase()
+      const employees = await employeeUseCase.executeFindAllForForms()
+      res.send(employees)
+    } catch (error) {
+      next(error)
+    }
+  },
+
   async handleFindById(req: Request, res: Response, next: NextFunction) {
     try {
       const employeeId = Number(req.params.id)
