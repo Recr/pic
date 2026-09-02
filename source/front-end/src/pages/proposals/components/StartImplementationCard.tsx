@@ -108,18 +108,13 @@ const StartImplementationCard: React.FC<ProposalWithSuggestions> = (proposal) =>
           </p>
         </div>
         <hr className="text-gray-300 -mx-4" />
-        <div
-          className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center"
-          onClick={(e) => e.stopPropagation()}
+        <button
+          type="button"
+          onClick={() => handleStatusUpdate('IMPLEMENTATION')}
+          className="w-full cursor-pointer rounded border border-blue-800 bg-blue-500 px-3 py-2 md:py-0.5  text-white transition-all hover:bg-blue-700 sm:w-auto text-xs md:text-sm mt-2"
         >
-          <button
-            type="button"
-            onClick={() => handleStatusUpdate('IMPLEMENTATION')}
-            className="w-full cursor-pointer rounded border border-blue-800 bg-blue-500 px-3 py-2 md:py-0.5  text-white transition-all hover:bg-blue-700 sm:w-auto text-xs md:text-sm"
-          >
-            Implementar
-          </button>
-        </div>
+          Implementar
+        </button>
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>

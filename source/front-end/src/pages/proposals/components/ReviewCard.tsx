@@ -206,6 +206,7 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
             <button
               onClick={() => setIsConfirmationModalOpen(false)}
               className="py-2 px-4 cursor-pointer rounded border border-gray-300 bg-gray-100 hover:bg-gray-200 text-gray-800 transition-all"
+              type="button"
             >
               Cancelar
             </button>
@@ -214,6 +215,7 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
                 handleStatusUpdate(newStatus)
                 setIsConfirmationModalOpen(false)
               }}
+              type="button"
               className="py-2 px-4 cursor-pointer rounded border border-green-800 bg-green-500 hover:bg-green-700 text-white transition-all"
             >
               Confirmar
@@ -252,6 +254,7 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
           <div className="flex gap-3 justify-end">
             <button
               onClick={() => setIsRejectionModalOpen(false)}
+              type="button"
               className="py-2 px-4 cursor-pointer rounded border border-gray-300 bg-gray-100 hover:bg-gray-200 text-gray-800 transition-all"
             >
               Cancelar
@@ -273,6 +276,7 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
                 await handleStatusUpdate(reasonStatus, normalizedRejectionNote)
                 setIsRejectionModalOpen(false)
               }}
+              type="button"
               className="py-2 px-4 cursor-pointer rounded border border-[#c0392b] bg-[#e74c3c] hover:bg-[#c0392b] text-white transition-all"
             >
               {reasonStatus === 'NOT_VIABLE' ? 'Confirmar nao viavel' : 'Confirmar rejeicao'}

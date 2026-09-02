@@ -251,7 +251,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
       link.download = filename
       document.body.appendChild(link)
       link.click()
-      document.body.removeChild(link)
+      link.remove()
     } catch (error) {
       console.error('Download error:', error)
       toast.error(`Erro ao baixar arquivo: ${getErrorMessage(error)}`)
@@ -338,16 +338,14 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   }
 
   const canEditManager = user?.role === 'ADMIN'
-  const canEditChampion =
-    user?.role === 'ADMIN' ? true : user?.re === proposal.manager?.re ? true : false
+  const canEditChampion = user?.role === 'ADMIN' ? true : user?.re === proposal.manager?.re
 
   return (
     <>
-      {/* sm:px-4 md:grid-cols-[56px_2fr_2fr_1fr_1fr_1fr] md:gap-0 md:py-2 */}
-      {/* ${proposal.isActive ? 'hover:bg-blue-100 border-gray-200' : 'bg-red-100  border-red-200 hover:bg-red-300 hover:border-red-400'} */}
-      <div
-        className={`bg-gray-50 rounded-lg md:rounded-none flex flex-1 px-3 py-3 md:py-0 text-left shadow-lg md:shadow-sm hover:bg-blue-50 text-sm hover:cursor-pointer transition-all ${borderColors[proposal.status] ?? 'border-gray-300'} border-l-8 md:border-l-4 hover:translate-y-1 hover:animate-pulse`}
+      <button
+        className={`bg-gray-50 rounded-lg md:rounded-none flex flex-1 px-3 py-3 md:py-0 text-left shadow-lg md:shadow-sm hover:bg-blue-50 text-sm hover:cursor-pointer transition-all ${borderColors[proposal.status] ?? 'border-gray-300'} border-l-8 md:border-l-4 hover:translate-y-1 hover:animate-pulse ${proposal.isActive ? 'hover:bg-blue-100 border-gray-200' : 'bg-red-100  border-red-200 hover:bg-red-300 hover:border-red-400'}`}
         onClick={() => setIsModalOpen(true)}
+        type="button"
       >
         <div className="flex flex-1 flex-col gap-3 md:grid md:grid-cols-[56px_2fr_2fr_1fr_0.8fr_1fr] lg:grid-cols-[56px_2fr_2fr_1fr_0.55fr_1fr] xl:grid-cols-[56px_2fr_2fr_1fr_0.4fr_1fr] md:gap-0 md:py-1">
           <div className="flex justify-between">
@@ -411,7 +409,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
           />
         </div>
         <ChevronRightIcon size={32} className="text-gray-400 self-center md:hidden" />
-      </div>
+      </button>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div className="w-full sm:max-w-11/12 space-y-4 p-4 md:max-w-[70vw]  sm:p-6 lg:w-152">
           <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:gap-4">
@@ -505,13 +503,14 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
             <div>
               <p className="text-sm font-semibold mb-2">Gestor</p>
               <div className="flex flex-wrap gap-2">
-                <p
+                <button
                   onClick={() => {
                     if (canEditManager) {
                       setEmployeeType('MANAGER')
                       setIsUpdateManagerModalOpen(true)
                     }
                   }}
+                  type="button"
                   className={`bg-gray-100 px-2 py-1 rounded text-sm ${canEditManager ? 'border border-blue-300 border-dashed hover:cursor-pointer hover:bg-blue-50 hover:border-blue-400' : ''} transition-colors`}
                 >
                   <span className="text-gray-700 font-bold">{proposal.manager.name}</span>
@@ -520,7 +519,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
                     {' - '}
                     Turno: {proposal.manager.shift}
                   </span>
-                </p>
+                </button>
               </div>
             </div>
           )}

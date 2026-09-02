@@ -10,10 +10,11 @@ import { categoryAPI } from '../../features/category/category-api'
 import DropdownSelect from '../../components/inputs/DropdownSelect'
 import type { RootState } from '../../app/store'
 import { useSelector } from 'react-redux'
+import FilterItem from './components/FilterItem'
 
 type PageSizeSelection = '50' | '100' | '200' | 'more'
 type MoreLimitSelection = 'all' | 'custom' | null
-type PageItem = number | 'ellipsis'
+type PageItem = number | { type: 'ellipsis'; key: string }
 
 const STATUS_OPTIONS = [
   'DEFINE_CHAMPION',
@@ -76,7 +77,7 @@ const getPageItems = (currentPage: number, totalPages: number): PageItem[] => {
 
   sortedPages.forEach((page, index) => {
     if (index > 0 && page - sortedPages[index - 1] > 1) {
-      items.push('ellipsis')
+      items.push({ type: 'ellipsis', key: `ellipsis-before-${page}` })
     }
 
     items.push(page)
@@ -110,14 +111,7 @@ const SuggestionList: React.FC = () => {
   const [isFilterBarVisible, setIsFilterBarVisible] = useState(false)
   const user = useSelector((state: RootState) => state.auth.user)
 
-  const presetLimit =
-    pageSizeSelection === '50'
-      ? 50
-      : pageSizeSelection === '100'
-        ? 100
-        : pageSizeSelection === '200'
-          ? 200
-          : 50
+  const presetLimit = Number(pageSizeSelection ?? '50')
   const customLimitValue = Number(customLimitInput)
   const customLimit =
     Number.isInteger(customLimitValue) && customLimitValue > 0 ? customLimitValue : 50
@@ -425,8 +419,7 @@ const SuggestionList: React.FC = () => {
               )}
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                ID
+              <FilterItem filterName="ID" filterId="id">
                 <input
                   type="number"
                   min={1}
@@ -435,9 +428,8 @@ const SuggestionList: React.FC = () => {
                   placeholder="Ex.: 123"
                   className="rounded border border-gray-300 px-3 py-2 text-sm"
                 />
-              </label>
-              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                RE
+              </FilterItem>
+              <FilterItem filterId="re" filterName="RE">
                 <input
                   type="number"
                   min={1}
@@ -446,9 +438,8 @@ const SuggestionList: React.FC = () => {
                   placeholder="Ex.: 45678"
                   className="rounded border border-gray-300 px-3 py-2 text-sm"
                 />
-              </label>
-              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                Nome do colaborador
+              </FilterItem>
+              <FilterItem filterId="employeeName" filterName="Nome do Colaborador">
                 <input
                   type="text"
                   value={filterEmployeeNameInput}
@@ -456,9 +447,8 @@ const SuggestionList: React.FC = () => {
                   placeholder="Buscar por nome"
                   className="rounded border border-gray-300 px-3 py-2 text-sm"
                 />
-              </label>
-              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                Nome do gestor
+              </FilterItem>
+              <FilterItem filterId="managerName" filterName="Nome do gestor">
                 <input
                   type="text"
                   value={filterManagerNameInput}
@@ -466,9 +456,8 @@ const SuggestionList: React.FC = () => {
                   placeholder="Buscar por nome"
                   className="rounded border border-gray-300 px-3 py-2 text-sm"
                 />
-              </label>
-              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                Nome do executor
+              </FilterItem>
+              <FilterItem filterName="Nome do executor" filterId="championName">
                 <input
                   type="text"
                   value={filterChampionNameInput}
@@ -476,9 +465,8 @@ const SuggestionList: React.FC = () => {
                   placeholder="Buscar por nome"
                   className="rounded border border-gray-300 px-3 py-2 text-sm"
                 />
-              </label>
-              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                Descrição
+              </FilterItem>
+              <FilterItem filterName="Descrição" filterId="description">
                 <input
                   type="text"
                   value={filterDescriptionInput}
@@ -486,27 +474,24 @@ const SuggestionList: React.FC = () => {
                   placeholder="Buscar na descrição"
                   className="rounded border border-gray-300 px-3 py-2 text-sm"
                 />
-              </label>
-              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                De
+              </FilterItem>
+              <FilterItem filterName="Data de criação (De)" filterId="dateFrom">
                 <input
                   type="date"
                   value={filterDateFromInput}
                   onChange={(event) => setFilterDateFromInput(event.target.value)}
                   className="rounded border border-gray-300 px-3 py-2 text-sm"
                 />
-              </label>
-              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                Até
+              </FilterItem>
+              <FilterItem filterName="Data de criação (Até)" filterId="dateTo">
                 <input
                   type="date"
                   value={filterDateToInput}
                   onChange={(event) => setFilterDateToInput(event.target.value)}
                   className="rounded border border-gray-300 px-3 py-2 text-sm"
                 />
-              </label>
-              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                Status
+              </FilterItem>
+              <FilterItem filterName="Status" filterId="status">
                 <DropdownSelect
                   value={filterStatusInput}
                   onChange={setFilterStatusInput}
@@ -517,9 +502,8 @@ const SuggestionList: React.FC = () => {
                   }))}
                   buttonClassName="rounded border border-gray-300 px-3 py-2 text-sm"
                 />
-              </label>
-              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                Área
+              </FilterItem>
+              <FilterItem filterId="area" filterName="Área">
                 <DropdownSelect
                   value={filterAreaInput}
                   placeholder="Todas"
@@ -531,9 +515,8 @@ const SuggestionList: React.FC = () => {
                     })) ?? []
                   }
                 />
-              </label>
-              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                Categoria
+              </FilterItem>
+              <FilterItem filterId="category" filterName="Categoria">
                 <DropdownSelect
                   value={filterCategoryInput}
                   placeholder="Todas"
@@ -545,7 +528,7 @@ const SuggestionList: React.FC = () => {
                     })) ?? []
                   }
                 />
-              </label>
+              </FilterItem>
             </div>
             <div
               className={`mt-4 flex flex-row sm:items-start gap-3 ${hasActiveFilters ? 'justify-between' : 'justify-end'} items-center`}
@@ -591,9 +574,9 @@ const SuggestionList: React.FC = () => {
             <ChevronLeftIcon size={20} />
             <span className="hidden sm:block">Anterior</span>
           </button>
-          {visiblePages.map((pageItem, index) =>
-            pageItem === 'ellipsis' ? (
-              <span key={`ellipsis-${index}`} className="px-1 text-gray-500">
+          {visiblePages.map((pageItem) =>
+            typeof pageItem !== 'number' ? (
+              <span key={pageItem.key} className="px-1 text-gray-500">
                 ...
               </span>
             ) : (
