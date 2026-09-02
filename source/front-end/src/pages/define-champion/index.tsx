@@ -4,7 +4,8 @@ import { ProposalCard } from './components/DefineProposalChampionCard'
 import { Skeleton } from '../../components/skeletons/Skeleton'
 
 const DefineChampion: React.FC = () => {
-  const { data: championList, isLoading: isLoadingChampions } = employeeAPI.useGetEmployeesQuery()
+  const { data: championList, isLoading: isLoadingChampions } =
+    employeeAPI.useGetEmployeesForFormsQuery()
   const { data: proposalsList, isLoading: isLoadingProposals } =
     proposalAPI.useGetProposalsWithoutChampionQuery()
 

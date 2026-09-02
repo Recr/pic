@@ -73,7 +73,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   const [updateProposalManager] = proposalAPI.useUpdateProposalManagerMutation()
   const [updateProposalChampion] = proposalAPI.useUpdateProposalChampionMutation()
   const user = useSelector((state: RootState) => state.auth.user)
-  const { data: employeeList } = employeeAPI.useGetEmployeesQuery()
+  const { data: employeeList } = employeeAPI.useGetEmployeesForFormsQuery()
 
   const isAdmin = user?.role === 'ADMIN'
   const isManager = user?.re !== undefined && proposal.manager?.re === user.re

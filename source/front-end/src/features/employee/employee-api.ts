@@ -13,6 +13,10 @@ export const employeeAPI = api.injectEndpoints({
       query: () => '/employees',
       providesTags: ['Employee'],
     }),
+    getEmployeesForForms: builder.query<Employee[], void>({
+      query: () => '/employees/basic-info',
+      providesTags: ['Employee'],
+    }),
     getUnregisteredEmployees: builder.query<UnregisteredEmployee[], void>({
       query: () => '/employees/unregistered',
       providesTags: ['Employee'],
