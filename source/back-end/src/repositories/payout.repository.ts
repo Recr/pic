@@ -31,6 +31,36 @@ class PrismaPayoutRepository {
                 rewardAmount: true,
                 completedAt: true,
                 isActive: true,
+                isLegacy: true,
+                status: true,
+                requiresImplementation: true,
+                manager: {
+                  select: {
+                    re: true,
+                    name: true,
+                    shift: true,
+                    role: true,
+                  },
+                },
+                champion: {
+                  select: {
+                    re: true,
+                    name: true,
+                    shift: true,
+                    role: true,
+                  },
+                },
+                area: {
+                  select: {
+                    name: true,
+                  },
+                },
+                category: {
+                  select: {
+                    name: true,
+                    categoryReward: true,
+                  },
+                },
               },
             },
           },

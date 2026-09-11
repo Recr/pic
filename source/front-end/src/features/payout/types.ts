@@ -1,3 +1,5 @@
+import type { Employee } from '../employee/types'
+
 export type PayoutStatus = 'PENDING' | 'PAID' | 'CANCELLED'
 
 export interface Payout {
@@ -7,7 +9,7 @@ export interface Payout {
   value: number
   status: PayoutStatus
   suggestion: {
-    employeeRe: string
+    employeeRe: number
     employeeName: string
     employeeShift: string
     employee: {
@@ -21,7 +23,19 @@ export interface Payout {
       description: string
       createdAt: string
       rewardAmount: number
-      completedAt: string | null
+      completedAt: string
+      isLegacy: boolean
+      manager: Employee | null
+      champion: Employee | null
+      status: string
+      requiresImplementation: boolean
+      area: {
+        name: string
+      }
+      category: {
+        name: string
+        categoryReward: number
+      }
     }
   }
 }

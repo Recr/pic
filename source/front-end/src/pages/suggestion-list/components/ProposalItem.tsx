@@ -3,7 +3,7 @@ import Modal from '../../../components/modal/Modal'
 import StatusBadge from '../../../components/badges/StatusBadge'
 import type { ProposalDetailed } from '../../../features/proposal/types'
 import { proposalAPI } from '../../../features/proposal/proposal-api'
-import { getStatusColor } from '../../../helpers/getStatusColor'
+import { borderColors, getStatusColor } from '../../../helpers/getStatusColor'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../../app/store'
 import { toast } from 'react-toastify'
@@ -26,6 +26,11 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod/src/zod.js'
 import { translateRoles } from '../../../helpers/translateRoles'
 import EmployeeInformationBadge from '../../../components/badges/EmployeeInformationBadge'
+import {
+  getProposalAvailableUndoActions,
+  useProposalUndo,
+  type UndoType,
+} from '../../../helpers/handleProposalUndoButton'
 
 const MAX_ATTACHMENTS_PER_UPLOAD = 5
 const MAX_ATTACHMENT_SIZE_BYTES = 10 * 1024 * 1024
@@ -38,34 +43,13 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   const [isUpdateManagerModalOpen, setIsUpdateManagerModalOpen] = React.useState(false)
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
   const [removingAttachmentId, setRemovingAttachmentId] = React.useState<number | null>(null)
-  const [selectedUndoType, setSelectedUndoType] = React.useState<
-    | 'IMPLEMENTED_TO_WAITING_APPROVAL'
-    | 'IMPLEMENTED_TO_IMPLEMENTATION'
-    | 'IMPLEMENTATION_TO_TO_IMPLEMENT'
-    | 'TO_IMPLEMENT_TO_UNDER_VALIDATION'
-    | 'REJECTED_TO_UNDER_VALIDATION'
-    | 'REJECTED_TO_DEFINE_CHAMPION'
-    | null
-  >(null)
+  const [selectedUndoType, setSelectedUndoType] = React.useState<UndoType>(null)
 
   const [uploadAttachments, { isLoading: isUploadingAttachments }] =
     proposalAPI.useUploadProposalAttachmentsMutation()
   const [deleteAttachment, { isLoading: isDeletingAttachment }] =
     proposalAPI.useDeleteProposalAttachmentMutation()
-  const [
-    undoImplementedToWaitingApproval,
-    { isLoading: isUndoFinishedWithoutImplementationLoading },
-  ] = proposalAPI.useUndoImplementedToWaitingApprovalMutation()
-  const [undoImplementedToImplementation, { isLoading: isUndoImplementedLoading }] =
-    proposalAPI.useUndoImplementedToImplementationMutation()
-  const [undoImplementationToToImplement, { isLoading: isUndoImplementationLoading }] =
-    proposalAPI.useUndoImplementationToToImplementMutation()
-  const [undoToImplementToUnderValidation, { isLoading: isUndoToImplementLoading }] =
-    proposalAPI.useUndoToImplementToUnderValidationMutation()
-  const [undoRejectedToUnderValidation, { isLoading: isUndoRejectedValidationLoading }] =
-    proposalAPI.useUndoRejectedToUnderValidationMutation()
-  const [undoRejectedToDefineChampion, { isLoading: isUndoRejectedChampionLoading }] =
-    proposalAPI.useUndoRejectedToDefineChampionMutation()
+  const { undoProposal, isUndoLoading } = useProposalUndo()
   const [softDeleteProposal, { isLoading: isSoftDeleteLoading }] =
     proposalAPI.useSoftDeleteProposalMutation()
   const [restoreProposal, { isLoading: isRestoringLoading }] =
@@ -82,75 +66,18 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   const fileInputId = `attachment-input-${proposal.id}`
 
   const getUndoLoading = () => {
-    switch (selectedUndoType) {
-      case 'IMPLEMENTED_TO_WAITING_APPROVAL':
-        return isUndoFinishedWithoutImplementationLoading
-      case 'IMPLEMENTED_TO_IMPLEMENTATION':
-        return isUndoImplementedLoading
-      case 'IMPLEMENTATION_TO_TO_IMPLEMENT':
-        return isUndoImplementationLoading
-      case 'TO_IMPLEMENT_TO_UNDER_VALIDATION':
-        return isUndoToImplementLoading
-      case 'REJECTED_TO_UNDER_VALIDATION':
-        return isUndoRejectedValidationLoading
-      case 'REJECTED_TO_DEFINE_CHAMPION':
-        return isUndoRejectedChampionLoading
-      default:
-        return false
-    }
-  }
-
-  const borderColors: Record<string, string> = {
-    IMPLEMENTED: 'border-green-300',
-    REJECTED: 'border-red-300',
-    DEFINE_CHAMPION: 'border-blue-300',
-    WAITING_APPROVAL: 'border-orange-300',
-    UNDER_VALIDATION: 'border-orange-300',
-    TO_IMPLEMENT: 'border-yellow-300',
-    IMPLEMENTATION: 'border-cyan-300',
-    NOT_VIABLE: 'border-gray-300',
-    PENDING: 'border-orange-300',
-    PAID: 'border-green-300',
-    CANCELLED: 'border-red-300',
-  }
-
-  const getAvailableUndoActions = () => {
-    const actions: (typeof selectedUndoType)[] = []
-
-    if (
-      proposal.status === 'IMPLEMENTED' &&
-      !proposal.requiresImplementation &&
-      (isAdmin || isManager)
-    ) {
-      actions.push('IMPLEMENTED_TO_WAITING_APPROVAL')
-    }
-
-    if (proposal.status === 'IMPLEMENTED' && (isAdmin || isChampion)) {
-      actions.push('IMPLEMENTED_TO_IMPLEMENTATION')
-    }
-
-    if (proposal.status === 'IMPLEMENTATION' && isChampion) {
-      actions.push('IMPLEMENTATION_TO_TO_IMPLEMENT')
-    }
-
-    if (proposal.status === 'TO_IMPLEMENT' && isChampion) {
-      actions.push('TO_IMPLEMENT_TO_UNDER_VALIDATION')
-    }
-
-    if ((proposal.status === 'REJECTED' || proposal.status === 'NOT_VIABLE') && isChampion) {
-      actions.push('REJECTED_TO_UNDER_VALIDATION')
-    }
-
-    if (proposal.status === 'REJECTED' && (isAdmin || isManager) && !proposal.champion) {
-      actions.push('REJECTED_TO_DEFINE_CHAMPION')
-    }
-
-    return actions
+    return isUndoLoading(selectedUndoType)
   }
 
   const getPrimaryUndoAction = () => {
-    const actions = getAvailableUndoActions()
-    return actions.length > 0 ? actions[0] : null
+    const actions = getProposalAvailableUndoActions(
+      isAdmin,
+      isManager,
+      isChampion,
+      proposal.status,
+      proposal.requiresImplementation,
+    )
+    return actions[0] ?? null
   }
 
   const handleUndoClick = () => {
@@ -168,26 +95,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
     }
 
     try {
-      switch (selectedUndoType) {
-        case 'IMPLEMENTED_TO_WAITING_APPROVAL':
-          await undoImplementedToWaitingApproval({ proposalId: proposal.id.toString() }).unwrap()
-          break
-        case 'IMPLEMENTED_TO_IMPLEMENTATION':
-          await undoImplementedToImplementation({ proposalId: proposal.id.toString() }).unwrap()
-          break
-        case 'IMPLEMENTATION_TO_TO_IMPLEMENT':
-          await undoImplementationToToImplement({ proposalId: proposal.id.toString() }).unwrap()
-          break
-        case 'TO_IMPLEMENT_TO_UNDER_VALIDATION':
-          await undoToImplementToUnderValidation({ proposalId: proposal.id.toString() }).unwrap()
-          break
-        case 'REJECTED_TO_UNDER_VALIDATION':
-          await undoRejectedToUnderValidation({ proposalId: proposal.id.toString() }).unwrap()
-          break
-        case 'REJECTED_TO_DEFINE_CHAMPION':
-          await undoRejectedToDefineChampion({ proposalId: proposal.id.toString() }).unwrap()
-          break
-      }
+      await undoProposal(selectedUndoType, proposal.id)
 
       setIsUndoModalOpen(false)
       setSelectedUndoType(null)
@@ -527,7 +435,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
             <div>
               <p className="text-sm font-semibold mb-2">Executor</p>
               <div className="flex flex-wrap gap-2">
-                <p
+                <button
                   onClick={() => {
                     if (canEditChampion) {
                       setEmployeeType('CHAMPION')
@@ -542,7 +450,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
                     {' - '}
                     Turno: {proposal.champion.shift}
                   </span>
-                </p>
+                </button>
               </div>
             </div>
           )}

@@ -5,9 +5,10 @@ interface ModalProps {
   isOpen: boolean
   onClose: () => void
   children: ReactNode
+  className?: string
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, className }) => {
   if (!isOpen) return null
 
   return (
@@ -16,7 +17,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
       onClick={onClose}
     >
       <div
-        className="relative z-1001 max-h-[calc(100vh-1.5rem)] overflow-y-auto rounded-lg bg-white p-4 sm:w-auto sm:max-h-[calc(100vh-2rem)]"
+        className={`relative z-1001 max-h-[calc(100vh-1.5rem)] overflow-y-auto rounded-lg bg-white p-4 sm:w-auto sm:max-h-[calc(100vh-2rem)] ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         <X
