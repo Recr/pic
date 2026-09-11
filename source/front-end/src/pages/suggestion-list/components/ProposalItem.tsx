@@ -343,7 +343,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   return (
     <>
       <button
-        className={`bg-gray-50 rounded-lg md:rounded-none flex flex-1 px-3 py-3 md:py-0 text-left shadow-lg md:shadow-sm hover:bg-blue-50 text-sm hover:cursor-pointer transition-all ${borderColors[proposal.status] ?? 'border-gray-300'} border-l-8 md:border-l-4 hover:translate-y-1 hover:animate-pulse ${proposal.isActive ? 'hover:bg-blue-100 border-gray-200' : 'bg-red-100  border-red-200 hover:bg-red-300 hover:border-red-400'}`}
+        className={`bg-gray-50 rounded-lg md:rounded-none flex flex-1 px-3 py-3 md:py-0 text-left shadow-lg md:shadow-sm hover:bg-blue-50 text-sm hover:cursor-pointer transition-all ${borderColors[proposal.status] ?? 'border-gray-300'} border-l-8 md:border-l-4 hover:translate-y-0.5 hover:animate-pulse ${proposal.isActive ? 'hover:bg-blue-100 ' : 'bg-red-100  border-red-200 hover:bg-red-300 hover:border-red-400'}`}
         onClick={() => setIsModalOpen(true)}
         type="button"
       >
