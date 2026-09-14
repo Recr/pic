@@ -8,12 +8,22 @@ import {
   ChevronsRight,
   IdCardIcon,
   Minus,
-  Trash2,
   Undo2,
   UserIcon,
 } from 'lucide-react'
 import Modal from '../../../components/modal/Modal'
 import EmployeeInformationBadge from '../../../components/badges/EmployeeInformationBadge'
+import { useSelector } from 'react-redux'
+import type { RootState } from '../../../app/store'
+import {
+  getProposalAvailableUndoActions,
+  useProposalUndo,
+  type UndoType,
+} from '../../../helpers/handleProposalUndoButton'
+import PayoutUndoStatusModal from './PayoutUndoStatusModal'
+import { toast } from 'react-toastify'
+import { API_BASE_URL } from '../../../services/base-query-with-auth'
+import { proposalAPI } from '../../../features/proposal/proposal-api'
 
 type PayoutItemProps = {
   payout: Payout
@@ -35,45 +45,141 @@ const borderColors: Record<string, string> = {
   CANCELLED: 'border-red-300',
 }
 
+const MAX_ATTACHMENTS_PER_UPLOAD = 5
+const MAX_ATTACHMENT_SIZE_BYTES = 10 * 1024 * 1024
+
 const PayoutItem: React.FC<PayoutItemProps> = ({ payout, isSelected, onToggleSelect }) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const user = useSelector((state: RootState) => state.auth.user)
+  const isAdmin = user?.role === 'ADMIN'
+  const isManager = user?.re !== undefined && payout.suggestion.proposal.manager?.re === user.re
+  const isChampion = user?.re !== undefined && payout.suggestion.proposal.champion?.re === user.re
+  const [isUndoModalOpen, setIsUndoModalOpen] = useState(false)
+  const [selectedUndoType, setSelectedUndoType] = useState<UndoType>(null)
+  const { undoProposal, isUndoLoading } = useProposalUndo()
 
-  // const getAvailableUndoActions = () => {
-  //   const actions: (typeof selectedUndoType)[] = []
+  const canEditAttachments = Boolean(isAdmin || isManager || isChampion)
+  const fileInputId = `attachment-input-${payout.suggestion.proposal.id}`
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [uploadAttachments, { isLoading: isUploadingAttachments }] =
+    proposalAPI.useUploadProposalAttachmentsMutation()
+  const [deleteAttachment, { isLoading: isDeletingAttachment }] =
+    proposalAPI.useDeleteProposalAttachmentMutation()
+  const [removingAttachmentId, setRemovingAttachmentId] = useState<number | null>(null)
 
-  //   if (
-  //     payout.suggestion.proposal.status === 'IMPLEMENTED' &&
-  //     !payout.suggestion.proposal.requiresImplementation &&
-  //     (isAdmin || isManager)
-  //   ) {
-  //     actions.push('IMPLEMENTED_TO_WAITING_APPROVAL')
-  //   }
+  const handleDownloadAttachment = async (
+    proposalId: number,
+    attachmentId: number,
+    filename: string,
+  ) => {
+    try {
+      console.log('Starting download:', { proposalId, attachmentId, filename })
 
-  //   if (proposal.status === 'IMPLEMENTED' && (isAdmin || isChampion)) {
-  //     actions.push('IMPLEMENTED_TO_IMPLEMENTATION')
-  //   }
+      const link = document.createElement('a')
+      link.href = `${API_BASE_URL.replace(/\/$/, '')}/proposals/${proposalId}/attachments/${attachmentId}/download`
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+    } catch (error) {
+      console.error('Download error:', error)
+      toast.error(`Erro ao baixar arquivo: ${getErrorMessage(error)}`)
+    }
+  }
 
-  //   return actions
-  // }
+  const handleUploadAttachments = async () => {
+    if (selectedFiles.length === 0) {
+      toast.warning('Selecione ao menos um arquivo para anexar.')
+      return
+    }
 
-  // const getPrimaryUndoAction = () => {
-  //   const actions = getAvailableUndoActions()
-  //   return actions.length > 0 ? actions[0] : null
-  // }
+    try {
+      await uploadAttachments({
+        proposalId: payout.suggestion.proposal.id,
+        files: selectedFiles,
+      }).unwrap()
+      setSelectedFiles([])
+      toast.success('Arquivos anexados com sucesso.')
+    } catch (error) {
+      toast.error(`Erro ao anexar arquivos: ${getErrorMessage(error)}`)
+    }
+  }
 
-  // const handleUndoClick = () => {
-  //   const undoType = getPrimaryUndoAction()
-  //   if (!undoType) {
-  //     return
-  //   }
-  //   setSelectedUndoType(undoType)
-  //   setIsUndoModalOpen(true)
-  // }
+  const handleRemoveAttachment = async (attachmentId: number) => {
+    const shouldDelete = window.confirm('Deseja remover este arquivo anexado?')
+    if (!shouldDelete) {
+      return
+    }
 
-  // const handleConfirmUndo = async () => {
-  //   if (!selectedUndoType) {
-  //     return
-  //   }
+    try {
+      setRemovingAttachmentId(attachmentId)
+      await deleteAttachment({ proposalId: payout.suggestion.proposal.id, attachmentId }).unwrap()
+      toast.success('Arquivo removido com sucesso.')
+    } catch (error) {
+      toast.error(`Erro ao remover arquivo: ${getErrorMessage(error)}`)
+    } finally {
+      setRemovingAttachmentId(null)
+    }
+  }
+
+  const getPrimaryUndoAction = () => {
+    const actions = getProposalAvailableUndoActions(
+      isAdmin,
+      isManager,
+      isChampion,
+      payout.suggestion.proposal.status,
+      payout.suggestion.proposal.requiresImplementation,
+    )
+    return actions[0] ?? null
+  }
+
+  const handleUndoClick = () => {
+    const undoType = getPrimaryUndoAction()
+    if (!undoType) {
+      return
+    }
+    setSelectedUndoType(undoType)
+    setIsUndoModalOpen(true)
+  }
+
+  const handleConfirmUndo = async () => {
+    if (!selectedUndoType) {
+      return
+    }
+
+    try {
+      await undoProposal(selectedUndoType, payout.suggestion.proposal.id)
+
+      setIsUndoModalOpen(false)
+      setSelectedUndoType(null)
+      toast.success('Ação desfeita com sucesso.')
+    } catch (error) {
+      toast.error(`Erro ao desfazer ação: ${getErrorMessage(error)}`)
+    }
+  }
+
+  const getErrorMessage = (error: unknown) => {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'data' in error &&
+      typeof (error as { data?: unknown }).data === 'object' &&
+      (error as { data?: { message?: unknown } }).data !== null &&
+      typeof (error as { data?: { message?: unknown } }).data?.message === 'string'
+    ) {
+      return (error as { data?: { message?: string } }).data?.message
+    }
+
+    if (error instanceof Error) {
+      return error.message
+    }
+
+    return 'Falha inesperada.'
+  }
+
+  const getUndoLoading = () => {
+    return isUndoLoading(selectedUndoType)
+  }
 
   return (
     <>
@@ -189,7 +295,7 @@ const PayoutItem: React.FC<PayoutItemProps> = ({ payout, isSelected, onToggleSel
               </div>
             </div>
             <div className="flex items-center gap-2">
-              {/* {getPrimaryUndoAction() && (
+              {getPrimaryUndoAction() && (
                 <button
                   type="button"
                   onClick={handleUndoClick}
@@ -198,7 +304,7 @@ const PayoutItem: React.FC<PayoutItemProps> = ({ payout, isSelected, onToggleSel
                 >
                   <Undo2 size={16} />
                 </button>
-              )} */}
+              )}
               <StatusBadge status={payout.status} color={getStatusColor(payout.status)} />
             </div>
           </div>
@@ -277,9 +383,8 @@ const PayoutItem: React.FC<PayoutItemProps> = ({ payout, isSelected, onToggleSel
               </div>
             </div>
           )}
-          {/* <div>
+          <div>
             <p className="mb-2 text-sm font-semibold">Arquivos Anexados</p>
-
             {canEditAttachments ? (
               <div className="mb-3 rounded border border-dashed border-gray-300 bg-gray-50 p-3">
                 <label
@@ -361,9 +466,10 @@ const PayoutItem: React.FC<PayoutItemProps> = ({ payout, isSelected, onToggleSel
               </p>
             )}
 
-            {proposal.attachments && proposal.attachments.length > 0 ? (
+            {payout.suggestion.proposal.attachments &&
+            payout.suggestion.proposal.attachments.length > 0 ? (
               <div className="max-h-56 space-y-2 overflow-y-auto pr-1 sm:max-h-64">
-                {proposal.attachments.map((attachment) => (
+                {payout.suggestion.proposal.attachments.map((attachment) => (
                   <div
                     key={attachment.id}
                     className="flex flex-col gap-2 rounded border border-gray-200 bg-gray-50 p-3 sm:flex-row sm:items-center sm:justify-between"
@@ -411,9 +517,20 @@ const PayoutItem: React.FC<PayoutItemProps> = ({ payout, isSelected, onToggleSel
             ) : (
               <p className="text-sm text-gray-500">Nenhum arquivo anexado.</p>
             )}
-          </div> */}
+          </div>
         </div>
       </Modal>
+      <PayoutUndoStatusModal
+        isOpen={isUndoModalOpen}
+        onClose={() => {
+          setIsUndoModalOpen(false)
+          setSelectedUndoType(null)
+        }}
+        onConfirm={handleConfirmUndo}
+        proposal={payout.suggestion.proposal}
+        undoType={selectedUndoType}
+        isLoading={getUndoLoading()}
+      />
     </>
   )
 }

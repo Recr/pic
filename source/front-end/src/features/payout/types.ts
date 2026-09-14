@@ -36,6 +36,15 @@ export interface Payout {
         name: string
         categoryReward: number
       }
+      attachments: [
+        {
+          id: number
+          storedName: string
+          originalName: string
+          sizeBytes: number
+          uploadedAt: string
+        },
+      ]
     }
   }
 }

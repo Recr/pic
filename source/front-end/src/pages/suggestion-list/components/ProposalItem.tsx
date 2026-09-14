@@ -36,14 +36,14 @@ const MAX_ATTACHMENTS_PER_UPLOAD = 5
 const MAX_ATTACHMENT_SIZE_BYTES = 10 * 1024 * 1024
 
 const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) => {
-  const [isModalOpen, setIsModalOpen] = React.useState(false)
-  const [isUndoModalOpen, setIsUndoModalOpen] = React.useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false)
-  const [isRestoreModalOpen, setIsRestoreModalOpen] = React.useState(false)
-  const [isUpdateManagerModalOpen, setIsUpdateManagerModalOpen] = React.useState(false)
-  const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
-  const [removingAttachmentId, setRemovingAttachmentId] = React.useState<number | null>(null)
-  const [selectedUndoType, setSelectedUndoType] = React.useState<UndoType>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isUndoModalOpen, setIsUndoModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false)
+  const [isUpdateManagerModalOpen, setIsUpdateManagerModalOpen] = useState(false)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [removingAttachmentId, setRemovingAttachmentId] = useState<number | null>(null)
+  const [selectedUndoType, setSelectedUndoType] = useState<UndoType>(null)
 
   const [uploadAttachments, { isLoading: isUploadingAttachments }] =
     proposalAPI.useUploadProposalAttachmentsMutation()

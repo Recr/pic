@@ -61,6 +61,15 @@ class PrismaPayoutRepository {
                     categoryReward: true,
                   },
                 },
+                attachments: {
+                  select: {
+                    id: true,
+                    storedName: true,
+                    originalName: true,
+                    sizeBytes: true,
+                    uploadedAt: true,
+                  },
+                },
               },
             },
           },
