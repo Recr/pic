@@ -109,42 +109,37 @@ class ProposalUseCase {
     const reFilter = filters.re === undefined ? undefined : String(filters.re)
     const idFilter = filters.id === undefined ? undefined : String(filters.id)
 
-    const reMatcher = reFilter
-      ? (proposal: {
-          suggestions: {
-            employeeRe: number
-            employee?: { re: number | null } | null
-          }[]
-        }) =>
-          proposal.suggestions.some((suggestion) => {
-            const suggestionRe = String(suggestion.employeeRe)
-            const employeeRe = suggestion.employee?.re
+    const matcher =
+      reFilter || idFilter
+        ? (proposal: {
+            id: number
+            suggestions: {
+              employeeRe: number
+              employeeId: number | null
+              employee?: { id: number | null; re: number | null } | null
+            }[]
+          }) => {
+            const matchesRe =
+              !reFilter ||
+              proposal.suggestions.some((suggestion) => {
+                return (
+                  String(suggestion.employeeRe).includes(reFilter) ||
+                  String(suggestion.employee?.re ?? '').includes(reFilter)
+                )
+              })
+            const matchesId =
+              !idFilter ||
+              String(proposal.id).includes(idFilter) ||
+              proposal.suggestions.some((suggestion) => {
+                return (
+                  String(suggestion.employeeId).includes(idFilter) ||
+                  String(suggestion.employee?.id ?? '').includes(idFilter)
+                )
+              })
 
-            return suggestionRe.includes(reFilter) || String(employeeRe ?? '').includes(reFilter)
-          })
-      : undefined
-
-    const idMatcher = idFilter
-      ? (proposal: {
-          id: number
-          suggestions: {
-            employeeId: number
-            employee?: { id: number | null } | null
-          }[]
-        }) => {
-          const proposalId = String(proposal.id)
-
-          return (
-            proposalId.includes(idFilter) ||
-            proposal.suggestions.some((suggestion) => {
-              const suggestionId = String(suggestion.employeeId)
-              const employeeId = suggestion.employee?.id
-
-              return suggestionId.includes(idFilter) || String(employeeId ?? '').includes(idFilter)
-            })
-          )
-        }
-      : undefined
+            return matchesRe && matchesId
+          }
+        : undefined
 
     if (filters.employeeName) {
       suggestionFilters.push({
@@ -190,7 +185,7 @@ class ProposalUseCase {
         },
       }
     }
-    return await this.proposalRepository.findAllDetailed(pagination, where, reMatcher, idMatcher)
+    return await this.proposalRepository.findAllDetailed(pagination, where, matcher)
   }
 
   public async executeFindAllWithoutChampion(role: Role, userId: number) {

@@ -58,11 +58,14 @@ class PrismaProposalRepository {
       },
       suggestions: {
         select: {
+          id: true,
+          employeeId: true,
           employeeName: true,
           employeeRe: true,
           employeeShift: true,
           employee: {
             select: {
+              id: true,
               re: true,
               name: true,
               role: true,
@@ -122,21 +125,17 @@ class PrismaProposalRepository {
   public async findAllDetailed(
     pagination: Pagination,
     where?: Prisma.ProposalWhereInput,
-    reMatcher?: (proposal: {
+    matcher?: (proposal: {
+      id: number
       suggestions: {
         employeeRe: number
-        employee?: { re: number | null } | null
-      }[]
-    }) => boolean,
-    idMatcher?: (proposal: {
-      suggestions: {
-        employeeId: number
-        employee?: { id: number | null } | null
+        employeeId: number | null
+        employee?: { id: number | null; re: number | null } | null
       }[]
     }) => boolean,
   ) {
     const finalWhere: Prisma.ProposalWhereInput = where ?? { isActive: true }
-    if (!reMatcher && !idMatcher) {
+    if (!matcher) {
       const [proposals, totalCount] = await Promise.all([
         prisma.proposal.findMany({
           take: pagination.limit,
@@ -159,21 +158,10 @@ class PrismaProposalRepository {
       select: this.getDetailedSelect(),
     })
 
-    const filteredProposals = proposals.filter((proposal) => {
-      const matchesRe = reMatcher ? reMatcher(proposal as never) : true
-      const matchesId = idMatcher ? idMatcher(proposal as never) : true
-
-      return matchesRe && matchesId
-    })
-    const totalCount = filteredProposals.length
-    const paginatedProposals = filteredProposals.slice(
-      pagination.offset,
-      pagination.offset + pagination.limit,
-    )
-
+    const filteredProposals = proposals.filter(matcher)
     return {
-      proposals: paginatedProposals,
-      totalCount,
+      proposals: filteredProposals.slice(pagination.offset, pagination.offset + pagination.limit),
+      totalCount: filteredProposals.length,
     }
   }
 

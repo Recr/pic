@@ -36,22 +36,22 @@ ChartJS.register(
 const AnnualImplementationAndTarget: React.FC = () => {
   const [year, setYear] = useState(currentYear)
   const [startDate, setStartDate] = useState<string>(`${year}-01-01`)
-  const [completionDate, setCompletionDate] = useState<string>(`${year}-12-31`)
+  const [endDate, setEndDate] = useState<string>(`${year}-12-31`)
   const [leftAxisScale, setLeftAxisScale] = useState(1)
 
   const filters = useMemo(
     () => ({
       ...(startDate ? { startDate } : {}),
-      ...(completionDate ? { completionDate } : {}),
-      ...{ status: 'IMPLEMENTED' },
+      ...(endDate ? { endDate } : {}),
+      status: 'IMPLEMENTED',
     }),
-    [startDate, completionDate],
+    [startDate, endDate],
   )
 
   const handleYearChange = (newYear: number) => {
     setYear(newYear)
     setStartDate(`${newYear}-01-01`)
-    setCompletionDate(`${newYear}-12-31`)
+    setEndDate(`${newYear}-12-31`)
   }
 
   const { data: proposalAnalytics } = analyticsAPI.useGetProposalAnalyticsQuery(filters)

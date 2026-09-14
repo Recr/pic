@@ -117,4 +117,69 @@ describe('ProposalRepository', () => {
     })
     expect(proposals).toStrictEqual(mockProposals)
   })
+
+  test('should find all active proposals with pagination and filters', async () => {
+    const mockProposals: Proposal[] = [
+      {
+        id: 1,
+        description: 'Test 1',
+        ...partialProposal,
+      },
+      {
+        id: 2,
+        description: 'Test 2',
+        ...partialProposal,
+      },
+    ]
+
+    prisma.proposal.findMany.mockResolvedValue(mockProposals)
+
+    const proposalRepository = new PrismaProposalRepository()
+
+    const pagination: { offset: number; limit: number } = { offset: 0, limit: 50 }
+    const filters = {
+      statuses: ['DEFINE_CHAMPION'],
+      startDate: new Date(new Date().setDate(new Date().getDate() - 1)),
+      endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+      categoryId: 1,
+      areaId: 1,
+    }
+
+    const where: Prisma.ProposalWhereInput = {
+      isActive: true,
+    }
+    if (filters.statuses && filters.statuses.length > 0) {
+      where.status = { in: filters.statuses }
+    }
+    if (filters.categoryId !== undefined) {
+      where.categoryId = filters.categoryId
+    }
+    if (filters.areaId !== undefined) {
+      where.areaId = filters.areaId
+    }
+    if (filters.startDate || filters.endDate) {
+      where.createdAt = {}
+      if (filters.startDate) {
+        where.createdAt.gte = filters.startDate
+      }
+      if (filters.endDate) {
+        where.createdAt.lte = filters.endDate
+      }
+    }
+
+    const matcher = (proposal: {
+      id: number
+      suggestions: {
+        employeeRe: number
+        employeeId: number | null
+        employee?: { id: number | null; re: number | null } | null
+      }[]
+    }) => true
+
+    const proposals = await proposalRepository.findAllDetailed(pagination, where, matcher)
+    expect(prisma.proposal.findMany).toHaveBeenCalledWith({
+      where,
+    })
+    expect(proposals).toStrictEqual(mockProposals)
+  })
 })
