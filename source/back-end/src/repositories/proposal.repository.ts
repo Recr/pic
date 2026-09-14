@@ -87,60 +87,28 @@ class PrismaProposalRepository {
     statuses?: string[],
     startDate?: Date,
     endDate?: Date,
-    completionDate?: Date,
-    category?: string,
     categoryId?: number,
     areaId?: number,
   ) {
     const where: Prisma.ProposalWhereInput = {
       isActive: true,
     }
-    if (statuses) {
+    if (statuses?.length) {
       where.status = { in: statuses }
     }
-    if (categoryId !== undefined) {
+    if (categoryId) {
       where.categoryId = categoryId
     }
-    if (category) {
-      where.category = {
-        is: {
-          name: {
-            equals: category,
-          },
-        },
-      }
-    }
-    if (areaId !== undefined) {
+    if (areaId) {
       where.areaId = areaId
     }
-    if (startDate || endDate || completionDate) {
-      if (completionDate) {
-        const completionUpperBound = endDate ?? completionDate
-
-        const completedAtFilter: Prisma.ProposalWhereInput = {
-          completedAt: {
-            ...(startDate ? { gte: startDate } : {}),
-            lte: completionUpperBound,
-          },
-        }
-
-        const createdAtFallbackFilter: Prisma.ProposalWhereInput = {
-          completedAt: null,
-          createdAt: {
-            ...(startDate ? { gte: startDate } : {}),
-            lte: completionUpperBound,
-          },
-        }
-
-        where.OR = [completedAtFilter, createdAtFallbackFilter]
-      } else {
-        where.createdAt = {}
-        if (startDate) {
-          where.createdAt.gte = startDate
-        }
-        if (endDate) {
-          where.createdAt.lte = endDate
-        }
+    if (startDate || endDate) {
+      where.createdAt = {}
+      if (startDate) {
+        where.createdAt.gte = startDate
+      }
+      if (endDate) {
+        where.createdAt.lte = endDate
       }
     }
 

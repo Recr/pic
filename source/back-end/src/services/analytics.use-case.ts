@@ -151,8 +151,6 @@ class AnalyticsUseCase {
       filters?.statuses,
       filters?.startDate,
       filters?.endDate,
-      filters?.completionDate,
-      filters?.category,
       filters?.categoryId,
       filters?.areaId,
     )
