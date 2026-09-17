@@ -172,4 +172,57 @@ describe('ProposalRepository', () => {
       totalCount: 3,
     })
   })
+
+  test('should return all proposals with employees', async () => {
+    const mockProposals: Proposal[] = [
+      {
+        id: 1,
+        description: 'Test 1',
+        ...partialProposal,
+      },
+    ]
+
+    prisma.proposal.findMany.mockResolvedValue(mockProposals)
+
+    const proposalRepository = new PrismaProposalRepository()
+
+    const where: Prisma.ProposalWhereInput = {
+      isActive: true,
+      status: 'DEFINE_CHAMPION',
+    }
+
+    const proposals = await proposalRepository.findAllWithEmployees(where)
+    expect(prisma.proposal.findMany).toHaveBeenCalledWith({
+      where,
+      select: expect.any(Object),
+    })
+    expect(proposals).toStrictEqual(mockProposals)
+  })
+
+  test('should return all proposals without champions', async () => {
+    const mockProposals: Proposal[] = [
+      {
+        id: 1,
+        description: 'Test 1',
+        ...partialProposal,
+      },
+    ]
+
+    prisma.proposal.findMany.mockResolvedValue(mockProposals)
+
+    const proposalRepository = new PrismaProposalRepository()
+
+    const where: Prisma.ProposalWhereInput = {
+      isActive: true,
+      status: 'DEFINE_CHAMPION',
+      championId: null,
+    }
+
+    const proposals = await proposalRepository.findAllWithoutChampion(where)
+    expect(prisma.proposal.findMany).toHaveBeenCalledWith({
+      where,
+      select: expect.any(Object),
+    })
+    expect(proposals).toStrictEqual(mockProposals)
+  })
 })

@@ -212,10 +212,28 @@ class ProposalUseCase {
   }
 
   public async executeFindAllWithoutChampion(role: Role, userId: number) {
-    if (role === Role.ADMIN) {
-      return await this.proposalRepository.findAllWithoutChampion(userId)
+    const where: Prisma.ProposalWhereInput = {
+      isActive: true,
+      championId: null,
+      status: 'DEFINE_CHAMPION',
+      ...(role === Role.ADMIN
+        ? {
+            OR: [
+              {
+                managerId: null,
+              },
+              {
+                managerId: userId,
+              },
+            ],
+          }
+        : { managerId: userId }),
     }
-    return await this.proposalRepository.findAllWithoutChampionFromManager(userId)
+
+    // if (role === Role.ADMIN) {
+    return await this.proposalRepository.findAllWithoutChampion(where)
+    // }
+    // return await this.proposalRepository.findAllWithoutChampionFromManager(where)
   }
 
   public async executeFindAllWithoutManager() {

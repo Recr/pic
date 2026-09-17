@@ -95,24 +95,15 @@ class PrismaProposalRepository {
   ) {
     const where: Prisma.ProposalWhereInput = {
       isActive: true,
-    }
-    if (statuses?.length) {
-      where.status = { in: statuses }
-    }
-    if (categoryId) {
-      where.categoryId = categoryId
-    }
-    if (areaId) {
-      where.areaId = areaId
-    }
-    if (startDate || endDate) {
-      where.createdAt = {}
-      if (startDate) {
-        where.createdAt.gte = startDate
-      }
-      if (endDate) {
-        where.createdAt.lte = endDate
-      }
+      ...(statuses?.length && { status: { in: statuses } }),
+      ...(categoryId !== undefined && { categoryId }),
+      ...(areaId !== undefined && { areaId }),
+      ...((startDate || endDate) && {
+        createdAt: {
+          ...(startDate && { gte: startDate }),
+          ...(endDate && { lte: endDate }),
+        },
+      }),
     }
 
     const proposals = await prisma.proposal.findMany({
@@ -213,21 +204,9 @@ class PrismaProposalRepository {
     return proposals
   }
 
-  public async findAllWithoutChampion(userId: number) {
+  public async findAllWithoutChampion(where: Prisma.ProposalWhereInput) {
     const proposals = await prisma.proposal.findMany({
-      where: {
-        isActive: true,
-        championId: null,
-        status: 'DEFINE_CHAMPION',
-        OR: [
-          {
-            managerId: null,
-          },
-          {
-            managerId: userId,
-          },
-        ],
-      },
+      where,
       select: {
         id: true,
         description: true,
@@ -269,48 +248,6 @@ class PrismaProposalRepository {
         isActive: true,
         managerId: null,
         championId: null,
-        status: 'DEFINE_CHAMPION',
-      },
-      select: {
-        id: true,
-        description: true,
-        status: true,
-        createdAt: true,
-        managerNotes: true,
-        suggestions: {
-          select: {
-            id: false,
-            employeeId: false,
-            proposalId: false,
-            employeeName: true,
-            employeeRe: true,
-            employeeShift: true,
-            employee: {
-              select: {
-                re: true,
-                name: true,
-                role: true,
-                shift: true,
-              },
-            },
-          },
-        },
-        area: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    })
-    return proposals
-  }
-  public async findAllWithoutChampionFromManager(userId: number) {
-    const proposals = await prisma.proposal.findMany({
-      where: {
-        isActive: true,
-        championId: null,
-        managerId: userId,
         status: 'DEFINE_CHAMPION',
       },
       select: {
