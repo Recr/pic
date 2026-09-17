@@ -242,7 +242,7 @@ class PrismaProposalRepository {
     return proposals
   }
 
-  public async findAllWithoutManager() {
+  public async findAllWithoutManagerAndChampion() {
     const proposals = await prisma.proposal.findMany({
       where: {
         isActive: true,

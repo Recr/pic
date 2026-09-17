@@ -230,14 +230,11 @@ class ProposalUseCase {
         : { managerId: userId }),
     }
 
-    // if (role === Role.ADMIN) {
     return await this.proposalRepository.findAllWithoutChampion(where)
-    // }
-    // return await this.proposalRepository.findAllWithoutChampionFromManager(where)
   }
 
-  public async executeFindAllWithoutManager() {
-    return await this.proposalRepository.findAllWithoutManager()
+  public async executeFindAllWithoutManagerAndChampion() {
+    return await this.proposalRepository.findAllWithoutManagerAndChampion()
   }
 
   public async executeFindById(proposalId: number) {

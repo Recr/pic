@@ -39,7 +39,7 @@ proposalsRoutes.get(
   '/to-define-manager',
   authMiddleware,
   checkRole([Role.ADMIN]),
-  ProposalsController.handleFindAllWithoutManager,
+  ProposalsController.handleFindAllWithoutManagerAndChampion,
 )
 
 proposalsRoutes.get(
