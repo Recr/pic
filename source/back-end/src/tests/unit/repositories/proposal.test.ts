@@ -118,7 +118,7 @@ describe('ProposalRepository', () => {
     expect(proposals).toStrictEqual(mockProposals)
   })
 
-  test('should find all active proposals with pagination and filters', async () => {
+  test('should find detailed proposals with matcher and pagination', async () => {
     const mockProposals: Proposal[] = [
       {
         id: 1,
@@ -130,56 +130,46 @@ describe('ProposalRepository', () => {
         description: 'Test 2',
         ...partialProposal,
       },
+      {
+        id: 3,
+        description: 'Test 3',
+        ...partialProposal,
+      },
+      {
+        id: 4,
+        description: 'Test 4',
+        ...partialProposal,
+      },
     ]
 
     prisma.proposal.findMany.mockResolvedValue(mockProposals)
 
     const proposalRepository = new PrismaProposalRepository()
 
-    const pagination: { offset: number; limit: number } = { offset: 0, limit: 50 }
-    const filters = {
-      statuses: ['DEFINE_CHAMPION'],
-      startDate: new Date(new Date().setDate(new Date().getDate() - 1)),
-      endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
-      categoryId: 1,
-      areaId: 1,
-    }
+    const pagination: { offset: number; limit: number } = { offset: 1, limit: 1 }
 
     const where: Prisma.ProposalWhereInput = {
       isActive: true,
-    }
-    if (filters.statuses && filters.statuses.length > 0) {
-      where.status = { in: filters.statuses }
-    }
-    if (filters.categoryId !== undefined) {
-      where.categoryId = filters.categoryId
-    }
-    if (filters.areaId !== undefined) {
-      where.areaId = filters.areaId
-    }
-    if (filters.startDate || filters.endDate) {
-      where.createdAt = {}
-      if (filters.startDate) {
-        where.createdAt.gte = filters.startDate
-      }
-      if (filters.endDate) {
-        where.createdAt.lte = filters.endDate
-      }
+      status: 'DEFINE_CHAMPION',
     }
 
-    const matcher = (proposal: {
+    const matcher: (proposal: {
       id: number
       suggestions: {
         employeeRe: number
         employeeId: number | null
         employee?: { id: number | null; re: number | null } | null
       }[]
-    }) => true
+    }) => boolean = (proposal) => proposal.id !== 2
 
     const proposals = await proposalRepository.findAllDetailed(pagination, where, matcher)
     expect(prisma.proposal.findMany).toHaveBeenCalledWith({
       where,
+      select: expect.any(Object),
     })
-    expect(proposals).toStrictEqual(mockProposals)
+    expect(proposals).toStrictEqual({
+      proposals: [mockProposals[2]],
+      totalCount: 3,
+    })
   })
 })
