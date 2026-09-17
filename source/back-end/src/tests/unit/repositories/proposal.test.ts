@@ -29,7 +29,7 @@ const partialProposal: Omit<Proposal, 'id' | 'description'> = {
 }
 
 describe('ProposalRepository', () => {
-  test('should find all active proposals', async () => {
+  test('returns all active proposals', async () => {
     const mockProposals: Proposal[] = [
       {
         id: 1,
@@ -57,7 +57,7 @@ describe('ProposalRepository', () => {
     expect(proposals).toStrictEqual(mockProposals)
   })
 
-  test('should find all active proposals with filters', async () => {
+  test('returns active proposals filtered by status, date range, category, and area', async () => {
     const mockProposals: Proposal[] = [
       {
         id: 1,
@@ -118,7 +118,7 @@ describe('ProposalRepository', () => {
     expect(proposals).toStrictEqual(mockProposals)
   })
 
-  test('should find detailed proposals with matcher and pagination', async () => {
+  test('returns detailed proposals with filters, matcher and pagination', async () => {
     const mockProposals: Proposal[] = [
       {
         id: 1,
@@ -173,7 +173,7 @@ describe('ProposalRepository', () => {
     })
   })
 
-  test('should return all proposals with employees', async () => {
+  test('returns all proposals with related employees entity data', async () => {
     const mockProposals: Proposal[] = [
       {
         id: 1,
@@ -199,7 +199,7 @@ describe('ProposalRepository', () => {
     expect(proposals).toStrictEqual(mockProposals)
   })
 
-  test('should return all proposals without champions', async () => {
+  test('returns all proposals without champions', async () => {
     const mockProposals: Proposal[] = [
       {
         id: 1,
