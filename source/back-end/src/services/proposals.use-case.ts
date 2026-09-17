@@ -234,7 +234,13 @@ class ProposalUseCase {
   }
 
   public async executeFindAllWithoutManagerAndChampion() {
-    return await this.proposalRepository.findAllWithoutManagerAndChampion()
+    const where: Prisma.ProposalWhereInput = {
+      isActive: true,
+      managerId: null,
+      championId: null,
+      status: 'DEFINE_CHAMPION',
+    }
+    return await this.proposalRepository.findAllWithoutManagerAndChampion(where)
   }
 
   public async executeFindById(proposalId: number) {

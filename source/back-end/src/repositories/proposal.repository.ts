@@ -242,14 +242,9 @@ class PrismaProposalRepository {
     return proposals
   }
 
-  public async findAllWithoutManagerAndChampion() {
+  public async findAllWithoutManagerAndChampion(where: Prisma.ProposalWhereInput) {
     const proposals = await prisma.proposal.findMany({
-      where: {
-        isActive: true,
-        managerId: null,
-        championId: null,
-        status: 'DEFINE_CHAMPION',
-      },
+      where,
       select: {
         id: true,
         description: true,

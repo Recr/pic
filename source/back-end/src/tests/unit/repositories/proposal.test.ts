@@ -225,4 +225,31 @@ describe('ProposalRepository', () => {
     })
     expect(proposals).toStrictEqual(mockProposals)
   })
+
+  test('returns all proposals without managers and champions', async () => {
+    const mockProposals: Proposal[] = [
+      {
+        id: 1,
+        description: 'Test 1',
+        ...partialProposal,
+      },
+    ]
+    prisma.proposal.findMany.mockResolvedValue(mockProposals)
+
+    const proposalRepository = new PrismaProposalRepository()
+
+    const where: Prisma.ProposalWhereInput = {
+      isActive: true,
+      managerId: null,
+      championId: null,
+      status: 'DEFINE_CHAMPION',
+    }
+
+    const proposals = await proposalRepository.findAllWithoutManagerAndChampion(where)
+    expect(prisma.proposal.findMany).toHaveBeenCalledWith({
+      where,
+      select: expect.any(Object),
+    })
+    expect(proposals).toStrictEqual(mockProposals)
+  })
 })
