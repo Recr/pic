@@ -37,7 +37,30 @@ class ProposalUseCase {
   }
 
   public async executeFindAllWithEmployees(userId?: number) {
-    const proposals = await this.proposalRepository.findAllWithEmployees(userId)
+    const where: Prisma.ProposalWhereInput =
+      userId === undefined
+        ? {
+            isActive: true,
+            status: {
+              in: ['UNDER_VALIDATION', 'TO_IMPLEMENT', 'IMPLEMENTATION'],
+            },
+          }
+        : {
+            isActive: true,
+            OR: [
+              {
+                status: {
+                  in: ['UNDER_VALIDATION', 'TO_IMPLEMENT', 'IMPLEMENTATION'],
+                },
+                championId: userId,
+              },
+              {
+                status: 'WAITING_APPROVAL',
+                managerId: userId,
+              },
+            ],
+          }
+    const proposals = await this.proposalRepository.findAllWithEmployees(where)
     return proposals
   }
 

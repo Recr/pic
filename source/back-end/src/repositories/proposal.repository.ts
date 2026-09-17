@@ -165,31 +165,7 @@ class PrismaProposalRepository {
     }
   }
 
-  public async findAllWithEmployees(userId?: number) {
-    const where: Prisma.ProposalWhereInput =
-      userId === undefined
-        ? {
-            isActive: true,
-            status: {
-              in: ['UNDER_VALIDATION', 'TO_IMPLEMENT', 'IMPLEMENTATION'],
-            },
-          }
-        : {
-            isActive: true,
-            OR: [
-              {
-                status: {
-                  in: ['UNDER_VALIDATION', 'TO_IMPLEMENT', 'IMPLEMENTATION'],
-                },
-                championId: userId,
-              },
-              {
-                status: 'WAITING_APPROVAL',
-                managerId: userId,
-              },
-            ],
-          }
-
+  public async findAllWithEmployees(where: Prisma.ProposalWhereInput) {
     const proposals = await prisma.proposal.findMany({
       where,
       select: {
