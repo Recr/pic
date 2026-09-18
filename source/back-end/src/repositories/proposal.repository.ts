@@ -115,7 +115,7 @@ class PrismaProposalRepository {
 
   public async findAllDetailed(
     pagination: Pagination,
-    where?: Prisma.ProposalWhereInput,
+    where: Prisma.ProposalWhereInput,
     matcher?: (proposal: {
       id: number
       suggestions: {
@@ -125,17 +125,16 @@ class PrismaProposalRepository {
       }[]
     }) => boolean,
   ) {
-    const finalWhere: Prisma.ProposalWhereInput = where ?? { isActive: true }
     if (!matcher) {
       const [proposals, totalCount] = await Promise.all([
         prisma.proposal.findMany({
           take: pagination.limit,
           skip: pagination.offset,
-          where: finalWhere,
+          where,
           select: this.getDetailedSelect(),
         }),
         prisma.proposal.count({
-          where: finalWhere,
+          where,
         }),
       ])
       return {
@@ -145,7 +144,7 @@ class PrismaProposalRepository {
     }
 
     const proposals = await prisma.proposal.findMany({
-      where: finalWhere,
+      where,
       select: this.getDetailedSelect(),
     })
 
@@ -242,53 +241,12 @@ class PrismaProposalRepository {
     return proposals
   }
 
-  public async findAllWithoutManagerAndChampion(where: Prisma.ProposalWhereInput) {
-    const proposals = await prisma.proposal.findMany({
-      where,
-      select: {
-        id: true,
-        description: true,
-        status: true,
-        createdAt: true,
-        managerNotes: true,
-        suggestions: {
-          select: {
-            id: false,
-            employeeId: false,
-            proposalId: false,
-            employeeName: true,
-            employeeRe: true,
-            employeeShift: true,
-            employee: {
-              select: {
-                re: true,
-                name: true,
-                role: true,
-                shift: true,
-              },
-            },
-          },
-        },
-        area: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    })
-    return proposals
-  }
-
-  public async findById(proposalId: number, includeInactive?: boolean) {
+  public async findById(proposalId: number) {
     const proposal = await prisma.proposal.findUnique({
       where: {
         id: proposalId,
       },
     })
-    if (proposal && !proposal.isActive && !includeInactive) {
-      return null
-    }
     return proposal
   }
 

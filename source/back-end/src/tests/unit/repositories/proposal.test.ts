@@ -1,4 +1,4 @@
-import { expect, test, vi, describe } from 'vitest'
+import { expect, test, vi, describe, beforeEach } from 'vitest'
 import { Prisma, Proposal } from '../../../../prisma/client/client'
 import { Decimal } from '../../../../prisma/client/internal/prismaNamespace'
 import prisma from '../../../lib/__mocks__/prisma'
@@ -29,6 +29,12 @@ const partialProposal: Omit<Proposal, 'id' | 'description'> = {
 }
 
 describe('ProposalRepository', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  const proposalRepository = new PrismaProposalRepository()
+
   test('returns all active proposals', async () => {
     const mockProposals: Proposal[] = [
       {
@@ -45,7 +51,6 @@ describe('ProposalRepository', () => {
 
     prisma.proposal.findMany.mockResolvedValue(mockProposals)
 
-    const proposalRepository = new PrismaProposalRepository()
     const proposals = await proposalRepository.findAll()
 
     expect(prisma.proposal.findMany).toHaveBeenCalledWith({
@@ -72,8 +77,6 @@ describe('ProposalRepository', () => {
     ]
 
     prisma.proposal.findMany.mockResolvedValue(mockProposals)
-
-    const proposalRepository = new PrismaProposalRepository()
 
     const filters = {
       statuses: ['DEFINE_CHAMPION'],
@@ -144,8 +147,6 @@ describe('ProposalRepository', () => {
 
     prisma.proposal.findMany.mockResolvedValue(mockProposals)
 
-    const proposalRepository = new PrismaProposalRepository()
-
     const pagination: { offset: number; limit: number } = { offset: 1, limit: 1 }
 
     const where: Prisma.ProposalWhereInput = {
@@ -184,8 +185,6 @@ describe('ProposalRepository', () => {
 
     prisma.proposal.findMany.mockResolvedValue(mockProposals)
 
-    const proposalRepository = new PrismaProposalRepository()
-
     const where: Prisma.ProposalWhereInput = {
       isActive: true,
       status: 'DEFINE_CHAMPION',
@@ -210,8 +209,6 @@ describe('ProposalRepository', () => {
 
     prisma.proposal.findMany.mockResolvedValue(mockProposals)
 
-    const proposalRepository = new PrismaProposalRepository()
-
     const where: Prisma.ProposalWhereInput = {
       isActive: true,
       status: 'DEFINE_CHAMPION',
@@ -226,30 +223,94 @@ describe('ProposalRepository', () => {
     expect(proposals).toStrictEqual(mockProposals)
   })
 
-  test('returns all proposals without managers and champions', async () => {
+  test('should update and return the proposal', async () => {
+    const proposalId = 1
+
+    const updateData: Prisma.ProposalUpdateInput = {
+      status: 'COMPLETED',
+    }
+
+    const updatedProposal: Proposal = {
+      ...partialProposal,
+      description: 'Updated Proposal',
+      id: proposalId,
+      status: 'COMPLETED',
+    }
+
+    prisma.proposal.update.mockResolvedValue(updatedProposal)
+
+    const result = await proposalRepository.updateProposal(proposalId, updateData)
+
+    expect(prisma.proposal.update).toHaveBeenCalledWith({
+      where: { id: proposalId },
+      data: updateData,
+    })
+
+    expect(result).toEqual(updatedProposal)
+  })
+
+  test('return proposal by the category id', async () => {
+    const categoryId = 3
     const mockProposals: Proposal[] = [
       {
         id: 1,
         description: 'Test 1',
         ...partialProposal,
+        categoryId,
       },
     ]
     prisma.proposal.findMany.mockResolvedValue(mockProposals)
 
-    const proposalRepository = new PrismaProposalRepository()
-
-    const where: Prisma.ProposalWhereInput = {
-      isActive: true,
-      managerId: null,
-      championId: null,
-      status: 'DEFINE_CHAMPION',
-    }
-
-    const proposals = await proposalRepository.findAllWithoutManagerAndChampion(where)
+    const proposals = await proposalRepository.findByCategoryId(3)
     expect(prisma.proposal.findMany).toHaveBeenCalledWith({
-      where,
-      select: expect.any(Object),
+      where: {
+        isActive: true,
+        categoryId,
+      },
     })
     expect(proposals).toStrictEqual(mockProposals)
+  })
+
+  test('return proposal by the id', async () => {
+    const proposalId = 1
+    const mockProposal: Proposal = {
+      id: proposalId,
+      description: 'Test 1',
+      ...partialProposal,
+    }
+    prisma.proposal.findUnique.mockResolvedValue(mockProposal)
+
+    const result = await proposalRepository.findById(proposalId)
+
+    expect(prisma.proposal.findUnique).toHaveBeenCalledWith({
+      where: { id: proposalId },
+    })
+
+    expect(result).toEqual(mockProposal)
+  })
+
+  test('should create a proposal with suggestions and return the created proposal', async () => {
+    const employees = [
+      { id: 1, re: 123, name: 'Employee 1', shift: '1' },
+      { id: 2, re: 456, name: 'Employee 2', shift: '2' },
+    ]
+
+    const newProposalData = {
+      status: 'DEFINE_CHAMPION',
+      areaId: 1,
+    }
+
+    const createdProposal: Proposal = {
+      id: 1,
+      description: 'New Proposal',
+      ...partialProposal,
+    }
+
+    prisma.proposal.create.mockResolvedValue({ newProposalData })
+
+    expect(prisma.proposal.create).toHaveBeenCalledWith({
+      employees,
+      data: newProposalData,
+    })
   })
 })

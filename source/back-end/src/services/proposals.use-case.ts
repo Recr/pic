@@ -240,7 +240,7 @@ class ProposalUseCase {
       championId: null,
       status: 'DEFINE_CHAMPION',
     }
-    return await this.proposalRepository.findAllWithoutManagerAndChampion(where)
+    return await this.proposalRepository.findAllWithoutChampion(where)
   }
 
   public async executeFindById(proposalId: number) {
@@ -557,7 +557,10 @@ class ProposalUseCase {
   }
 
   public async executeRestoreProposal(proposalId: number) {
-    const proposal = await this.proposalRepository.findById(proposalId, true)
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal?.isActive) {
+      return null
+    }
     if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
 
     const updatedData: Prisma.ProposalUpdateInput = {
