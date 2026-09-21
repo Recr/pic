@@ -121,7 +121,7 @@ describe('ProposalRepository', () => {
     expect(proposals).toStrictEqual(mockProposals)
   })
 
-  test('returns detailed proposals with filters, matcher and pagination', async () => {
+  test('returns detailed proposals filtered and paginated ', async () => {
     const mockProposals: Proposal[] = [
       {
         id: 1,
@@ -145,8 +145,6 @@ describe('ProposalRepository', () => {
       },
     ]
 
-    const pagination: { offset: number; limit: number } = { offset: 1, limit: 1 }
-
     prisma.proposal.findMany.mockResolvedValue(mockProposals)
     prisma.proposal.count.mockResolvedValue(mockProposals.length)
 
@@ -155,29 +153,16 @@ describe('ProposalRepository', () => {
       status: 'DEFINE_CHAMPION',
     }
 
-    // const matcher: (proposal: {
-    //   id: number
-    //   suggestions: {
-    //     employeeRe: number
-    //     employeeId: number | null
-    //     employee?: { id: number | null; re: number | null } | null
-    //   }[]
-    // }) => boolean = (proposal) => proposal.id !== 2
-
-    const proposals = await proposalRepository.findAllDetailed(pagination, where)
+    const proposals = await proposalRepository.findAllDetailed(where)
 
     expect(prisma.proposal.findMany).toHaveBeenCalledWith({
       where,
       select: expect.any(Object),
-      take: pagination.limit,
-      skip: pagination.offset,
     })
-    expect(prisma.proposal.count).toHaveBeenCalledWith({
-      where,
-    })
+    expect(prisma.proposal.count).toHaveBeenCalledWith({ where })
     expect(proposals).toStrictEqual({
       proposals: mockProposals,
-      totalCount: 4,
+      totalCount: mockProposals.length,
     })
   })
 

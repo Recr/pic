@@ -209,18 +209,19 @@ class ProposalUseCase {
       }
     }
     const detailedProposals = await this.proposalRepository.findAllDetailed(
-      pagination,
       where,
-      // matcher,
+      matcher ? undefined : pagination,
     )
 
-    if (!matcher) return detailedProposals
-
-    const filteredProposals = detailedProposals.proposals.filter(matcher)
-    return {
-      proposals: filteredProposals.slice(pagination.offset, pagination.offset + pagination.limit),
-      totalCount: filteredProposals.length,
+    if (matcher) {
+      const filteredProposals = detailedProposals.proposals.filter(matcher)
+      return {
+        proposals: filteredProposals.slice(pagination.offset, pagination.offset + pagination.limit),
+        totalCount: filteredProposals.length,
+      }
     }
+
+    return detailedProposals
   }
 
   public async executeFindAllWithoutChampion(role: Role, userId: number) {
