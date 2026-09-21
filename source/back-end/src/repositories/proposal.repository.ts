@@ -111,11 +111,10 @@ class PrismaProposalRepository {
     return proposals
   }
 
-  public async findAllDetailed(pagination: Pagination, where: Prisma.ProposalWhereInput) {
+  public async findAllDetailed(where: Prisma.ProposalWhereInput, pagination?: Pagination) {
     const [proposals, totalCount] = await Promise.all([
       prisma.proposal.findMany({
-        take: pagination.limit,
-        skip: pagination.offset,
+        ...(pagination && { take: pagination.limit, skip: pagination.offset }),
         where,
         select: this.getDetailedSelect(),
       }),
