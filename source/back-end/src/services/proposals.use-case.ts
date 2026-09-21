@@ -208,7 +208,19 @@ class ProposalUseCase {
         },
       }
     }
-    return await this.proposalRepository.findAllDetailed(pagination, where, matcher)
+    const detailedProposals = await this.proposalRepository.findAllDetailed(
+      pagination,
+      where,
+      // matcher,
+    )
+
+    if (!matcher) return detailedProposals
+
+    const filteredProposals = detailedProposals.proposals.filter(matcher)
+    return {
+      proposals: filteredProposals.slice(pagination.offset, pagination.offset + pagination.limit),
+      totalCount: filteredProposals.length,
+    }
   }
 
   public async executeFindAllWithoutChampion(role: Role, userId: number) {

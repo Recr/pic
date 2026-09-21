@@ -145,32 +145,39 @@ describe('ProposalRepository', () => {
       },
     ]
 
-    prisma.proposal.findMany.mockResolvedValue(mockProposals)
-
     const pagination: { offset: number; limit: number } = { offset: 1, limit: 1 }
+
+    prisma.proposal.findMany.mockResolvedValue(mockProposals)
+    prisma.proposal.count.mockResolvedValue(mockProposals.length)
 
     const where: Prisma.ProposalWhereInput = {
       isActive: true,
       status: 'DEFINE_CHAMPION',
     }
 
-    const matcher: (proposal: {
-      id: number
-      suggestions: {
-        employeeRe: number
-        employeeId: number | null
-        employee?: { id: number | null; re: number | null } | null
-      }[]
-    }) => boolean = (proposal) => proposal.id !== 2
+    // const matcher: (proposal: {
+    //   id: number
+    //   suggestions: {
+    //     employeeRe: number
+    //     employeeId: number | null
+    //     employee?: { id: number | null; re: number | null } | null
+    //   }[]
+    // }) => boolean = (proposal) => proposal.id !== 2
 
-    const proposals = await proposalRepository.findAllDetailed(pagination, where, matcher)
+    const proposals = await proposalRepository.findAllDetailed(pagination, where)
+
     expect(prisma.proposal.findMany).toHaveBeenCalledWith({
       where,
       select: expect.any(Object),
+      take: pagination.limit,
+      skip: pagination.offset,
+    })
+    expect(prisma.proposal.count).toHaveBeenCalledWith({
+      where,
     })
     expect(proposals).toStrictEqual({
-      proposals: [mockProposals[2]],
-      totalCount: 3,
+      proposals: mockProposals,
+      totalCount: 4,
     })
   })
 
@@ -249,6 +256,60 @@ describe('ProposalRepository', () => {
     expect(result).toEqual(updatedProposal)
   })
 
+  test('should update an approved proposal and create payouts in a transaction', async () => {
+    const proposalId = 1
+    const updateData: Prisma.ProposalUpdateInput = {
+      status: 'TO_IMPLEMENT',
+    }
+    const payouts: Prisma.PayoutCreateManyInput[] = [
+      { suggestionId: 10, value: 12.5, status: 'PENDING' },
+      { suggestionId: 11, value: 12.5, status: 'PENDING' },
+    ]
+    const updatedProposal: Proposal = {
+      ...partialProposal,
+      id: proposalId,
+      description: 'Approved proposal',
+      status: 'TO_IMPLEMENT',
+    }
+
+    prisma.proposal.update.mockResolvedValue(updatedProposal)
+    prisma.payout.createMany.mockResolvedValue({ count: payouts.length })
+    prisma.$transaction.mockResolvedValue([updatedProposal, { count: payouts.length }])
+
+    const result = await proposalRepository.updateApprovedProposalAndCreatePayouts(
+      proposalId,
+      updateData,
+      payouts,
+    )
+
+    expect(prisma.proposal.update).toHaveBeenCalledWith({
+      where: { id: proposalId },
+      data: updateData,
+    })
+    expect(prisma.payout.createMany).toHaveBeenCalledWith({
+      data: payouts,
+    })
+    expect(prisma.$transaction).toHaveBeenCalledWith([expect.any(Promise), expect.any(Promise)])
+    expect(result).toEqual(updatedProposal)
+  })
+
+  test('should propagate transaction errors when creating payouts fails', async () => {
+    const transactionError = new Error('Payout creation failed')
+    const updateData: Prisma.ProposalUpdateInput = {
+      status: 'TO_IMPLEMENT',
+    }
+
+    prisma.proposal.update.mockResolvedValue({} as Proposal)
+    prisma.payout.createMany.mockResolvedValue({ count: 1 })
+    prisma.$transaction.mockRejectedValue(transactionError)
+
+    await expect(
+      proposalRepository.updateApprovedProposalAndCreatePayouts(1, updateData, [
+        { suggestionId: 10, value: 25, status: 'PENDING' },
+      ]),
+    ).rejects.toBe(transactionError)
+  })
+
   test('return proposal by the category id', async () => {
     const categoryId = 3
     const mockProposals: Proposal[] = [
@@ -296,21 +357,46 @@ describe('ProposalRepository', () => {
     ]
 
     const newProposalData = {
-      status: 'DEFINE_CHAMPION',
+      description: 'Test proposal',
       areaId: 1,
     }
 
     const createdProposal: Proposal = {
       id: 1,
-      description: 'New Proposal',
+      description: 'Test Proposal',
       ...partialProposal,
     }
 
-    prisma.proposal.create.mockResolvedValue({ newProposalData })
+    prisma.proposal.create.mockResolvedValue(createdProposal)
+
+    const result = await proposalRepository.createWithSuggestions({ employees, ...newProposalData })
 
     expect(prisma.proposal.create).toHaveBeenCalledWith({
-      employees,
-      data: newProposalData,
+      data: {
+        ...newProposalData,
+        suggestions: {
+          createMany: {
+            data: [
+              {
+                employeeId: 1,
+                employeeRe: 123,
+                employeeName: 'Employee 1',
+                employeeShift: '1',
+              },
+              {
+                employeeId: 2,
+                employeeRe: 456,
+                employeeName: 'Employee 2',
+                employeeShift: '2',
+              },
+            ],
+          },
+        },
+      },
     })
+
+    expect(result).toEqual(createdProposal)
   })
+
+  test('Should find all proposals filtered')
 })
