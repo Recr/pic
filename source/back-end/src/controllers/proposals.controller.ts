@@ -173,10 +173,10 @@ export const ProposalsController = {
     }
   },
 
-  async handleFindAllWithoutManager(req: Request, res: Response, next: NextFunction) {
+  async handleFindAllWithoutManagerAndChampion(req: Request, res: Response, next: NextFunction) {
     try {
       const proposalUseCase = makeProposalsUseCase()
-      const proposals = await proposalUseCase.executeFindAllWithoutManager()
+      const proposals = await proposalUseCase.executeFindAllWithoutManagerAndChampion()
       res.send(proposals)
     } catch (error) {
       next(error)

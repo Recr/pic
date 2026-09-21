@@ -45,6 +45,11 @@ export interface Pagination {
   offset: number
 }
 
+export interface DetailedProposalSearch {
+  id?: number
+  re?: number
+}
+
 export interface DetailedProposalFilters {
   id?: number
   re?: number

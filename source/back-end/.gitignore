@@ -26,5 +26,13 @@ dist-ssr
 # Environment files
 .env
 
+# Prisma
 /prisma/client/
+
+# Generated files
 uploads/
+
+# Coverage directory
+coverage
+
+

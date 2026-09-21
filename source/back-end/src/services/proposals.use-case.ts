@@ -37,7 +37,30 @@ class ProposalUseCase {
   }
 
   public async executeFindAllWithEmployees(userId?: number) {
-    const proposals = await this.proposalRepository.findAllWithEmployees(userId)
+    const where: Prisma.ProposalWhereInput =
+      userId === undefined
+        ? {
+            isActive: true,
+            status: {
+              in: ['UNDER_VALIDATION', 'TO_IMPLEMENT', 'IMPLEMENTATION'],
+            },
+          }
+        : {
+            isActive: true,
+            OR: [
+              {
+                status: {
+                  in: ['UNDER_VALIDATION', 'TO_IMPLEMENT', 'IMPLEMENTATION'],
+                },
+                championId: userId,
+              },
+              {
+                status: 'WAITING_APPROVAL',
+                managerId: userId,
+              },
+            ],
+          }
+    const proposals = await this.proposalRepository.findAllWithEmployees(where)
     return proposals
   }
 
@@ -109,42 +132,37 @@ class ProposalUseCase {
     const reFilter = filters.re === undefined ? undefined : String(filters.re)
     const idFilter = filters.id === undefined ? undefined : String(filters.id)
 
-    const reMatcher = reFilter
-      ? (proposal: {
-          suggestions: {
-            employeeRe: number
-            employee?: { re: number | null } | null
-          }[]
-        }) =>
-          proposal.suggestions.some((suggestion) => {
-            const suggestionRe = String(suggestion.employeeRe)
-            const employeeRe = suggestion.employee?.re
+    const matcher =
+      reFilter || idFilter
+        ? (proposal: {
+            id: number
+            suggestions: {
+              employeeRe: number
+              employeeId: number | null
+              employee?: { id: number | null; re: number | null } | null
+            }[]
+          }) => {
+            const matchesRe =
+              !reFilter ||
+              proposal.suggestions.some((suggestion) => {
+                return (
+                  String(suggestion.employeeRe).includes(reFilter) ||
+                  String(suggestion.employee?.re ?? '').includes(reFilter)
+                )
+              })
+            const matchesId =
+              !idFilter ||
+              String(proposal.id).includes(idFilter) ||
+              proposal.suggestions.some((suggestion) => {
+                return (
+                  String(suggestion.employeeId).includes(idFilter) ||
+                  String(suggestion.employee?.id ?? '').includes(idFilter)
+                )
+              })
 
-            return suggestionRe.includes(reFilter) || String(employeeRe ?? '').includes(reFilter)
-          })
-      : undefined
-
-    const idMatcher = idFilter
-      ? (proposal: {
-          id: number
-          suggestions: {
-            employeeId: number
-            employee?: { id: number | null } | null
-          }[]
-        }) => {
-          const proposalId = String(proposal.id)
-
-          return (
-            proposalId.includes(idFilter) ||
-            proposal.suggestions.some((suggestion) => {
-              const suggestionId = String(suggestion.employeeId)
-              const employeeId = suggestion.employee?.id
-
-              return suggestionId.includes(idFilter) || String(employeeId ?? '').includes(idFilter)
-            })
-          )
-        }
-      : undefined
+            return matchesRe && matchesId
+          }
+        : undefined
 
     if (filters.employeeName) {
       suggestionFilters.push({
@@ -190,18 +208,51 @@ class ProposalUseCase {
         },
       }
     }
-    return await this.proposalRepository.findAllDetailed(pagination, where, reMatcher, idMatcher)
+    const detailedProposals = await this.proposalRepository.findAllDetailed(
+      pagination,
+      where,
+      // matcher,
+    )
+
+    if (!matcher) return detailedProposals
+
+    const filteredProposals = detailedProposals.proposals.filter(matcher)
+    return {
+      proposals: filteredProposals.slice(pagination.offset, pagination.offset + pagination.limit),
+      totalCount: filteredProposals.length,
+    }
   }
 
   public async executeFindAllWithoutChampion(role: Role, userId: number) {
-    if (role === Role.ADMIN) {
-      return await this.proposalRepository.findAllWithoutChampion(userId)
+    const where: Prisma.ProposalWhereInput = {
+      isActive: true,
+      championId: null,
+      status: 'DEFINE_CHAMPION',
+      ...(role === Role.ADMIN
+        ? {
+            OR: [
+              {
+                managerId: null,
+              },
+              {
+                managerId: userId,
+              },
+            ],
+          }
+        : { managerId: userId }),
     }
-    return await this.proposalRepository.findAllWithoutChampionFromManager(userId)
+
+    return await this.proposalRepository.findAllWithoutChampion(where)
   }
 
-  public async executeFindAllWithoutManager() {
-    return await this.proposalRepository.findAllWithoutManager()
+  public async executeFindAllWithoutManagerAndChampion() {
+    const where: Prisma.ProposalWhereInput = {
+      isActive: true,
+      managerId: null,
+      championId: null,
+      status: 'DEFINE_CHAMPION',
+    }
+    return await this.proposalRepository.findAllWithoutChampion(where)
   }
 
   public async executeFindById(proposalId: number) {
@@ -518,7 +569,10 @@ class ProposalUseCase {
   }
 
   public async executeRestoreProposal(proposalId: number) {
-    const proposal = await this.proposalRepository.findById(proposalId, true)
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal?.isActive) {
+      return null
+    }
     if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
 
     const updatedData: Prisma.ProposalUpdateInput = {
