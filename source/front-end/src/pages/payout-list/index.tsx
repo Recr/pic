@@ -93,14 +93,14 @@ const PayoutList: React.FC = () => {
     if (selectedPayouts.length === 0) return
 
     const rows = selectedPayouts.map((payout) => ({
-      ID: payout.id,
-      PropostaID: payout.suggestion.proposal.id,
+      ID: Number(payout.id),
+      PropostaID: Number(payout.suggestion.proposal.id),
       Proposta: payout.suggestion.proposal.description,
       Colaborador: payout.suggestion.employeeName,
-      RE: payout.suggestion.employeeRe,
+      RE: Number(payout.suggestion.employeeRe),
       Turno: payout.suggestion.employeeShift,
       DataCriacao: new Date(payout.createdAt).toLocaleDateString('pt-BR'),
-      Valor: payout.value,
+      Valor: Number(payout.value),
       Status: statusLabels[payout.status],
       DataPagamento: payout.payedAt ? new Date(payout.payedAt).toLocaleDateString('pt-BR') : '',
     }))
