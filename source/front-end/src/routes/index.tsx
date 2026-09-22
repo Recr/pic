@@ -127,7 +127,7 @@ const AppShell: React.FC = () => {
           <Route
             path="/analytics"
             element={
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['ADMIN', 'GENERAL_MANAGER']}>
                 <AnalyticsPage />
               </PrivateRoute>
             }

@@ -260,6 +260,7 @@ export const proposalAPI = api.injectEndpoints({
       invalidatesTags: (_result, _error, { proposalId }) => [
         { type: 'Proposal', id: proposalId },
         { type: 'Proposal', id: 'LIST' },
+        'Payout',
       ],
     }),
     deleteProposalAttachment: builder.mutation<void, { proposalId: number; attachmentId: number }>({
@@ -270,6 +271,7 @@ export const proposalAPI = api.injectEndpoints({
       invalidatesTags: (_result, _error, { proposalId }) => [
         { type: 'Proposal', id: proposalId },
         { type: 'Proposal', id: 'LIST' },
+        'Payout',
       ],
     }),
     undoImplementedToWaitingApproval: builder.mutation<Proposal, { proposalId: string }>({

@@ -14,11 +14,8 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
   //   return next(new AppError('Refresh token not found.', StatusCodes.UNAUTHORIZED))
   // }
 
-  const token = accessToken
-    ? accessToken
-    : authHeader?.startsWith('Bearer ')
-      ? authHeader.slice(7)
-      : authHeader
+  const token =
+    accessToken || (authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : authHeader)
 
   const secret = process.env.ACCESS_TOKEN_SECRET
   if (!secret) {

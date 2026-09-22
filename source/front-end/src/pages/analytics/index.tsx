@@ -8,6 +8,7 @@ import MonthlySubmissionAccumulatedAndTarget from './components/MonthlySubmissio
 import { Skeleton } from '../../components/skeletons/Skeleton'
 import AnnualAccumulatedAndTarget from './components/AnnualAccumulatedAndTarget'
 import TimeToCommunicationAndImplementation from './components/TimeToCommunicationAndImplementation'
+import PendingAndCompletedPayments from './components/PendingAndCompletedPayments'
 
 const currentYear = new Date().getFullYear()
 
@@ -157,6 +158,10 @@ const AnalyticsPage: React.FC = () => {
               </div>
             </div>
           </section>
+
+          {/* <section>
+            <PendingAndCompletedPayments />
+          </section> */}
 
           <section>
             <TimeToCommunicationAndImplementation />

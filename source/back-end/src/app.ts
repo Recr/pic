@@ -2,10 +2,14 @@ import express from 'express'
 import { appRoutes } from './router'
 import cors, { CorsOptions } from 'cors'
 import cookieParser from 'cookie-parser'
+import { startEmailJob } from './jobs/email-job'
+import dotenv from 'dotenv'
 
-const app = express()
-const port = process.env.PORT || 3030
-const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173'
+dotenv.config()
+
+const app = express().disable('x-powered-by')
+const port = process.env.PORT
+const corsOrigin = `${process.env.CORS_ORIGIN}`
 
 const corsOptions: CorsOptions = {
   origin: corsOrigin,
@@ -23,6 +27,8 @@ app.use(express.json())
 app.use(cors(corsOptions))
 app.use(cookieParser())
 app.use('/api', appRoutes)
+
+startEmailJob()
 
 app.listen(port, () => {
   return console.log(`Server is running on port ${port}`)

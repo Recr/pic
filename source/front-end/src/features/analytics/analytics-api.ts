@@ -1,6 +1,8 @@
 import { api } from '../../services/api'
 import type {
+  GetPendingAndCompletedPaymentsFilters,
   GetTimeToCommunicationAndImplementationFilters,
+  PendingAndCompletedPaymentsResponse,
   TimeToCommunicationAndImplementationResponse,
 } from './types'
 
@@ -8,7 +10,6 @@ export interface GetProposalAnalyticsFilters {
   status?: string
   startDate?: string
   endDate?: string
-  completionDate?: string
   category?: string
   categoryId?: number
   areaId?: number
@@ -39,10 +40,6 @@ export const analyticsAPI = api.injectEndpoints({
 
         if (filters?.endDate) {
           params.set('endDate', filters.endDate)
-        }
-
-        if (filters?.completionDate) {
-          params.set('completionDate', filters.completionDate)
         }
 
         if (filters?.category) {
@@ -89,6 +86,29 @@ export const analyticsAPI = api.injectEndpoints({
 
         return {
           url: `/analytics/time-to-communication-and-implementation?${queryString}`,
+          method: 'GET',
+        }
+      },
+    }),
+    getPendingAndCompletedPayments: builder.query<
+      PendingAndCompletedPaymentsResponse,
+      GetPendingAndCompletedPaymentsFilters
+    >({
+      query: (filters) => {
+        const params = new URLSearchParams()
+
+        if (filters?.startDate) {
+          params.set('startDate', filters.startDate)
+        }
+
+        if (filters?.endDate) {
+          params.set('endDate', filters.endDate)
+        }
+
+        const queryString = params.toString()
+
+        return {
+          url: `/analytics/pending-and-completed-payments?${queryString}`,
           method: 'GET',
         }
       },

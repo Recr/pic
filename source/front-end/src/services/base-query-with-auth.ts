@@ -1,7 +1,7 @@
 import { fetchBaseQuery } from '@reduxjs/toolkit/query'
 import { logout } from '../features/auth/auth-slice'
 
-const API_BASE_URL = import.meta.env.API_URL || 'http://localhost:3030/api'
+export const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
 const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
@@ -11,7 +11,7 @@ const baseQuery = fetchBaseQuery({
 export const baseQueryWithAuth = async (args: any, api: any, extraOptions: any) => {
   let result = await baseQuery(args, api, extraOptions)
 
-  if (result.error && result.error.status === 401) {
+  if (result.error?.status === 401) {
     const isRefreshRequest =
       typeof args === 'object' && args !== null && 'url' in args && args.url === '/auth/refresh'
 

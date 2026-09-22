@@ -194,6 +194,7 @@ const Employee: React.FC = () => {
                       setIsEditModalOpen(true)
                       updateSetValue('name', employee.name)
                       updateSetValue('re', employee.re)
+                      updateSetValue('email', employee.email)
                       updateSetValue('role', employee.role)
                       updateSetValue('shift', employee.shift || '1')
                     }}
@@ -212,7 +213,7 @@ const Employee: React.FC = () => {
             </div>
           </div>
 
-          {hasUnregisteredEmployees && (
+          {unregisteredEmployees && hasUnregisteredEmployees && (
             <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <h2 className="text-lg font-semibold text-gray-800">Não cadastrados</h2>
@@ -298,14 +299,10 @@ const Employee: React.FC = () => {
         }}
       >
         <div className="rounded-xl bg-whites p-1 gap-4 flex flex-col w-2xs">
-          {/* <X
-            className="hover:cursor-pointer size-4 hover:size-6 "
-            onClick={() => setIsEditModalOpen(false)}
-          /> */}
           <h2 className="text-center">Editar Colaborador</h2>
           {selectedEmployee ? (
             <form
-              className="flex flex-col  mt-5 p-2 rounded-lg"
+              className="flex flex-col mt-5 p-2 rounded-lg"
               onSubmit={updateHandleSubmit(updateOnSubmit)}
             >
               <div className="flex flex-col gap-2 text-sm">
@@ -332,6 +329,17 @@ const Employee: React.FC = () => {
                 />
                 {updateErrors.re && (
                   <span className="text-xs text-red-600">{updateErrors.re.message}</span>
+                )}
+                <label>Email:</label>
+                <input
+                  className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  type="text"
+                  {...updateRegister('email')}
+                  placeholder="Email do colaborador"
+                  autoComplete="off"
+                />
+                {updateErrors.email && (
+                  <span className="text-xs text-red-600">{updateErrors.email.message}</span>
                 )}
                 <DropdownSelect
                   label="Cargo"
@@ -401,97 +409,110 @@ const Employee: React.FC = () => {
           }
         }}
       >
-        <h2 className="text-center">Adicionar Colaborador</h2>
-        <form
-          className="flex flex-col m-auto mt-10 p-4 bg-gray-100 rounded-lg shadow-lg"
-          onSubmit={createHandleSubmit(createOnSubmit)}
-        >
-          <div className="flex flex-col gap-2 text-sm">
-            <label>Nome:</label>
-            <input
-              className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              type="text"
-              {...createRegister('name')}
-              placeholder="Nome completo do operador"
-              autoComplete="off"
-            />
-            {createErrors.name && (
-              <span className="text-xs text-red-600">{createErrors.name.message}</span>
-            )}
-            <label>RE:</label>
-            <input
-              className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              type="number"
-              {...createRegister('re')}
-              placeholder="RE do operador"
-              min={0}
-              max={50000}
-              autoComplete="off"
-            />
-            {createErrors.re && (
-              <span className="text-xs text-red-600">{createErrors.re.message}</span>
-            )}
-            <DropdownSelect
-              label="Cargo"
-              value={createRoleValue}
-              onChange={(value) =>
-                createSetValue('role', value as CreateEmployeeSchemaInput['role'])
-              }
-              placeholder="Selecione um cargo"
-              options={[
-                { value: 'OPERATOR', label: 'Operador' },
-                { value: 'TEAM_LEADER', label: 'Team Leader' },
-                { value: 'SUPERVISOR', label: 'Supervisor' },
-                { value: 'MANAGER', label: 'Gerente' },
-                { value: 'GENERAL_MANAGER', label: 'Gerente Geral (GM)' },
-                { value: 'HUMAN_RESOURCES', label: 'Recursos Humanos (RH)' },
-                { value: 'TECHNICAL_SUPPORT', label: 'Suporte Técnico' },
-                { value: 'ADMIN', label: 'Administrador' },
-              ]}
-              showEmptyOption={false}
-              buttonClassName="w-full rounded border border-gray-300 bg-white px-3 py-2 text-left text-sm text-gray-700 transition hover:cursor-pointer hover:border-blue-300 hover:bg-blue-50"
-            />
-            {createErrors.role && (
-              <span className="text-xs text-red-600">{createErrors.role.message}</span>
-            )}
-            <DropdownSelect
-              label="Turno"
-              value={createShiftValue}
-              onChange={(value) =>
-                createSetValue('shift', value as CreateEmployeeSchemaInput['shift'])
-              }
-              placeholder="Selecione um turno"
-              options={[
-                { value: '1', label: '1º' },
-                { value: '2', label: '2º' },
-                { value: '3', label: '3º' },
-                { value: 'ADM', label: 'Administrativo' },
-              ]}
-              showEmptyOption={false}
-              buttonClassName="w-full rounded border border-gray-300 bg-white px-3 py-2 text-left text-sm text-gray-700 transition hover:cursor-pointer hover:border-blue-300 hover:bg-blue-50"
-            />
-            {createErrors.shift && (
-              <span className="text-xs text-red-600">{createErrors.shift.message}</span>
-            )}
-            <label>Senha:</label>
-            <input
-              className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              type="password"
-              {...createRegister('password')}
-              placeholder="Senha do operador"
-            />
-            {createErrors.password && (
-              <span className="text-xs text-red-600">{createErrors.password.message}</span>
-            )}
-            <button
-              className="mt-4 rounded-full bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:cursor-pointer hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
-              type="submit"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Cadastrando...' : 'Cadastrar'}
-            </button>
-          </div>
-        </form>
+        <div className="rounded-xl bg-whites p-1 gap-4 flex flex-col w-2xs">
+          <h2 className="text-center">Adicionar Colaborador</h2>
+          <form
+            className="flex flex-col mt-5 p-2 rounded-lg"
+            onSubmit={createHandleSubmit(createOnSubmit)}
+          >
+            <div className="flex flex-col gap-2 text-sm">
+              <label>Nome:</label>
+              <input
+                className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                type="text"
+                {...createRegister('name')}
+                placeholder="Nome completo do operador"
+                autoComplete="off"
+              />
+              {createErrors.name && (
+                <span className="text-xs text-red-600">{createErrors.name.message}</span>
+              )}
+              <label>RE:</label>
+              <input
+                className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                type="number"
+                {...createRegister('re')}
+                placeholder="RE do operador"
+                min={0}
+                max={50000}
+                autoComplete="off"
+              />
+              {createErrors.re && (
+                <span className="text-xs text-red-600">{createErrors.re.message}</span>
+              )}
+              <label>Email:</label>
+              <input
+                className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                type="text"
+                {...createRegister('email')}
+                placeholder="Email do colaborador"
+                autoComplete="off"
+              />
+              {createErrors.email && (
+                <span className="text-xs text-red-600">{createErrors.email.message}</span>
+              )}
+              <DropdownSelect
+                label="Cargo"
+                value={createRoleValue}
+                onChange={(value) =>
+                  createSetValue('role', value as CreateEmployeeSchemaInput['role'])
+                }
+                placeholder="Selecione um cargo"
+                options={[
+                  { value: 'OPERATOR', label: 'Operador' },
+                  { value: 'TEAM_LEADER', label: 'Team Leader' },
+                  { value: 'SUPERVISOR', label: 'Supervisor' },
+                  { value: 'MANAGER', label: 'Gerente' },
+                  { value: 'GENERAL_MANAGER', label: 'Gerente Geral (GM)' },
+                  { value: 'HUMAN_RESOURCES', label: 'Recursos Humanos (RH)' },
+                  { value: 'TECHNICAL_SUPPORT', label: 'Suporte Técnico' },
+                  { value: 'ADMIN', label: 'Administrador' },
+                ]}
+                showEmptyOption={false}
+                buttonClassName="w-full rounded border border-gray-300 bg-white px-3 py-2 text-left text-sm text-gray-700 transition hover:cursor-pointer hover:border-blue-300 hover:bg-blue-50"
+              />
+              {createErrors.role && (
+                <span className="text-xs text-red-600">{createErrors.role.message}</span>
+              )}
+              <DropdownSelect
+                label="Turno"
+                value={createShiftValue}
+                onChange={(value) =>
+                  createSetValue('shift', value as CreateEmployeeSchemaInput['shift'])
+                }
+                placeholder="Selecione um turno"
+                options={[
+                  { value: '1', label: '1º' },
+                  { value: '2', label: '2º' },
+                  { value: '3', label: '3º' },
+                  { value: 'ADM', label: 'Administrativo' },
+                ]}
+                showEmptyOption={false}
+                buttonClassName="w-full rounded border border-gray-300 bg-white px-3 py-2 text-left text-sm text-gray-700 transition hover:cursor-pointer hover:border-blue-300 hover:bg-blue-50"
+              />
+              {createErrors.shift && (
+                <span className="text-xs text-red-600">{createErrors.shift.message}</span>
+              )}
+              <label>Senha:</label>
+              <input
+                className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                type="password"
+                {...createRegister('password')}
+                placeholder="Senha do operador"
+              />
+              {createErrors.password && (
+                <span className="text-xs text-red-600">{createErrors.password.message}</span>
+              )}
+              <button
+                className="mt-4 rounded-full bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:cursor-pointer hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+                type="submit"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Cadastrando...' : 'Cadastrar'}
+              </button>
+            </div>
+          </form>
+        </div>
       </Modal>
     </div>
   )

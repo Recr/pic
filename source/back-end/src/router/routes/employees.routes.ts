@@ -14,7 +14,8 @@ import { Role } from '../../utils/types/employees.types'
 
 const employeeRoutes = Router()
 
-employeeRoutes.get('/', EmployeesController.handleFindAll)
+employeeRoutes.get('/', authMiddleware, checkRole([Role.ADMIN]), EmployeesController.handleFindAll)
+employeeRoutes.get('/basic-info', EmployeesController.handleFindAllForForms)
 employeeRoutes.get(
   '/unregistered',
   authMiddleware,

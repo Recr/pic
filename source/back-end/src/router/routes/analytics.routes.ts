@@ -9,15 +9,22 @@ const analyticsRoutes = Router()
 analyticsRoutes.get(
   '/proposals',
   authMiddleware,
-  checkRole([Role.ADMIN]),
+  checkRole([Role.ADMIN, Role.GENERAL_MANAGER]),
   AnalyticsController.handleGetProposalAnalytics,
 )
 
 analyticsRoutes.get(
   '/time-to-communication-and-implementation',
   authMiddleware,
-  checkRole([Role.ADMIN]),
+  checkRole([Role.ADMIN, Role.GENERAL_MANAGER]),
   AnalyticsController.handleGetTimeToCommunicationAndImplementation,
+)
+
+analyticsRoutes.get(
+  '/pending-and-completed-payments',
+  authMiddleware,
+  checkRole([Role.ADMIN, Role.GENERAL_MANAGER]),
+  AnalyticsController.handleGetPendingAndCompletedPayments,
 )
 
 export { analyticsRoutes }

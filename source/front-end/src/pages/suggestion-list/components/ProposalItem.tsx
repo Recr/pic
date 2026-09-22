@@ -3,10 +3,11 @@ import Modal from '../../../components/modal/Modal'
 import StatusBadge from '../../../components/badges/StatusBadge'
 import type { ProposalDetailed } from '../../../features/proposal/types'
 import { proposalAPI } from '../../../features/proposal/proposal-api'
-import { getStatusColor } from '../../../helpers/getStatusColor'
+import { borderColors, getStatusColor } from '../../../helpers/getStatusColor'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../../app/store'
 import { toast } from 'react-toastify'
+import { API_BASE_URL } from '../../../services/base-query-with-auth'
 import {
   Undo2,
   Trash2,
@@ -25,46 +26,30 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod/src/zod.js'
 import { translateRoles } from '../../../helpers/translateRoles'
 import EmployeeInformationBadge from '../../../components/badges/EmployeeInformationBadge'
+import {
+  getProposalAvailableUndoActions,
+  useProposalUndo,
+  type UndoType,
+} from '../../../helpers/handleProposalUndoButton'
 
 const MAX_ATTACHMENTS_PER_UPLOAD = 5
 const MAX_ATTACHMENT_SIZE_BYTES = 10 * 1024 * 1024
 
 const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) => {
-  const [isModalOpen, setIsModalOpen] = React.useState(false)
-  const [isUndoModalOpen, setIsUndoModalOpen] = React.useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false)
-  const [isRestoreModalOpen, setIsRestoreModalOpen] = React.useState(false)
-  const [isUpdateManagerModalOpen, setIsUpdateManagerModalOpen] = React.useState(false)
-  const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
-  const [removingAttachmentId, setRemovingAttachmentId] = React.useState<number | null>(null)
-  const [selectedUndoType, setSelectedUndoType] = React.useState<
-    | 'IMPLEMENTED_TO_WAITING_APPROVAL'
-    | 'IMPLEMENTED_TO_IMPLEMENTATION'
-    | 'IMPLEMENTATION_TO_TO_IMPLEMENT'
-    | 'TO_IMPLEMENT_TO_UNDER_VALIDATION'
-    | 'REJECTED_TO_UNDER_VALIDATION'
-    | 'REJECTED_TO_DEFINE_CHAMPION'
-    | null
-  >(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isUndoModalOpen, setIsUndoModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false)
+  const [isUpdateManagerModalOpen, setIsUpdateManagerModalOpen] = useState(false)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [removingAttachmentId, setRemovingAttachmentId] = useState<number | null>(null)
+  const [selectedUndoType, setSelectedUndoType] = useState<UndoType>(null)
 
   const [uploadAttachments, { isLoading: isUploadingAttachments }] =
     proposalAPI.useUploadProposalAttachmentsMutation()
   const [deleteAttachment, { isLoading: isDeletingAttachment }] =
     proposalAPI.useDeleteProposalAttachmentMutation()
-  const [
-    undoImplementedToWaitingApproval,
-    { isLoading: isUndoFinishedWithoutImplementationLoading },
-  ] = proposalAPI.useUndoImplementedToWaitingApprovalMutation()
-  const [undoImplementedToImplementation, { isLoading: isUndoImplementedLoading }] =
-    proposalAPI.useUndoImplementedToImplementationMutation()
-  const [undoImplementationToToImplement, { isLoading: isUndoImplementationLoading }] =
-    proposalAPI.useUndoImplementationToToImplementMutation()
-  const [undoToImplementToUnderValidation, { isLoading: isUndoToImplementLoading }] =
-    proposalAPI.useUndoToImplementToUnderValidationMutation()
-  const [undoRejectedToUnderValidation, { isLoading: isUndoRejectedValidationLoading }] =
-    proposalAPI.useUndoRejectedToUnderValidationMutation()
-  const [undoRejectedToDefineChampion, { isLoading: isUndoRejectedChampionLoading }] =
-    proposalAPI.useUndoRejectedToDefineChampionMutation()
+  const { undoProposal, isUndoLoading } = useProposalUndo()
   const [softDeleteProposal, { isLoading: isSoftDeleteLoading }] =
     proposalAPI.useSoftDeleteProposalMutation()
   const [restoreProposal, { isLoading: isRestoringLoading }] =
@@ -72,7 +57,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   const [updateProposalManager] = proposalAPI.useUpdateProposalManagerMutation()
   const [updateProposalChampion] = proposalAPI.useUpdateProposalChampionMutation()
   const user = useSelector((state: RootState) => state.auth.user)
-  const { data: employeeList } = employeeAPI.useGetEmployeesQuery()
+  const { data: employeeList } = employeeAPI.useGetEmployeesForFormsQuery()
 
   const isAdmin = user?.role === 'ADMIN'
   const isManager = user?.re !== undefined && proposal.manager?.re === user.re
@@ -81,75 +66,18 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   const fileInputId = `attachment-input-${proposal.id}`
 
   const getUndoLoading = () => {
-    switch (selectedUndoType) {
-      case 'IMPLEMENTED_TO_WAITING_APPROVAL':
-        return isUndoFinishedWithoutImplementationLoading
-      case 'IMPLEMENTED_TO_IMPLEMENTATION':
-        return isUndoImplementedLoading
-      case 'IMPLEMENTATION_TO_TO_IMPLEMENT':
-        return isUndoImplementationLoading
-      case 'TO_IMPLEMENT_TO_UNDER_VALIDATION':
-        return isUndoToImplementLoading
-      case 'REJECTED_TO_UNDER_VALIDATION':
-        return isUndoRejectedValidationLoading
-      case 'REJECTED_TO_DEFINE_CHAMPION':
-        return isUndoRejectedChampionLoading
-      default:
-        return false
-    }
-  }
-
-  const borderColors: Record<string, string> = {
-    IMPLEMENTED: 'border-green-300',
-    REJECTED: 'border-red-300',
-    DEFINE_CHAMPION: 'border-blue-300',
-    WAITING_APPROVAL: 'border-orange-300',
-    UNDER_VALIDATION: 'border-orange-300',
-    TO_IMPLEMENT: 'border-yellow-300',
-    IMPLEMENTATION: 'border-cyan-300',
-    NOT_VIABLE: 'border-gray-300',
-    PENDING: 'border-orange-300',
-    PAID: 'border-green-300',
-    CANCELLED: 'border-red-300',
-  }
-
-  const getAvailableUndoActions = () => {
-    const actions: (typeof selectedUndoType)[] = []
-
-    if (
-      proposal.status === 'IMPLEMENTED' &&
-      !proposal.requiresImplementation &&
-      (isAdmin || isManager)
-    ) {
-      actions.push('IMPLEMENTED_TO_WAITING_APPROVAL')
-    }
-
-    if (proposal.status === 'IMPLEMENTED' && (isAdmin || isChampion)) {
-      actions.push('IMPLEMENTED_TO_IMPLEMENTATION')
-    }
-
-    if (proposal.status === 'IMPLEMENTATION' && isChampion) {
-      actions.push('IMPLEMENTATION_TO_TO_IMPLEMENT')
-    }
-
-    if (proposal.status === 'TO_IMPLEMENT' && isChampion) {
-      actions.push('TO_IMPLEMENT_TO_UNDER_VALIDATION')
-    }
-
-    if ((proposal.status === 'REJECTED' || proposal.status === 'NOT_VIABLE') && isChampion) {
-      actions.push('REJECTED_TO_UNDER_VALIDATION')
-    }
-
-    if (proposal.status === 'REJECTED' && (isAdmin || isManager) && !proposal.champion) {
-      actions.push('REJECTED_TO_DEFINE_CHAMPION')
-    }
-
-    return actions
+    return isUndoLoading(selectedUndoType)
   }
 
   const getPrimaryUndoAction = () => {
-    const actions = getAvailableUndoActions()
-    return actions.length > 0 ? actions[0] : null
+    const actions = getProposalAvailableUndoActions(
+      isAdmin,
+      isManager,
+      isChampion,
+      proposal.status,
+      proposal.requiresImplementation,
+    )
+    return actions[0] ?? null
   }
 
   const handleUndoClick = () => {
@@ -167,26 +95,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
     }
 
     try {
-      switch (selectedUndoType) {
-        case 'IMPLEMENTED_TO_WAITING_APPROVAL':
-          await undoImplementedToWaitingApproval({ proposalId: proposal.id.toString() }).unwrap()
-          break
-        case 'IMPLEMENTED_TO_IMPLEMENTATION':
-          await undoImplementedToImplementation({ proposalId: proposal.id.toString() }).unwrap()
-          break
-        case 'IMPLEMENTATION_TO_TO_IMPLEMENT':
-          await undoImplementationToToImplement({ proposalId: proposal.id.toString() }).unwrap()
-          break
-        case 'TO_IMPLEMENT_TO_UNDER_VALIDATION':
-          await undoToImplementToUnderValidation({ proposalId: proposal.id.toString() }).unwrap()
-          break
-        case 'REJECTED_TO_UNDER_VALIDATION':
-          await undoRejectedToUnderValidation({ proposalId: proposal.id.toString() }).unwrap()
-          break
-        case 'REJECTED_TO_DEFINE_CHAMPION':
-          await undoRejectedToDefineChampion({ proposalId: proposal.id.toString() }).unwrap()
-          break
-      }
+      await undoProposal(selectedUndoType, proposal.id)
 
       setIsUndoModalOpen(false)
       setSelectedUndoType(null)
@@ -245,45 +154,12 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
     try {
       console.log('Starting download:', { proposalId, attachmentId, filename })
 
-      const response = await fetch(
-        `/api/proposals/${proposalId}/attachments/${attachmentId}/download`,
-        {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            Accept: 'application/octet-stream',
-          },
-        },
-      )
-
-      // console.log('Response received:', {
-      //   status: response.status,
-      //   statusText: response.statusText,
-      //   contentType: response.headers.get('content-type'),
-      //   contentLength: response.headers.get('content-length'),
-      // })
-      {
-        /* TODO: refactor to use toast */
-      }
-      if (!response.ok) {
-        const errorText = await response.text()
-        toast.error(`Erro ao baixar arquivo (${response.status}): ${errorText || 'Falha.'}`)
-        return
-      }
-
-      const blob = await response.blob()
-      console.log('Blob received:', { size: blob.size, type: blob.type })
-
-      const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
-      link.href = url
+      link.href = `${API_BASE_URL.replace(/\/$/, '')}/proposals/${proposalId}/attachments/${attachmentId}/download`
       link.download = filename
       document.body.appendChild(link)
       link.click()
-      document.body.removeChild(link)
-      window.URL.revokeObjectURL(url)
-
-      // console.log('Download triggered successfully')
+      link.remove()
     } catch (error) {
       console.error('Download error:', error)
       toast.error(`Erro ao baixar arquivo: ${getErrorMessage(error)}`)
@@ -370,16 +246,14 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
   }
 
   const canEditManager = user?.role === 'ADMIN'
-  const canEditChampion =
-    user?.role === 'ADMIN' ? true : user?.re === proposal.manager?.re ? true : false
+  const canEditChampion = user?.role === 'ADMIN' ? true : user?.re === proposal.manager?.re
 
   return (
     <>
-      {/* sm:px-4 md:grid-cols-[56px_2fr_2fr_1fr_1fr_1fr] md:gap-0 md:py-2 */}
-      {/* ${proposal.isActive ? 'hover:bg-blue-100 border-gray-200' : 'bg-red-100  border-red-200 hover:bg-red-300 hover:border-red-400'} */}
-      <div
-        className={`bg-gray-50 rounded-lg md:rounded-none flex flex-1 px-3 py-3 md:py-0 text-left shadow-lg md:shadow-sm hover:bg-blue-50 text-sm hover:cursor-pointer transition-all ${borderColors[proposal.status] ?? 'border-gray-300'} border-l-8 md:border-l-4 hover:translate-y-1 hover:animate-pulse`}
+      <button
+        className={`bg-gray-50 rounded-lg md:rounded-none flex flex-1 px-3 py-3 md:py-0 text-left shadow-lg md:shadow-sm hover:bg-blue-50 text-sm hover:cursor-pointer transition-all ${borderColors[proposal.status] ?? 'border-gray-300'} border-l-8 md:border-l-4 hover:translate-y-0.5 hover:animate-pulse ${proposal.isActive ? 'hover:bg-blue-100 ' : 'bg-red-100  border-red-200 hover:bg-red-300 hover:border-red-400'}`}
         onClick={() => setIsModalOpen(true)}
+        type="button"
       >
         <div className="flex flex-1 flex-col gap-3 md:grid md:grid-cols-[56px_2fr_2fr_1fr_0.8fr_1fr] lg:grid-cols-[56px_2fr_2fr_1fr_0.55fr_1fr] xl:grid-cols-[56px_2fr_2fr_1fr_0.4fr_1fr] md:gap-0 md:py-1">
           <div className="flex justify-between">
@@ -443,7 +317,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
           />
         </div>
         <ChevronRightIcon size={32} className="text-gray-400 self-center md:hidden" />
-      </div>
+      </button>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div className="w-full sm:max-w-11/12 space-y-4 p-4 md:max-w-[70vw]  sm:p-6 lg:w-152">
           <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:gap-4">
@@ -537,13 +411,14 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
             <div>
               <p className="text-sm font-semibold mb-2">Gestor</p>
               <div className="flex flex-wrap gap-2">
-                <p
+                <button
                   onClick={() => {
                     if (canEditManager) {
                       setEmployeeType('MANAGER')
                       setIsUpdateManagerModalOpen(true)
                     }
                   }}
+                  type="button"
                   className={`bg-gray-100 px-2 py-1 rounded text-sm ${canEditManager ? 'border border-blue-300 border-dashed hover:cursor-pointer hover:bg-blue-50 hover:border-blue-400' : ''} transition-colors`}
                 >
                   <span className="text-gray-700 font-bold">{proposal.manager.name}</span>
@@ -552,7 +427,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
                     {' - '}
                     Turno: {proposal.manager.shift}
                   </span>
-                </p>
+                </button>
               </div>
             </div>
           )}
@@ -560,7 +435,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
             <div>
               <p className="text-sm font-semibold mb-2">Executor</p>
               <div className="flex flex-wrap gap-2">
-                <p
+                <button
                   onClick={() => {
                     if (canEditChampion) {
                       setEmployeeType('CHAMPION')
@@ -575,7 +450,7 @@ const ProposalItem: React.FC<{ proposal: ProposalDetailed }> = ({ proposal }) =>
                     {' - '}
                     Turno: {proposal.champion.shift}
                   </span>
-                </p>
+                </button>
               </div>
             </div>
           )}

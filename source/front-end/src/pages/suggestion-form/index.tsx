@@ -11,6 +11,7 @@ import type { RootState } from '../../app/store'
 import EmployeeCombobox from '../../components/inputs/EmployeeCombobox'
 import DropdownSelect from '../../components/inputs/DropdownSelect'
 import { Skeleton } from '../../components/skeletons/Skeleton'
+import { MapPinIcon } from 'lucide-react'
 
 const EMPLOYEE_OPTIONS = [1, 2, 3] as const
 
@@ -31,7 +32,8 @@ const SuggestionForm: React.FC = () => {
   const [areaError, setAreaError] = useState<string | null>(null)
   const [createProposal] = proposalAPI.useCreateProposalMutation()
 
-  const { data: employees = [], isLoading: isLoadingEmployees } = employeeAPI.useGetEmployeesQuery()
+  const { data: employees = [], isLoading: isLoadingEmployees } =
+    employeeAPI.useGetEmployeesForFormsQuery()
   const { data: areas = [], isLoading: isLoadingAreas } = areaAPI.useGetAreasQuery()
 
   const navigate = useNavigate()
@@ -197,13 +199,20 @@ const SuggestionForm: React.FC = () => {
             id="logo"
             src={logo}
             alt="Logo"
-            className="object-contain w-80 sm:w-96 mb-5 border border-[#ccc] rounded"
+            className="object-contain w-80 sm:w-95 shadow-xl rounded"
           />
+          <div className="sm:w-95 w-80 flex gap-6 bg-white rounded py-2 shadow-md my-2 px-4 items-center">
+            <MapPinIcon size={42} className="bg-blue-100 text-blue-700 p-2 rounded-full" />
+            <div className="flex flex-col">
+              <p className="font-medium text-gray-500">Local</p>
+              <h2 className="text-xl font-medium text-center w-full">São Bernardo do Campo</h2>
+            </div>
+          </div>
         </div>
         <form
           key={formKey}
           onSubmit={handleSubmit}
-          className="bg-white flex flex-col items-center w-80 sm:w-auto shadow-custom py-5 px-7.5 mx-auto mb-7.5 rounded"
+          className="bg-white flex flex-col items-center shadow-custom py-5 px-7.5 mx-auto mb-7.5 rounded shadow-md"
         >
           {/* employee_amount_radio */}
           <div id="employee_amount_radio" className="my-8 mx-auto flex flex-col items-center">
@@ -230,7 +239,7 @@ const SuggestionForm: React.FC = () => {
           {/* employee_information */}
           <div
             id="employee_information"
-            className="flex flex-col md:flex-row items-center gap-5 w-full mb-7.5 md:max-w-175 md:justify-center"
+            className="flex flex-col md:flex-row items-center gap-5  mb-7.5 "
           >
             {Array.from({ length: employeeCount }, (_, i) => i + 1).map((num) => (
               <div

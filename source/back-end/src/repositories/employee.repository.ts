@@ -15,6 +15,20 @@ class PrismaEmployeeRepository {
     return employees
   }
 
+  public async findAllForForms() {
+    const employees = await prisma.employee.findMany({
+      select: {
+        re: true,
+        name: true,
+        shift: true,
+      },
+      orderBy: {
+        re: 'asc',
+      },
+    })
+    return employees
+  }
+
   public async findAllWithToken() {
     const employees = await prisma.employee.findMany({
       where: {
@@ -106,6 +120,37 @@ class PrismaEmployeeRepository {
       },
     })
     return suggestions
+  }
+
+  public async findAllWithUnansweredProposals() {
+    const employees = await prisma.employee.findMany({
+      where: {
+        proposalsManager: {
+          some: {
+            status: 'DEFINE_CHAMPION',
+          },
+        },
+        email: {
+          not: null,
+        },
+      },
+      select: {
+        re: true,
+        name: true,
+        email: true,
+        _count: {
+          select: {
+            proposalsManager: {
+              where: {
+                status: 'DEFINE_CHAMPION',
+              },
+            },
+          },
+        },
+      },
+    })
+
+    return employees
   }
 
   public async create(newEmployee: Prisma.EmployeeCreateInput, tx?: Prisma.TransactionClient) {

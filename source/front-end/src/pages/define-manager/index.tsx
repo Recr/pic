@@ -7,7 +7,8 @@ import { Skeleton } from '../../components/skeletons/Skeleton'
 import { ToastContainer } from 'react-toastify'
 
 const DefineManager: React.FC = () => {
-  const { data: managerList, isLoading: isLoadingManagers } = employeeAPI.useGetEmployeesQuery()
+  const { data: managerList, isLoading: isLoadingManagers } =
+    employeeAPI.useGetEmployeesForFormsQuery()
   const { data: areas, isLoading: isLoadingAreas } = areaAPI.useGetAreasQuery()
   const { data: proposalsList, isLoading: isLoadingProposals } =
     proposalAPI.useGetProposalsWithoutManagerQuery()

@@ -12,12 +12,17 @@ const SALT_ROUNDS = 12
 
 class EmployeeUseCase {
   constructor(
-    private employeeRepository: PrismaEmployeeRepository,
-    private suggestionRepository: PrismaSuggestionRepository,
+    private readonly employeeRepository: PrismaEmployeeRepository,
+    private readonly suggestionRepository: PrismaSuggestionRepository,
   ) {}
 
   public async executeFindAll() {
     const employees = await this.employeeRepository.findAll()
+    return employees
+  }
+
+  public async executeFindAllForForms() {
+    const employees = await this.employeeRepository.findAllForForms()
     return employees
   }
 
@@ -110,6 +115,11 @@ class EmployeeUseCase {
     if (!employee) throw new AppError('Employee not found.', StatusCodes.NOT_FOUND)
     const updatedEmployee = await this.employeeRepository.update(employeeId, updatedEmployeeData)
     return updatedEmployee
+  }
+
+  public async executeFindAllWithUnansweredProposals() {
+    const employees = await this.employeeRepository.findAllWithUnansweredProposals()
+    return employees
   }
 }
 

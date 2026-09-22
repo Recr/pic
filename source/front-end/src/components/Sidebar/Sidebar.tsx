@@ -93,7 +93,7 @@ const Sidebar: React.FC = () => {
       icon: <ChartArea />,
       label: 'Relatórios',
       path: '/analytics',
-      allowedRoles: ['ADMIN'],
+      allowedRoles: ['ADMIN', 'GENERAL_MANAGER'],
     },
     { icon: <LogOut />, label: 'Sair', path: '/logout' },
   ]

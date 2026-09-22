@@ -6,8 +6,8 @@ import { PrismaProposalRepository } from '../repositories/proposal.repository'
 
 class CategoryUseCase {
   constructor(
-    private categoryRepository: PrismaCategoryRepository,
-    private proposalRepository: PrismaProposalRepository,
+    private readonly categoryRepository: PrismaCategoryRepository,
+    private readonly proposalRepository: PrismaProposalRepository,
   ) {}
 
   public async executeFindAll() {
