@@ -3,7 +3,6 @@ import ImplementationCard from './components/ImplementationCard'
 import ReviewCard from './components/ReviewCard'
 import StartImplementationCard from './components/StartImplementationCard'
 import { Skeleton } from '../../components/skeletons/Skeleton'
-import { ToastContainer } from 'react-toastify'
 import ReviewImplementedProposalCard from './components/ReviewImplementedProposalCard'
 import type { ProposalWithSuggestions, ProposalStatus } from './types'
 import { MobileCarouselSection } from './components/MobileCarouselSection'
@@ -89,7 +88,6 @@ const Proposals: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-primary-gray px-3 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8">
-      <ToastContainer />
       <div className="rounded-lg bg-white py-4 shadow-custom sm:py-5">
         <div className="mx-4 my-3 text-left text-3xl font-semibold sm:my-4 sm:text-2xl">
           Propostas

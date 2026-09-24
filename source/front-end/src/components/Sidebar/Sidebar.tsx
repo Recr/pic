@@ -14,8 +14,6 @@ import {
   X,
   Blocks,
   ChartArea,
-  Pin,
-  PinOff,
   PanelLeft,
   PanelLeftOpen,
 } from 'lucide-react'
@@ -114,55 +112,63 @@ const Sidebar: React.FC = () => {
     )
 
   return (
-    <div
-      className={`absolute lg:static m-4 lg:mt-8 lg:mr-0 lg:ml-4 lg:h-full rounded-xl bg-white transition-[width] duration-300 ease-in-out ${isMobileMenuOpen ? 'w-49' : 'w-13'} ${isSidebarExpanded ? 'lg:w-49' : 'lg:w-13'}`}
-      onMouseEnter={() => setIsSidebarHovered(true)}
-      onMouseLeave={() => setIsSidebarHovered(false)}
-    >
-      <div className="flex items-center justify-between p-2 lg:hidden">
-        <button
-          type="button"
-          aria-label={isMobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
-          onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-          className="relative z-40 rounded-md p-2 hover:bg-black hover:text-white transition-colors hover:cursor-pointer"
-        >
-          {isMobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
-        </button>
-      </div>
-      <div className="hidden justify-start p-2 lg:flex">
-        <button
-          type="button"
-          aria-label={isSidebarLocked ? 'Desbloquear menu lateral' : 'Fixar menu lateral aberto'}
-          aria-pressed={isSidebarLocked}
-          onClick={() => setIsSidebarLocked((prev) => !prev)}
-          className="rounded-md p-2 transition-colors hover:cursor-pointer hover:bg-black hover:text-white"
-        >
-          {isSidebarLocked ? (
-            <PanelLeft className="size-4" />
-          ) : (
-            <PanelLeftOpen className="size-4" />
-          )}
-        </button>
-      </div>
-      <hr className="text-black" />
-
-      <nav
-        className={`absolute lg:static top-16 z-30 flex h-fit flex-col gap-2 overflow-hidden rounded-xl bg-white shadow-md transition-[width,opacity,padding] duration-300 ease-in-out ${isMobileMenuOpen ? 'w-49 p-2 opacity-100' : ' w-0 p-0 opacity-0'} ${isSidebarExpanded ? 'lg:w-49' : 'lg:w-full'} lg:p-2 lg:opacity-100`}
+    <div className="sticky lg:static lg:h-full top-4 z-30 flex flex-col">
+      <div
+        className={`absolute z-30 lg:static mx-4 lg:mt-8 lg:mr-0 lg:ml-4 lg:h-full rounded-xl bg-secondary-gray lg:bg-white shadow-md transition-[width] duration-300 ease-in-out ${isMobileMenuOpen ? 'w-49' : 'w-13'} ${isSidebarExpanded ? 'lg:w-49' : 'lg:w-13'} lg:m-4`}
+        onMouseEnter={() => setIsSidebarHovered(true)}
+        onMouseLeave={() => setIsSidebarHovered(false)}
       >
-        {visibleItems.map((item) => (
-          <SideBarItem
-            key={item.path}
-            icon={item.icon}
-            label={item.label}
-            isExpanded={isSidebarExpanded}
-            isActive={window.location.pathname === item.path}
-            onClickFunction={() => {
-              navigate(item.path)
-              setIsMobileMenuOpen(false)
-            }}
-          />
-        ))}
-      </nav>
+        <div className="flex z-30 items-center justify-between p-2 lg:hidden rounded-xl">
+          <button
+            type="button"
+            aria-label={isMobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            className="relative z-30 rounded-md p-2 hover:bg-black hover:text-white transition-colors hover:cursor-pointer"
+          >
+            {isMobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
+        </div>
+        <div className="hidden justify-start p-2 lg:flex z-30">
+          <button
+            type="button"
+            aria-label={isSidebarLocked ? 'Desbloquear menu lateral' : 'Fixar menu lateral aberto'}
+            aria-pressed={isSidebarLocked}
+            onClick={() => setIsSidebarLocked((prev) => !prev)}
+            className="rounded-md p-2 transition-colors hover:cursor-pointer hover:bg-black hover:text-white"
+          >
+            {isSidebarLocked ? (
+              <PanelLeft className="size-4" />
+            ) : (
+              <PanelLeftOpen className="size-4" />
+            )}
+          </button>
+        </div>
+        <hr className="text-black hidden lg:block" />
+
+        <nav
+          className={`absolute lg:static z-30 top-16 flex h-fit flex-col gap-2 overflow-hidden rounded-xl bg-white shadow-md transition-[width,opacity,padding] duration-300 ease-in-out ${isMobileMenuOpen ? 'w-49 p-2 opacity-100' : ' w-0 p-0 opacity-0'} ${isSidebarExpanded ? 'lg:w-49' : 'lg:w-full'} lg:p-2 lg:opacity-100`}
+        >
+          {visibleItems.map((item) => (
+            <SideBarItem
+              key={item.path}
+              icon={item.icon}
+              label={item.label}
+              isExpanded={isSidebarExpanded}
+              isActive={window.location.pathname === item.path}
+              onClickFunction={() => {
+                navigate(item.path)
+                setIsMobileMenuOpen(false)
+              }}
+            />
+          ))}
+        </nav>
+      </div>
+      <button
+        type="button"
+        aria-label="Fechar menu"
+        onClick={() => setIsMobileMenuOpen(false)}
+        className={`fixed inset-0 z-20 bg-black/10 transition-[opacity,backdrop-filter] duration-300 ease-in-out lg:hidden ${isMobileMenuOpen ? 'pointer-events-auto opacity-100 backdrop-blur-xs' : 'pointer-events-none opacity-0 backdrop-blur-none'}`}
+      />
     </div>
   )
 }

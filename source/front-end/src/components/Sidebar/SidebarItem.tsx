@@ -22,11 +22,13 @@ const SideBarItem: React.FC<SidebarItemProps> = ({
 
   return (
     <button
-      className={`flex shrink-0 items-center transition-all duration-300 hover:bg-black hover:text-white ${isActive ? 'bg-black text-white' : ''} rounded-xl p-2 hover:cursor-pointer w-45 lg:w-auto`}
+      className={`flex h-8 shrink-0 items-center rounded-xl p-2 transition-all  hover:cursor-pointer hover:bg-black hover:text-white ${isActive && 'bg-black text-white'} w-45 lg:w-auto`}
       onClick={onClickFunction}
     >
       {iconWithStyle}
-      <span className={`text-sm px-2 rounded ${isExpanded ? 'lg:block' : 'lg:hidden'}`}>
+      <span
+        className={`shrink-0 rounded px-2 text-sm leading-none ${isExpanded ? 'w-fit lg:block' : 'lg:hidden'} overflow-hidden whitespace-nowrap transition-[width]`}
+      >
         {label}
       </span>
     </button>
