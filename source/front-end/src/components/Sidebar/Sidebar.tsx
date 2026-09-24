@@ -14,6 +14,10 @@ import {
   X,
   Blocks,
   ChartArea,
+  Pin,
+  PinOff,
+  PanelLeft,
+  PanelLeftOpen,
 } from 'lucide-react'
 import { useNavigate } from 'react-router'
 import SideBarItem from './SidebarItem'
@@ -25,6 +29,9 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate()
   const userRole = useSelector((state: RootState) => state.auth.user?.role)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSidebarHovered, setIsSidebarHovered] = useState(false)
+  const [isSidebarLocked, setIsSidebarLocked] = useState(false)
+  const isSidebarExpanded = isSidebarHovered || isSidebarLocked
 
   const sidebarItems = [
     {
@@ -107,35 +114,48 @@ const Sidebar: React.FC = () => {
     )
 
   return (
-    <div className="relative bg-gray-200">
-      <div className="flex items-center justify-between p-2 md:hidden">
+    <div
+      className={`absolute lg:static m-4 lg:mt-8 lg:mr-0 lg:ml-4 lg:h-full rounded-xl bg-white transition-[width] duration-300 ease-in-out ${isMobileMenuOpen ? 'w-49' : 'w-13'} ${isSidebarExpanded ? 'lg:w-49' : 'lg:w-13'}`}
+      onMouseEnter={() => setIsSidebarHovered(true)}
+      onMouseLeave={() => setIsSidebarHovered(false)}
+    >
+      <div className="flex items-center justify-between p-2 lg:hidden">
         <button
           type="button"
           aria-label={isMobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
           onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-          className="rounded-md p-2 hover:bg-blue-100 transition-colors"
+          className="relative z-40 rounded-md p-2 hover:bg-black hover:text-white transition-colors hover:cursor-pointer"
         >
           {isMobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
         </button>
       </div>
-
-      {isMobileMenuOpen && (
+      <div className="hidden justify-start p-2 lg:flex">
         <button
           type="button"
-          aria-label="Fechar menu"
-          onClick={() => setIsMobileMenuOpen(false)}
-          className="fixed inset-0 z-20 md:hidden"
-        />
-      )}
+          aria-label={isSidebarLocked ? 'Desbloquear menu lateral' : 'Fixar menu lateral aberto'}
+          aria-pressed={isSidebarLocked}
+          onClick={() => setIsSidebarLocked((prev) => !prev)}
+          className="rounded-md p-2 transition-colors hover:cursor-pointer hover:bg-black hover:text-white"
+        >
+          {isSidebarLocked ? (
+            <PanelLeft className="size-4" />
+          ) : (
+            <PanelLeftOpen className="size-4" />
+          )}
+        </button>
+      </div>
+      <hr className="text-black" />
 
       <nav
-        className={`${isMobileMenuOpen ? 'flex' : 'hidden'} absolute left-2 right-2 top-full z-30 mt-1 flex-col gap-2 rounded-xl border border-gray-200 bg-gray-100 p-2 shadow-md transition-all duration-300 ease-in-out md:static md:mt-0 md:flex md:flex-row md:items-center md:justify-center md:gap-4 md:overflow-x-auto md:rounded-none md:border-0 md:bg-transparent md:p-2 md:shadow-none`}
+        className={`absolute lg:static top-16 z-30 flex h-fit flex-col gap-2 overflow-hidden rounded-xl bg-white shadow-md transition-[width,opacity,padding] duration-300 ease-in-out ${isMobileMenuOpen ? 'w-49 p-2 opacity-100' : ' w-0 p-0 opacity-0'} ${isSidebarExpanded ? 'lg:w-49' : 'lg:w-full'} lg:p-2 lg:opacity-100`}
       >
         {visibleItems.map((item) => (
           <SideBarItem
             key={item.path}
             icon={item.icon}
             label={item.label}
+            isExpanded={isSidebarExpanded}
+            isActive={window.location.pathname === item.path}
             onClickFunction={() => {
               navigate(item.path)
               setIsMobileMenuOpen(false)

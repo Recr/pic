@@ -4,24 +4,32 @@ interface SidebarItemProps {
   icon: React.ReactNode
   label: string
   onClickFunction: () => void
+  isActive?: boolean
+  isExpanded?: boolean
 }
-const SideBarItem: React.FC<SidebarItemProps> = ({ icon, label, onClickFunction }) => {
+const SideBarItem: React.FC<SidebarItemProps> = ({
+  icon,
+  label,
+  onClickFunction,
+  isActive,
+  isExpanded,
+}) => {
   const iconWithStyle = isValidElement<{ className?: string }>(icon)
     ? cloneElement(icon, {
-        className: `${icon.props.className ?? ''} hover:cursor-pointer hover:text-blue-500 transition-all size-4 flex-shrink-0`,
+        className: `${icon.props.className ?? ''} hover:cursor-pointer transition-all size-4 flex-shrink-0`,
       })
     : icon
 
   return (
-    <div
-      className="group flex shrink-0 items-center transition-all duration-300 hover:bg-blue-200 rounded-full p-2 hover:cursor-pointer ease-in-out"
+    <button
+      className={`flex shrink-0 items-center transition-all duration-300 hover:bg-black hover:text-white ${isActive ? 'bg-black text-white' : ''} rounded-xl p-2 hover:cursor-pointer w-45 lg:w-auto`}
       onClick={onClickFunction}
     >
       {iconWithStyle}
-      <span className="hover:cursor-pointer text-sm px-2 rounded whitespace-nowrap transition-all duration-300 ease-in-out overflow-hidden max-w-xs opacity-100 md:max-w-0 md:opacity-0 md:pointer-events-none md:group-hover:max-w-xs md:group-hover:opacity-100">
+      <span className={`text-sm px-2 rounded ${isExpanded ? 'lg:block' : 'lg:hidden'}`}>
         {label}
       </span>
-    </div>
+    </button>
   )
 }
 

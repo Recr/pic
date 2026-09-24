@@ -18,6 +18,8 @@ const Logout: React.FC = () => {
       try {
         console.log('Attempting to log out...')
         await triggerLogout().unwrap()
+        await new Promise((resolve) => setTimeout(resolve, 3000))
+        console.log('Logout successful, navigating to home...')
       } catch (error) {
         console.error('Logout failed:', error)
       } finally {
@@ -37,7 +39,7 @@ const Logout: React.FC = () => {
   }, [dispatch, navigate, triggerLogout])
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-primary-gray px-4">
       <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-lg">
         <Skeleton className="mx-auto h-8 w-28" />
         <Skeleton className="mx-auto mt-4 h-4 w-48" />

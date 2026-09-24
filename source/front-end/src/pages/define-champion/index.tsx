@@ -13,7 +13,7 @@ const DefineChampion: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-[#eee] min-h-screen font-sans">
+      <div className="bg-primary-gray min-h-screen font-sans">
         <div className="mb-2.5 flex items-center justify-between bg-white px-5 py-2.5 shadow-md">
           <Skeleton className="ml-8 h-7 w-56" />
         </div>
@@ -32,7 +32,7 @@ const DefineChampion: React.FC = () => {
   }
 
   return (
-    <div className="bg-[#eee] min-h-screen font-sans">
+    <div className="bg-primary-gray min-h-screen font-sans">
       <div className="flex justify-between items-center py-2.5 px-5 bg-white shadow-md mb-2.5">
         <h2 className="ml-8 text-xl">Definir Executor</h2>
       </div>

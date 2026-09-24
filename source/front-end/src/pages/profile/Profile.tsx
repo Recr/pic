@@ -48,7 +48,7 @@ const Profile: React.FC = () => {
     }
   }
   return (
-    <div className="bg-gray-100 min-h-screen py-8">
+    <div className="bg-primary-gray min-h-screen py-8">
       <ToastContainer />
       <form
         className="bg-white flex flex-col items-center w-90 shadow-custom py-5 px-7.5 mx-auto mb-7.5 rounded-[20px]"

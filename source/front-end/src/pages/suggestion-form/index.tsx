@@ -140,7 +140,7 @@ const SuggestionForm: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-gray-100 flex min-h-svh flex-col">
+      <div className="bg-primary-100 flex min-h-svh flex-col">
         <div className="flex justify-center flex-col pt-4">
           <div className="flex flex-col items-center">
             <Skeleton className="mb-5 h-48 w-90 max-w-100 rounded-[20px] border-[5px] border-[#ccc]" />
@@ -183,7 +183,7 @@ const SuggestionForm: React.FC = () => {
   }
 
   return (
-    <div className="bg-gray-100 flex flex-col min-h-svh">
+    <div className="bg-primary-100 flex flex-col min-h-svh">
       <ToastContainer />
       {!isLoggedin && (
         <button

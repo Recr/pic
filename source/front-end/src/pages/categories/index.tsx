@@ -115,7 +115,7 @@ const Categories: React.FC = () => {
   }
 
   return (
-    <div className="bg-gray-100 min-h-screen py-5">
+    <div className="bg-primary-gray min-h-screen py-5">
       <div className="flex flex-col gap-4 m-auto bg-white w-xs sm:w-sm md:w-md lg:w-xl p-8 rounded-xl">
         <h1 className="text-2xl pt-5 pb-10">Categorias</h1>
         {categoriesList?.map((category) => (
