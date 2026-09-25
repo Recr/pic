@@ -9,6 +9,7 @@ import type { PayoutStatus } from '../../features/payout/types'
 import PayoutItem from './components/PayoutItem'
 import { Skeleton } from '../../components/skeletons/Skeleton'
 import DropdownSelect from '../../components/inputs/DropdownSelect'
+import Modal from '../../components/modal/Modal'
 
 const statusLabels: Record<PayoutStatus, string> = {
   PENDING: 'Pendente',
@@ -87,6 +88,7 @@ const PayoutList: React.FC = () => {
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null)
   const [nextStatus, setNextStatus] = useState<PayoutStatus>('PAID')
   const [pdfUrlState, setPdfUrlState] = useState<string | null>(null)
+  const [isPdfPreviewOpen, setIsPdfPreviewOpen] = useState(false)
 
   const getSelectedOrAllPayouts = () => {
     if (!payoutData || payoutData.length === 0) return []
@@ -528,90 +530,129 @@ const PayoutList: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-primary-gray md:px-4 md:py-8">
-      <div className="rounded-xl bg-white py-4 shadow-custom ">
-        <div className="mx-4 my-3 text-left text-xl font-semibold sm:my-4 sm:text-2xl">
-          Lista de Pagamentos
-        </div>
-        {pdfUrlState && <PdfPreview url={pdfUrlState} />}
-        <div className="mx-4 mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-          <DropdownSelect
-            id="payout-next-status"
-            label="Novo status"
-            value={nextStatus}
-            onChange={(value) => setNextStatus(value as PayoutStatus)}
-            placeholder="Selecione"
-            options={[
-              { value: 'PENDING', label: 'Pendente' },
-              { value: 'PAID', label: 'Pago' },
-              { value: 'CANCELLED', label: 'Cancelado' },
-            ]}
-            className="w-full sm:w-auto"
-            buttonClassName="w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
-            menuClassName="sm:w-56"
-          />
-          <button
-            type="button"
-            onClick={handleUpdateSelectedStatuses}
-            disabled={!canUpdate}
-            className="w-full cursor-pointer rounded bg-blue-600 px-3 py-2.25 text-sm text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400 sm:w-auto"
-          >
-            {isUpdatingStatus
-              ? 'Atualizando...'
-              : `Atualizar selecionados (${selectedPayoutIds.length})`}
-          </button>
-          <button
-            type="button"
-            onClick={handleExportExcel}
-            disabled={!payoutData || payoutData.length === 0}
-            className="w-full cursor-pointer rounded bg-emerald-600 px-3 py-2.25 text-sm text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-gray-400 sm:w-auto"
-          >
-            Exportar Excel
-          </button>
-          <button
-            type="button"
-            onClick={handleExportPdf}
-            disabled={!payoutData || payoutData.length === 0}
-            className="flex w-full items-center justify-center gap-2 rounded bg-linear-to-r from-cyan-600 via-teal-600 to-emerald-600 px-3 py-2.25 text-sm font-semibold text-white shadow-md transition-all hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:from-gray-400 disabled:via-gray-400 disabled:to-gray-500 sm:w-auto"
-          >
-            <FileDown size={16} />
-            Exportar PDF
-          </button>
-        </div>
-        <div className="mx-3 flex flex-col justify-center rounded-lg md:border border-gray-300 text-sm sm:mx-4">
-          <div className=" hidden grid-cols-[40px_56px_2fr_2fr_1fr_1fr_1fr_1fr] border-b-2 border-gray-200 px-4 py-2 font-semibold md:grid bg-gray-300">
-            <input
-              type="checkbox"
-              checked={
-                payoutData !== undefined && payoutData.length > 0
-                  ? selectedPayoutIds.length === payoutData.length
-                  : false
-              }
-              onChange={handleToggleSelectAll}
-              aria-label="Selecionar todos os pagamentos"
-              className="w-4 h-4 cursor-pointer"
-            />
-            <p>ID</p>
-            <p>Proposta</p>
-            <p>Colaborador</p>
-            <p>RE</p>
-            <p>Data</p>
-            <p>Valor</p>
-            <p className="text-center lg:text-left">Status</p>
+    <>
+      <div className="min-h-screen bg-primary-gray md:px-4 md:py-8">
+        <div className="rounded-xl bg-white py-4 shadow-custom ">
+          <div className="mx-4 my-3 text-left text-xl font-semibold sm:my-4 sm:text-2xl">
+            Lista de Pagamentos
           </div>
-          <div className="flex flex-col gap-3 md:gap-0">
-            {payoutData?.map((payout) => (
-              <PayoutItem
-                key={payout.id}
-                payout={payout}
-                isSelected={selectedPayoutIds.includes(payout.id)}
-                onToggleSelect={handleToggleSelect}
+          <div className="mx-4 mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+            <DropdownSelect
+              id="payout-next-status"
+              label="Novo status"
+              value={nextStatus}
+              onChange={(value) => setNextStatus(value as PayoutStatus)}
+              placeholder="Selecione"
+              options={[
+                { value: 'PENDING', label: 'Pendente' },
+                { value: 'PAID', label: 'Pago' },
+                { value: 'CANCELLED', label: 'Cancelado' },
+              ]}
+              className="w-full sm:w-auto"
+              buttonClassName="w-full border border-[#ccc] rounded bg-white hover:cursor-pointer hover:bg-blue-100 transition-colors"
+              menuClassName="sm:w-56"
+            />
+            <button
+              type="button"
+              onClick={handleUpdateSelectedStatuses}
+              disabled={!canUpdate}
+              className="w-full cursor-pointer rounded bg-blue-600 px-3 py-2.25 text-sm text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400 sm:w-auto"
+            >
+              {isUpdatingStatus
+                ? 'Atualizando...'
+                : `Atualizar selecionados (${selectedPayoutIds.length})`}
+            </button>
+            <button
+              type="button"
+              onClick={handleExportExcel}
+              disabled={!payoutData || payoutData.length === 0}
+              className="w-full cursor-pointer rounded bg-emerald-600 px-3 py-2.25 text-sm text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-gray-400 sm:w-auto"
+            >
+              Exportar Excel
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                handleExportPdf()
+                setIsPdfPreviewOpen(true)
+              }}
+              disabled={!payoutData || payoutData.length === 0}
+              className="flex w-full items-center justify-center gap-2 rounded bg-linear-to-r from-cyan-600 via-teal-600 to-emerald-600 px-3 py-2.25 text-sm font-semibold text-white shadow-md transition-all hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:from-gray-400 disabled:via-gray-400 disabled:to-gray-500 sm:w-auto"
+            >
+              <FileDown size={16} />
+              Exportar PDF
+            </button>
+          </div>
+          <div className="mx-3 flex flex-col justify-center rounded-lg md:border border-gray-300 text-sm sm:mx-4">
+            <div className=" hidden grid-cols-[40px_56px_2fr_2fr_1fr_1fr_1fr_1fr] border-b-2 border-gray-200 px-4 py-2 font-semibold md:grid bg-gray-300">
+              <input
+                type="checkbox"
+                checked={
+                  payoutData !== undefined && payoutData.length > 0
+                    ? selectedPayoutIds.length === payoutData.length
+                    : false
+                }
+                onChange={handleToggleSelectAll}
+                aria-label="Selecionar todos os pagamentos"
+                className="w-4 h-4 cursor-pointer"
               />
-            ))}
+              <p>ID</p>
+              <p>Proposta</p>
+              <p>Colaborador</p>
+              <p>RE</p>
+              <p>Data</p>
+              <p>Valor</p>
+              <p className="text-center lg:text-left">Status</p>
+            </div>
+            <div className="flex flex-col gap-3 md:gap-0">
+              {payoutData?.map((payout) => (
+                <PayoutItem
+                  key={payout.id}
+                  payout={payout}
+                  isSelected={selectedPayoutIds.includes(payout.id)}
+                  onToggleSelect={handleToggleSelect}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <Modal
+        isOpen={isPdfPreviewOpen}
+        onClose={function (): void {
+          setIsPdfPreviewOpen(false)
+        }}
+      >
+        <p className="text-2xl font-semibold mt-4">Exportar Documento</p>
+        <div className="flex justify-between">
+          <section className="size-100">
+            <div className="flex gap-2">
+              <label htmlFor="proposal-id">ID</label>
+              <input type="checkbox" id="proposal-id" />
+            </div>
+            <div className="flex gap-2">
+              <label htmlFor="employee-name">Colaborador</label>
+              <input type="checkbox" id="employee-name" />
+            </div>
+            <div className="flex gap-2">
+              <label htmlFor="employee-re">RE</label>
+              <input type="checkbox" id="employee-re" />
+            </div>
+            <div className="flex gap-2">
+              <label htmlFor="value">Valor</label>
+              <input type="checkbox" id="value" />
+            </div>
+            <div className="flex gap-2">
+              <label htmlFor="signatures">Assinaturas</label>
+              <input type="checkbox" id="signatures" />
+            </div>
+          </section>
+          <aside className="w-100 overflow-scroll">
+            {pdfUrlState && <PdfPreview url={pdfUrlState} />}
+          </aside>
+        </div>
+      </Modal>
+    </>
   )
 }
 

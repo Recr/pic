@@ -13,7 +13,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, className }) =
 
   return (
     <div
-      className="fixed inset-0 z-10 flex items-center justify-center overflow-y-auto bg-black/50 p-3 sm:items-center sm:p-4"
+      className="fixed inset-0 z-1000 flex items-center justify-center overflow-y-auto bg-black/50 p-3 sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
