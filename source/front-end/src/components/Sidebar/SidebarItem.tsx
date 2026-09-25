@@ -22,7 +22,7 @@ const SideBarItem: React.FC<SidebarItemProps> = ({
 
   return (
     <button
-      className={`flex h-8 shrink-0 items-center rounded-xl p-2 transition-all  hover:cursor-pointer hover:bg-black hover:text-white ${isActive && 'bg-black text-white'} w-45 lg:w-auto`}
+      className={`flex h-8 w-full shrink-0 items-center rounded-xl p-2 transition-all  hover:cursor-pointer duration-300 hover:bg-black hover:text-white ${isActive && 'bg-black text-white'} lg:w-auto`}
       onClick={onClickFunction}
     >
       {iconWithStyle}

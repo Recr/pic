@@ -30,7 +30,7 @@ const AppShell: React.FC = () => {
   })
 
   return (
-    <div className="min-h-screen relative bg-primary-gray lg:flex lg:flex-row ">
+    <div className="relative bg-primary-gray lg:flex">
       {isLoggedin && <Sidebar />}
       <main className="flex-1">
         <Routes>
