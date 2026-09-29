@@ -87,8 +87,8 @@ const Proposals: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-primary-gray px-3 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8">
-      <div className="rounded-lg bg-white py-4 shadow-custom sm:py-5">
+    <div className="min-h-screen bg-primary-gray px-3 py-4 sm:px-5 sm:py-6 md:px-4 md:py-8">
+      <div className="rounded-2xl bg-white py-4 shadow-custom sm:py-5">
         <div className="mx-4 my-3 text-left text-3xl font-semibold sm:my-4 sm:text-2xl">
           Propostas
         </div>

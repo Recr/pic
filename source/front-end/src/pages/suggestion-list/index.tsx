@@ -1,7 +1,6 @@
 import { proposalAPI } from '../../features/proposal/proposal-api'
 import ProposalItem from './components/ProposalItem'
 import { Skeleton } from '../../components/skeletons/Skeleton'
-import { ToastContainer } from 'react-toastify'
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon, ListFilterIcon } from 'lucide-react'
 import { translateStatus } from '../../helpers/translateStatus'
@@ -306,12 +305,11 @@ const SuggestionList: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-primary-gray m-4 lg:mt-8">
-      <ToastContainer />
-      <div className="mb-7.5 rounded-lg bg-white py-4 shadow-custom sm:py-5">
-        <div className="mx-4 my-3 text-left text-xl font-semibold sm:my-4 sm:text-2xl">
+    <div className="min-h-screen bg-primary-gray mx-4 mt-8">
+      <div className="mb-7.5 rounded-2xl bg-white py-4 shadow-custom sm:py-5">
+        <h2 className="mx-4 my-3 text-left font-semibold sm:my-4 sm:text-2xl">
           Lista de Propostas
-        </div>
+        </h2>
         <div className="mx-4 mb-4 flex flex-col gap-3 text-sm sm:flex-row sm:flex-wrap sm:items-center">
           <span className="font-medium text-gray-700">Registros por página</span>
           <div className="flex flex-wrap items-center gap-2">
