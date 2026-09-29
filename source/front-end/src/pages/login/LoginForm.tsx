@@ -3,7 +3,7 @@ import { loginSchema } from '../../validation/schemas/login-schemas'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { authAPI } from '../../features/auth/auth-api'
-import { ToastContainer, toast } from 'react-toastify'
+import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { sleep } from '../../helpers/sleep'
 import { useSelector } from 'react-redux'
@@ -68,7 +68,6 @@ const LoginForm: React.FC = () => {
       >
         Voltar
       </button>
-      <ToastContainer />
       <form
         className="mx-auto flex justify-center flex-col w-xs py-12 bg-white  rounded-lg items-center gap-4 shadow-xl drop-shadow-black absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
         onSubmit={handleSubmit(onSubmit, onInvalid)}

@@ -4,7 +4,6 @@ import { proposalAPI } from '../../features/proposal/proposal-api'
 import { categoryAPI } from '../../features/category/category-api'
 import { ProposalCard } from './components/DefineProposalManagerCard'
 import { Skeleton } from '../../components/skeletons/Skeleton'
-import { ToastContainer } from 'react-toastify'
 
 const DefineManager: React.FC = () => {
   const { data: managerList, isLoading: isLoadingManagers } =

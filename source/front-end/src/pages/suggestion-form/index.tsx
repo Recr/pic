@@ -4,7 +4,7 @@ import logo from '../../assets/logo.png'
 import { proposalAPI } from '../../features/proposal/proposal-api'
 import { employeeAPI } from '../../features/employee/employee-api'
 import { areaAPI } from '../../features/area/area-api'
-import { ToastContainer, toast } from 'react-toastify'
+import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../app/store'
@@ -184,7 +184,6 @@ const SuggestionForm: React.FC = () => {
 
   return (
     <div className="bg-primary-100 flex flex-col min-h-svh">
-      <ToastContainer />
       {!isLoggedin && (
         <button
           onClick={() => navigate('/login')}

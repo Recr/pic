@@ -8,7 +8,7 @@ import type z from 'zod'
 import { changePasswordSchema } from '../../validation/schemas/login-schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { authAPI } from '../../features/auth/auth-api'
-import { toast, ToastContainer } from 'react-toastify/unstyled'
+import { toast } from 'react-toastify/unstyled'
 
 type ChangePasswordSchema = z.infer<typeof changePasswordSchema>
 
@@ -49,7 +49,6 @@ const Profile: React.FC = () => {
   }
   return (
     <div className="bg-primary-gray min-h-screen py-8">
-      <ToastContainer />
       <form
         className="bg-white flex flex-col items-center w-90 shadow-custom py-5 px-7.5 mx-auto mb-7.5 rounded-[20px]"
         action=""
