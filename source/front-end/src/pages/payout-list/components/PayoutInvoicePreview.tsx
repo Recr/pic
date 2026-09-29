@@ -1,0 +1,147 @@
+import type { Payout } from '../../../features/payout/types'
+
+type PayoutInvoicePreviewProps = {
+  payouts: Payout[]
+  issuedAt: Date
+  showId: boolean
+  showName: boolean
+  showRE: boolean
+  showProposal: boolean
+  showPaymentValue: boolean
+  showStatus: boolean
+  showSignatureFields: boolean
+}
+
+const statusLabels = {
+  PENDING: 'Pendente',
+  PAID: 'Pago',
+  CANCELLED: 'Cancelado',
+} as const
+
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+
+const PayoutInvoicePreview: React.FC<PayoutInvoicePreviewProps> = ({
+  payouts,
+  issuedAt,
+  showId,
+  showName,
+  showRE,
+  showProposal,
+  showPaymentValue,
+  showStatus,
+  showSignatureFields,
+}) => {
+  const totalValue = payouts.reduce((total, payout) => total + Number(payout.value), 0)
+
+  return (
+    <article className="mx-auto min-h-[1123px] w-full max-w-[794px] bg-[#f3f3f3] p-6 text-[#202020] shadow-sm sm:p-9">
+      <header className="rounded-xl bg-[#111] p-6 text-white">
+        <p className="mb-2 text-[10px] font-bold tracking-[0.18em] text-[#cfcfcf]">
+          Programa de Incentivo a Criatividade PIC
+        </p>
+        <h2 className="mb-1 text-2xl font-bold">Lista de pagamentos</h2>
+        <div className="mt-6 text-right">
+          <p className="mb-1 text-[10px] font-bold uppercase text-[#bdbdbd]">Emitido em</p>
+          <p className="text-sm">{issuedAt.toLocaleDateString('pt-BR')}</p>
+        </div>
+      </header>
+
+      <section className="mt-6">
+        <h3 className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#666]">
+          Resumo da emissão
+        </h3>
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            ['Pagamentos', payouts.length],
+            ['Emissão', issuedAt.toLocaleDateString('pt-BR')],
+            ['Status', 'Consolidado'],
+          ].map(([label, value]) => (
+            <div key={label as string} className="rounded-md border border-[#d8d8d8] bg-white p-3">
+              <p className="mb-1 text-[9px] uppercase text-[#777]">{label as string}</p>
+              <p className="text-sm font-bold text-[#202020]">{value as string}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-6">
+        <h3 className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#666]">
+          Itens do comprovante
+        </h3>
+        <div className="overflow-x-auto rounded-md border border-[#d8d8d8] bg-white">
+          <table className="w-full min-w-[620px] table-fixed border-collapse text-left text-[10px]">
+            <thead className="bg-[#e4e4e4] text-[9px] uppercase text-[#444]">
+              <tr>
+                {showId && <th className="px-2 py-3 font-bold">ID</th>}
+                {showName && <th className="px-2 py-3 font-bold">Colaborador</th>}
+                {showRE && <th className="px-2 py-3 font-bold">RE</th>}
+                {showProposal && <th className="px-2 py-3 font-bold">Proposta</th>}
+                {showStatus && <th className="px-2 py-3 font-bold">Status</th>}
+                {showPaymentValue && <th className="px-2 py-3 text-right font-bold">Valor</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {payouts.map((payout) => (
+                <tr key={payout.id} className="border-t border-[#e5e5e5] align-middle">
+                  {showId && <td className="px-2 py-3">{payout.id}</td>}
+                  {showName && (
+                    <td className="px-2 py-3">
+                      {payout.suggestion.employee?.name ?? payout.suggestion.employeeName}
+                    </td>
+                  )}
+                  {showRE && (
+                    <td className="px-2 py-3">
+                      {payout.suggestion.employee?.re ?? payout.suggestion.employeeRe}
+                    </td>
+                  )}
+                  {showProposal && (
+                    <td className="px-2 py-3">{payout.suggestion.proposal.description}</td>
+                  )}
+                  {showStatus && <td className="px-2 py-3">{statusLabels[payout.status]}</td>}
+                  {showPaymentValue && (
+                    <td className="px-2 py-3 text-right">{formatCurrency(Number(payout.value))}</td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {showPaymentValue && (
+        <div className="mt-4 flex justify-end">
+          <div className="rounded-md bg-[#e1e1e1] px-4 py-3">
+            <p className="text-[9px] font-bold uppercase text-[#666]">Valor total</p>
+            <p className="mt-1 text-lg font-bold text-[#111]">{formatCurrency(totalValue)}</p>
+          </div>
+        </div>
+      )}
+
+      {showSignatureFields && (
+        <section className="mt-7">
+          <h3 className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#666]">
+            Validações
+          </h3>
+          <div className="grid grid-cols-2 gap-7">
+            {[
+              ['Colaborador', 'Recebedor'],
+              ['Financeiro', 'Responsável pelo pagamento'],
+            ].map(([title, subtitle]) => (
+              <div key={title} className="border-t border-[#999] pt-2">
+                <p className="text-[9px] font-bold uppercase text-[#333]">{title}</p>
+                <p className="mt-1 text-[9px] text-[#777]">{subtitle}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <footer className="mt-12 flex justify-between border-t border-[#d8d8d8] pt-2 text-[9px] text-[#777]">
+        <span>Programa PIC · Documento interno</span>
+      </footer>
+    </article>
+  )
+}
+
+export default PayoutInvoicePreview
