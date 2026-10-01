@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { PDFDownloadLink } from '@react-pdf/renderer'
-import { FileDown } from 'lucide-react'
+import { ChevronDown, FileDown, Minus, Plus } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import { payoutAPI } from '../../features/payout/payout-api'
 import type { Payout, PayoutStatus } from '../../features/payout/types'
@@ -10,6 +10,7 @@ import Modal from '../../components/modal/Modal'
 import PayoutItem from './components/PayoutItem'
 import PayoutInvoiceDocument from './components/PayoutInvoiceDocument'
 import PayoutInvoicePreview from './components/PayoutInvoicePreview'
+import type { SignatureField } from './types'
 
 const statusLabels: Record<PayoutStatus, string> = {
   PENDING: 'Pendente',
@@ -34,6 +35,36 @@ const PayoutList: React.FC = () => {
   const [exportShowPaymentValue, setExportShowPaymentValue] = useState(true)
   const [exportShowStatus, setExportShowStatus] = useState(true)
   const [exportShowSignatureFields, setExportShowSignatureFields] = useState(true)
+  const [signersAmount, setSignersAmount] = useState<number>(4)
+  const [signatureFields, setSignatureFields] = useState<SignatureField[]>([
+    { name: '', role: '' },
+    { name: '', role: '' },
+  ])
+  const [contentDropdownOpen, setContentDropdownOpen] = useState(true)
+  const [signaturesDropdownOpen, setSignaturesDropdownOpen] = useState(true)
+
+  const handleSignatureFieldChange = (
+    index: number,
+    field: keyof SignatureField,
+    value: string,
+  ) => {
+    setSignatureFields((previous) => {
+      const next = [...previous]
+      next[index] = { ...next[index], [field]: value }
+      return next
+    })
+  }
+
+  const updateSignersAmount = (nextAmount: number) => {
+    const normalized = Math.max(0, Number(nextAmount) || 0)
+    setSignersAmount(normalized)
+    setSignatureFields((previous) =>
+      Array.from({ length: normalized }, (_, index) => ({
+        name: previous[index]?.name ?? '',
+        role: previous[index]?.role ?? '',
+      })),
+    )
+  }
 
   const getSelectedOrAllPayouts = () => {
     if (!payoutData?.length) return []
@@ -127,6 +158,7 @@ const PayoutList: React.FC = () => {
       showPaymentValue={exportShowPaymentValue}
       showStatus={exportShowStatus}
       showSignatureFields={exportShowSignatureFields}
+      signatureFields={signatureFields}
     />
   )
 
@@ -228,25 +260,30 @@ const PayoutList: React.FC = () => {
         </div>
       </div>
       <Modal isOpen={isPdfPreviewOpen} onClose={() => setIsPdfPreviewOpen(false)}>
-        <div className="flex flex-col gap-4 pt-2 lg:flex-row w-300">
+        <div className="flex flex-col gap-4 pt-2 lg:flex-row">
           <section className="flex w-full flex-col gap-4 lg:w-64 lg:pt-2">
             <div>
-              <p className="text-xl font-semibold text-gray-900">Comprovante</p>
+              <p className="text-xl font-semibold text-gray-900">Exportar Lista</p>
               <p className="mt-1 text-sm text-gray-500">Revise os campos e baixe o documento.</p>
             </div>
-            <div className="space-y-2 rounded-lg border border-gray-200 bg-gray-50 p-3">
+            <div className="space-y-2 rounded-lg border border-gray-200 bg-gray-50 p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-gray-900">Conteúdo</p>
+                <ChevronDown className="h-4 w-4 text-gray-500" />
+              </div>
+
               {[
                 ['ID', exportShowId, setExportShowId],
                 ['Colaborador', exportShowName, setExportShowName],
                 ['RE', exportShowRE, setExportShowRE],
                 ['Proposta', exportShowProposal, setExportShowProposal],
                 ['Valor', exportShowPaymentValue, setExportShowPaymentValue],
-                ['Campos de assinatura', exportShowSignatureFields, setExportShowSignatureFields],
                 ['Status', exportShowStatus, setExportShowStatus],
+                ['Campos de assinatura', exportShowSignatureFields, setExportShowSignatureFields],
               ].map(([label, checked, setChecked]) => (
                 <label
                   key={label as string}
-                  className="group flex cursor-pointer items-center justify-between gap-3 rounded-md px-2 py-2 text-sm text-gray-700 transition-colors hover:bg-white"
+                  className="pl-2 flex cursor-pointer items-center justify-between gap-3 rounded-md text-sm text-gray-700 transition-colors hover:bg-white"
                 >
                   <span>{label as string}</span>
                   <input
@@ -258,12 +295,91 @@ const PayoutList: React.FC = () => {
                   />
                   <span
                     aria-hidden="true"
-                    className="relative h-6 w-11 shrink-0 rounded-full bg-gray-300 transition-colors peer-checked:bg-black peer-focus-visible:ring-2 peer-focus-visible:ring-gray-500 peer-focus-visible:ring-offset-2"
+                    className="relative size-5 shrink-0 rounded-sm bg-gray-300 transition-colors duration-200 ease-out peer-checked:bg-primary-highlight-color peer-focus-visible:ring-2 peer-focus-visible:ring-gray-500 peer-focus-visible:ring-offset-2 peer-checked:[&>span]:opacity-100 peer-checked:[&>span]:scale-100"
                   >
-                    <span className="absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
+                    <span className="absolute inset-0 flex items-center justify-center scale-75 text-white opacity-0 transition-all duration-200 ease-out">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-3.5 w-3.5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        stroke="currentColor"
+                        strokeWidth="1"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        ></path>
+                      </svg>
+                    </span>
                   </span>
                 </label>
               ))}
+              {exportShowSignatureFields && (
+                <div className="space-y-2 mt-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-gray-900">Assinaturas</p>
+                    <ChevronDown className="h-4 w-4 text-gray-500" />
+                  </div>
+                  <label className="pl-2 flex items-center justify-between gap-3 rounded-md text-xs font-medium text-gray-600">
+                    <span>N.° Campos</span>
+                    <div className="flex justify-between -gap-1">
+                      <button
+                        type="button"
+                        onClick={() => updateSignersAmount(signersAmount - 1)}
+                        disabled={signersAmount <= 0}
+                        aria-label="Remover campo de assinatura"
+                        className="cursor-pointer flex size-5 items-center justify-center rounded-full bg-black text-white disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <Minus size={12} strokeWidth={2.5} />
+                      </button>
+                      <input
+                        type="text"
+                        min={0}
+                        max={6}
+                        value={signersAmount}
+                        onChange={(event) => updateSignersAmount(Number(event.target.value))}
+                        className="w-8  rounded text-center"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => updateSignersAmount(signersAmount + 1)}
+                        disabled={signersAmount >= 6}
+                        aria-label="Adicionar campo de assinatura"
+                        className="cursor-pointer flex size-5 items-center justify-center rounded-full bg-black text-white disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <Plus size={10} strokeWidth={2.5} />
+                      </button>
+                    </div>
+                  </label>
+                  {Array.from({ length: signersAmount }, (_, index) => (
+                    <div
+                      key={`signature-field-${index}`}
+                      className="space-y-2 rounded-md border border-gray-200 bg-white p-2"
+                    >
+                      <input
+                        type="text"
+                        value={signatureFields[index]?.name ?? ''}
+                        placeholder={`Nome ${index + 1}`}
+                        onChange={(event) =>
+                          handleSignatureFieldChange(index, 'name', event.target.value)
+                        }
+                        className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
+                      />
+                      <input
+                        type="text"
+                        value={signatureFields[index]?.role ?? ''}
+                        placeholder={`Cargo ${index + 1}`}
+                        onChange={(event) =>
+                          handleSignatureFieldChange(index, 'role', event.target.value)
+                        }
+                        className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <PDFDownloadLink
               document={invoiceDocument}
@@ -277,7 +393,7 @@ const PayoutList: React.FC = () => {
               )}
             </PDFDownloadLink>
           </section>
-          <div className="h-[70vh] min-h-130 flex-1 overflow-y-auto rounded-lg border border-gray-200 bg-gray-100 p-3 shadow-inner sm:p-5">
+          <div className="min-h-130 flex-1 overflow-y-auto rounded-lg border border-gray-200 p-3 mt-19 shadow-inner ">
             <PayoutInvoicePreview
               payouts={invoicePayouts}
               issuedAt={invoiceDate}
@@ -288,6 +404,7 @@ const PayoutList: React.FC = () => {
               showPaymentValue={exportShowPaymentValue}
               showStatus={exportShowStatus}
               showSignatureFields={exportShowSignatureFields}
+              signatureFields={signatureFields}
             />
           </div>
         </div>

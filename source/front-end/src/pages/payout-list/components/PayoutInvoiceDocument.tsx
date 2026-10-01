@@ -1,6 +1,8 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import type { Payout } from '../../../features/payout/types'
 
+import type { SignatureField } from '../types'
+
 type PayoutInvoiceDocumentProps = {
   payouts: Payout[]
   issuedAt: Date
@@ -11,6 +13,7 @@ type PayoutInvoiceDocumentProps = {
   showPaymentValue: boolean
   showStatus: boolean
   showSignatureFields: boolean
+  signatureFields: SignatureField[]
 }
 
 const statusLabels = {
@@ -120,6 +123,7 @@ const PayoutInvoiceDocument: React.FC<PayoutInvoiceDocumentProps> = ({
   showPaymentValue,
   showStatus,
   showSignatureFields,
+  signatureFields,
 }) => {
   const totalValue = payouts.reduce((total, payout) => total + Number(payout.value), 0)
 
@@ -130,10 +134,10 @@ const PayoutInvoiceDocument: React.FC<PayoutInvoiceDocumentProps> = ({
           <Text style={styles.eyebrow}>Programa de Incentivo a Criatividade PIC</Text>
           <View style={styles.headerContent}>
             <Text style={styles.title}>Lista de pagamentos</Text>
-            <View style={styles.headerMeta}>
+            {/* <View style={styles.headerMeta}>
               <Text style={styles.metaLabel}>Emitido em</Text>
               <Text style={styles.metaValue}>{issuedAt.toLocaleDateString('pt-BR')}</Text>
-            </View>
+            </View> */}
           </View>
         </View>
         <View style={styles.section}>
@@ -147,14 +151,14 @@ const PayoutInvoiceDocument: React.FC<PayoutInvoiceDocumentProps> = ({
               <Text style={styles.summaryLabel}>Emissão</Text>
               <Text style={styles.summaryValue}>{issuedAt.toLocaleDateString('pt-BR')}</Text>
             </View>
-            <View style={styles.summaryItem}>
+            {/* <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>Status</Text>
               <Text style={styles.summaryValue}>Consolidado</Text>
-            </View>
+            </View> */}
           </View>
         </View>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Itens do comprovante</Text>
+          <Text style={styles.sectionTitle}>Itens</Text>
           <View style={styles.table}>
             <View style={[styles.tableRow, styles.tableHeader]} fixed>
               {showId && <Text style={[styles.cell, styles.headerCell]}>ID</Text>}
@@ -202,21 +206,19 @@ const PayoutInvoiceDocument: React.FC<PayoutInvoiceDocumentProps> = ({
         )}
         {showSignatureFields && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Validações</Text>
+            <Text style={styles.sectionTitle}>Assinaturas</Text>
             <View style={styles.signatures}>
-              <View style={styles.signature}>
-                <Text style={styles.signatureTitle}>Colaborador</Text>
-                <Text style={styles.signatureSubtitle}>Recebedor</Text>
-              </View>
-              <View style={styles.signature}>
-                <Text style={styles.signatureTitle}>Financeiro</Text>
-                <Text style={styles.signatureSubtitle}>Responsável pelo pagamento</Text>
-              </View>
+              {signatureFields.map((field, index) => (
+                <View key={`${field.name}-${field.role}-${index}`} style={styles.signature}>
+                  <Text style={styles.signatureTitle}>{field.name || 'Assinante'}</Text>
+                  <Text style={styles.signatureSubtitle}>{field.role || 'Cargo'}</Text>
+                </View>
+              ))}
             </View>
           </View>
         )}
         <View style={styles.footer} fixed>
-          <Text>Programa PIC · Documento interno</Text>
+          <Text>ePIC - Programa PIC · Documento interno</Text>
         </View>
       </Page>
     </Document>
