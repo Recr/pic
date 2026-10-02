@@ -5,6 +5,14 @@ import './index.css'
 import App from './App.tsx'
 import { store } from './app/store.ts'
 
+let plant
+
+if (import.meta.env.VITE_PLANT) {
+  plant = import.meta.env.VITE_PLANT
+} else {
+  throw new Error('VITE_PLANT environment variable is not defined')
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
@@ -12,3 +20,5 @@ createRoot(document.getElementById('root')!).render(
     </Provider>
   </StrictMode>,
 )
+
+document.title = `ePIC - ${plant}`.trim()

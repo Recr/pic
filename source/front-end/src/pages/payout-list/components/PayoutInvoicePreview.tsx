@@ -12,6 +12,7 @@ type PayoutInvoicePreviewProps = {
   showStatus: boolean
   showSignatureFields: boolean
   signatureFields: SignatureField[]
+  showCreationDate: boolean
 }
 
 const statusLabels = {
@@ -34,6 +35,7 @@ const PayoutInvoicePreview: React.FC<PayoutInvoicePreviewProps> = ({
   showStatus,
   showSignatureFields,
   signatureFields,
+  showCreationDate,
 }) => {
   const totalValue = payouts.reduce((total, payout) => total + Number(payout.value), 0)
 
@@ -44,10 +46,10 @@ const PayoutInvoicePreview: React.FC<PayoutInvoicePreviewProps> = ({
           Programa de Incentivo a Criatividade PIC
         </p>
         <h2 className="mb-1 text-lg sm:text-2xl font-bold">Lista de pagamentos</h2>
-        {/* <div className="mt-6 text-right">
+        <div className="mt-6 text-right">
           <p className="mb-1 text-[10px] font-bold uppercase text-[#bdbdbd]">Emitido em</p>
-          <p className="text-sm">{issuedAt.toLocaleDateString('pt-BR')}</p>
-        </div> */}
+          <p className="text-sm">{import.meta.env.VITE_PLANT}</p>
+        </div>
       </header>
 
       <section className="mt-6">
@@ -80,6 +82,7 @@ const PayoutInvoicePreview: React.FC<PayoutInvoicePreviewProps> = ({
                 {showRE && <th className="px-2 py-3 font-bold">RE</th>}
                 {showProposal && <th className="px-2 py-3 font-bold">Proposta</th>}
                 {showStatus && <th className="px-2 py-3 font-bold">Status</th>}
+                {showCreationDate && <th className="px-2 py-3 font-bold">Data de criação</th>}
                 {showPaymentValue && <th className="px-2 py-3 text-right font-bold">Valor</th>}
               </tr>
             </thead>
@@ -101,6 +104,11 @@ const PayoutInvoicePreview: React.FC<PayoutInvoicePreviewProps> = ({
                     <td className="px-2 py-3">{payout.suggestion.proposal.description}</td>
                   )}
                   {showStatus && <td className="px-2 py-3">{statusLabels[payout.status]}</td>}
+                  {showCreationDate && (
+                    <td className="px-2 py-3">
+                      {new Date(payout.createdAt).toLocaleDateString('pt-BR')}
+                    </td>
+                  )}
                   {showPaymentValue && (
                     <td className="px-2 py-3 text-right">{formatCurrency(Number(payout.value))}</td>
                   )}

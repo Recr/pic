@@ -14,6 +14,7 @@ type PayoutInvoiceDocumentProps = {
   showStatus: boolean
   showSignatureFields: boolean
   signatureFields: SignatureField[]
+  showCreationDate: boolean
 }
 
 const statusLabels = {
@@ -94,8 +95,19 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   totalValue: { color: '#111111', fontSize: 16, fontWeight: 'bold' },
-  signatures: { flexDirection: 'row', gap: 26, marginTop: 30 },
-  signature: { borderTopColor: '#999999', borderTopWidth: 1, flex: 1, paddingTop: 7 },
+  signatures: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginTop: 30,
+    rowGap: 18,
+  },
+  signature: {
+    borderTopColor: '#999999',
+    borderTopWidth: 1,
+    paddingTop: 7,
+    width: '47%',
+  },
   signatureTitle: { color: '#333333', fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase' },
   signatureSubtitle: { color: '#777777', fontSize: 7, marginTop: 3 },
   footer: {
@@ -124,6 +136,7 @@ const PayoutInvoiceDocument: React.FC<PayoutInvoiceDocumentProps> = ({
   showStatus,
   showSignatureFields,
   signatureFields,
+  showCreationDate,
 }) => {
   const totalValue = payouts.reduce((total, payout) => total + Number(payout.value), 0)
 
@@ -134,10 +147,10 @@ const PayoutInvoiceDocument: React.FC<PayoutInvoiceDocumentProps> = ({
           <Text style={styles.eyebrow}>Programa de Incentivo a Criatividade PIC</Text>
           <View style={styles.headerContent}>
             <Text style={styles.title}>Lista de pagamentos</Text>
-            {/* <View style={styles.headerMeta}>
+            <View style={styles.headerMeta}>
               <Text style={styles.metaLabel}>Emitido em</Text>
-              <Text style={styles.metaValue}>{issuedAt.toLocaleDateString('pt-BR')}</Text>
-            </View> */}
+              <Text style={styles.metaValue}>{import.meta.env.VITE_PLANT}</Text>
+            </View>
           </View>
         </View>
         <View style={styles.section}>
@@ -165,6 +178,9 @@ const PayoutInvoiceDocument: React.FC<PayoutInvoiceDocumentProps> = ({
               {showName && <Text style={[styles.cell, styles.headerCell]}>Colaborador</Text>}
               {showRE && <Text style={[styles.cell, styles.headerCell]}>RE</Text>}
               {showProposal && <Text style={[styles.cell, styles.headerCell]}>Proposta</Text>}
+              {showCreationDate && (
+                <Text style={[styles.cell, styles.headerCell]}>Data de criação</Text>
+              )}
               {showStatus && <Text style={[styles.cell, styles.headerCell]}>Status</Text>}
               {showPaymentValue && (
                 <Text style={[styles.cell, styles.headerCell, styles.valueCell]}>Valor</Text>
@@ -185,6 +201,11 @@ const PayoutInvoiceDocument: React.FC<PayoutInvoiceDocumentProps> = ({
                 )}
                 {showProposal && (
                   <Text style={styles.cell}>{payout.suggestion.proposal.description}</Text>
+                )}
+                {showCreationDate && (
+                  <Text style={styles.cell}>
+                    {new Date(payout.createdAt).toLocaleDateString('pt-BR')}
+                  </Text>
                 )}
                 {showStatus && <Text style={styles.cell}>{statusLabels[payout.status]}</Text>}
                 {showPaymentValue && (

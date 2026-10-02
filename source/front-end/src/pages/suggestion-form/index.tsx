@@ -204,7 +204,9 @@ const SuggestionForm: React.FC = () => {
             <MapPinIcon size={42} className="bg-blue-100 text-blue-700 p-2 rounded-full" />
             <div className="flex flex-col">
               <p className="font-medium text-gray-500">Local</p>
-              <h2 className="text-xl font-medium text-center w-full">São Bernardo do Campo</h2>
+              <h2 className="text-xl font-medium text-center w-full">
+                {import.meta.env.VITE_PLANT}
+              </h2>
             </div>
           </div>
         </div>
