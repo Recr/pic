@@ -187,7 +187,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
   return (
     <>
       <form
-        className="border border-[#ccc] rounded-md p-4 m-2.5 w-87.5 bg-white flex flex-col"
+        className="rounded-2xl p-4 w-87.5 bg-white flex flex-col shadow-lg hover:translate-y-1 hover:border-dashed transition[transform,shadow] duration-200 hover:shadow-2xl"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div onClick={() => setIsModalOpen(true)}>

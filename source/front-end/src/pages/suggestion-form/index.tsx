@@ -4,7 +4,7 @@ import logo from '../../assets/logo.png'
 import { proposalAPI } from '../../features/proposal/proposal-api'
 import { employeeAPI } from '../../features/employee/employee-api'
 import { areaAPI } from '../../features/area/area-api'
-import { ToastContainer, toast } from 'react-toastify'
+import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../app/store'
@@ -140,7 +140,7 @@ const SuggestionForm: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-gray-100 flex min-h-svh flex-col">
+      <div className="bg-primary-100 flex min-h-svh flex-col">
         <div className="flex justify-center flex-col pt-4">
           <div className="flex flex-col items-center">
             <Skeleton className="mb-5 h-48 w-90 max-w-100 rounded-[20px] border-[5px] border-[#ccc]" />
@@ -183,8 +183,7 @@ const SuggestionForm: React.FC = () => {
   }
 
   return (
-    <div className="bg-gray-100 flex flex-col min-h-svh">
-      <ToastContainer />
+    <div className="bg-primary-100 flex flex-col min-h-svh">
       {!isLoggedin && (
         <button
           onClick={() => navigate('/login')}
@@ -205,7 +204,9 @@ const SuggestionForm: React.FC = () => {
             <MapPinIcon size={42} className="bg-blue-100 text-blue-700 p-2 rounded-full" />
             <div className="flex flex-col">
               <p className="font-medium text-gray-500">Local</p>
-              <h2 className="text-xl font-medium text-center w-full">São Bernardo do Campo</h2>
+              <h2 className="text-xl font-medium text-center w-full">
+                {import.meta.env.VITE_PLANT}
+              </h2>
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { resetPasswordSchema } from '../../validation/schemas/login-schemas'
 import { zodResolver } from '@hookform/resolvers/zod/src/zod.js'
 import type z from 'zod'
-import { toast, ToastContainer } from 'react-toastify/unstyled'
+import { toast } from 'react-toastify/unstyled'
 import { authAPI } from '../../features/auth/auth-api'
 import { useState } from 'react'
 import Modal from '../../components/modal/Modal'
@@ -46,7 +46,6 @@ const PasswordResetPage: React.FC = () => {
   }
   return (
     <div className="bg-gray-100 h-screen">
-      <ToastContainer />
       <button
         onClick={() => navigate('/login')}
         className="px-4 py-2 bg-blue-500 text-white font-semibold w-fit rounded-sm absolute top-4 left-4 hover:bg-blue-700 transition-colors hover:cursor-pointer"

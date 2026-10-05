@@ -28,7 +28,7 @@ import { proposalAPI } from '../../../features/proposal/proposal-api'
 type PayoutItemProps = {
   payout: Payout
   isSelected: boolean
-  onToggleSelect: (id: number) => void
+  onToggleSelect: (id: number, isShiftPressed: boolean) => void
 }
 
 const borderColors: Record<string, string> = {
@@ -188,19 +188,15 @@ const PayoutItem: React.FC<PayoutItemProps> = ({ payout, isSelected, onToggleSel
         onClick={() => setIsModalOpen(true)}
       >
         <div className="flex items-center" onClick={(event) => event.stopPropagation()}>
-          {/* TODO: Implement checkbox functionality with shift to select multiple */}
           <input
             type="checkbox"
             checked={isSelected}
-            onChange={() => onToggleSelect(payout.id)}
+            onClick={(event) => onToggleSelect(payout.id, event.shiftKey)}
+            readOnly
             aria-label={`Selecionar payout ${payout.id}`}
             className="w-4 h-4 cursor-pointer"
           />
         </div>
-        {/* <p className="font-semibold text-lg md:text-sm flex items-center">
-          <span className="md:hidden">#</span>
-          {payout.suggestion.proposal.id}
-        </p> */}
         <div className="flex justify-between">
           <p className="font-semibold text-lg md:text-sm flex items-center">
             <span className="md:hidden">#</span>
@@ -217,12 +213,6 @@ const PayoutItem: React.FC<PayoutItemProps> = ({ payout, isSelected, onToggleSel
             ? `${payout.suggestion.proposal.description.substring(0, 50)}...`
             : payout.suggestion.proposal.description}
         </p>
-        {/* <p>
-          <span className="font-semibold md:hidden">Colaborador: </span>
-          {payout.suggestion.employee
-            ? payout.suggestion.employee.name
-            : payout.suggestion.employeeName}
-        </p> */}
         <p className="flex items-center gap-2 text-gray-700 text-xs md:pr-4">
           <UserIcon size={16} className="text-gray-400 md:hidden" />
           {payout.suggestion.employee
@@ -269,7 +259,7 @@ const PayoutItem: React.FC<PayoutItemProps> = ({ payout, isSelected, onToggleSel
           <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:gap-4">
             <div>
               <div className="flex gap-2">
-                <h2 className="text-xl font-semibold">Proposta #{payout.id}</h2>
+                <h2 className="text-xl font-semibold">Proposta #{payout.suggestion.proposal.id}</h2>
                 <p
                   className={`${!payout.suggestion.proposal.isLegacy && 'hidden'} bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-600 rounded flex items-center justify-center`}
                 >

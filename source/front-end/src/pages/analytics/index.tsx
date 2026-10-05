@@ -123,7 +123,7 @@ const AnalyticsPage: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-100 px-4 py-6">
+      <div className="min-h-screen bg-primary-gray m-4">
         <div className="mx-auto max-w-7xl space-y-6">
           <section className="rounded-lg bg-white p-6 shadow-sm">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">

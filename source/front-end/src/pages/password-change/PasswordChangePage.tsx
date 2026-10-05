@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { changePasswordSchema } from '../../validation/schemas/login-schemas'
 import { zodResolver } from '@hookform/resolvers/zod/src/zod.js'
 import type z from 'zod'
-import { toast, ToastContainer } from 'react-toastify/unstyled'
+import { toast } from 'react-toastify/unstyled'
 import { authAPI } from '../../features/auth/auth-api'
 
 type ChangePasswordSchema = z.infer<typeof changePasswordSchema>
@@ -40,7 +40,6 @@ const PasswordChangePage: React.FC = () => {
   }
   return (
     <>
-      <ToastContainer />
       <div className="w-md mx-auto mt-10">
         <form action="" onSubmit={handleSubmit(onSubmit)}>
           <h1 className="text-2xl font-semibold text-gray-800 mb-4 text-center">

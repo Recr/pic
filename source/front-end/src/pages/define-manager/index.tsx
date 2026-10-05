@@ -4,7 +4,6 @@ import { proposalAPI } from '../../features/proposal/proposal-api'
 import { categoryAPI } from '../../features/category/category-api'
 import { ProposalCard } from './components/DefineProposalManagerCard'
 import { Skeleton } from '../../components/skeletons/Skeleton'
-import { ToastContainer } from 'react-toastify'
 
 const DefineManager: React.FC = () => {
   const { data: managerList, isLoading: isLoadingManagers } =
@@ -18,7 +17,7 @@ const DefineManager: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-[#eee] min-h-screen font-sans">
+      <div className="bg-primary-gray min-h-screen font-sans">
         <div className="mb-2.5 flex items-center justify-between bg-white px-5 py-2.5 shadow-md">
           <Skeleton className="ml-8 h-7 w-56" />
         </div>
@@ -37,27 +36,26 @@ const DefineManager: React.FC = () => {
   }
 
   return (
-    <div className="bg-[#eee] min-h-screen font-sans">
-      <ToastContainer />
-      <div className="flex justify-between items-center py-2.5 px-5 bg-white shadow-md mb-2.5">
-        <h2 className="ml-8 text-xl">Definir Gerente</h2>
-      </div>
-      <div className="flex flex-wrap">
-        {!proposalsList || proposalsList.length === 0 ? (
-          <p className="px-2.5">Nenhuma proposta encontrada.</p>
-        ) : (
-          proposalsList
-            .filter((proposal) => proposal && proposal.id !== undefined)
-            .map((proposal) => (
-              <ProposalCard
-                key={proposal.id}
-                proposal={proposal}
-                availableManagers={managerList}
-                availableAreas={areas}
-                categories={categories}
-              />
-            ))
-        )}
+    <div className="bg-primary-gray min-h-screen mx-4 mt-4">
+      <div className="py-4 px-4 bg-white shadow-md mb-4 rounded-2xl">
+        <h2 className="text-2xl font-semibold mt-4">Definir Gerente</h2>
+        <div className="flex flex-wrap gap-4 rounded-2xl mt-4 p-4 bg-secondary-gray">
+          {!proposalsList || proposalsList.length === 0 ? (
+            <p className="px-2.5">Nada aqui por enquanto...</p>
+          ) : (
+            proposalsList
+              .filter((proposal) => proposal && proposal.id !== undefined)
+              .map((proposal) => (
+                <ProposalCard
+                  key={proposal.id}
+                  proposal={proposal}
+                  availableManagers={managerList}
+                  availableAreas={areas}
+                  categories={categories}
+                />
+              ))
+          )}
+        </div>
       </div>
     </div>
   )

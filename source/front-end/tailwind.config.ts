@@ -11,6 +11,10 @@ export default {
       fontFamily: {
         inter: ['Inter', 'sans-serif'],
       },
+      colors: {
+        'primary-gray': '#a39b23',
+        'secondary-gray': '#f7f7f7',
+      },
     },
   },
 } satisfies Config
