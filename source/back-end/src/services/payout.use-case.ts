@@ -17,11 +17,6 @@ class PayoutUseCase {
   public async executeFindAllFiltered(pagination: Pagination, filters: PayoutFilters) {
     const where: Prisma.PayoutWhereInput = {}
 
-    if (filters.description) {
-      if (where.suggestion?.proposal?.description)
-        where.suggestion.proposal.description = { contains: filters.description }
-    }
-
     if (filters.status) {
       where.status = filters.status
     }
@@ -84,7 +79,9 @@ class PayoutUseCase {
     if (filters.categoryId) {
       suggestionFilters.push({
         proposal: {
-          categoryId: filters.categoryId,
+          is: {
+            categoryId: filters.categoryId,
+          },
         },
       })
     }
@@ -92,7 +89,9 @@ class PayoutUseCase {
     if (filters.areaId) {
       suggestionFilters.push({
         proposal: {
-          areaId: filters.areaId,
+          is: {
+            areaId: filters.areaId,
+          },
         },
       })
     }
@@ -100,16 +99,26 @@ class PayoutUseCase {
     if (filters.description) {
       suggestionFilters.push({
         proposal: {
-          description: { contains: filters.description },
+          is: {
+            description: { contains: filters.description },
+          },
         },
       })
     }
 
-    if (suggestionFilters.length > 0) {
-      where.suggestion = {
-        AND: suggestionFilters,
-      }
+    where.suggestion = {
+      AND: [
+        ...suggestionFilters,
+        {
+          proposal: {
+            is: {
+              isActive: true,
+            },
+          },
+        },
+      ],
     }
+
     let payouts = await this.payoutRepository.findAllFiltered(where)
     if (matcher) {
       payouts = payouts.filter(matcher)
