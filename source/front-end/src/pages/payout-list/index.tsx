@@ -1,6 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState, type ChangeEvent } from 'react'
 import { PDFDownloadLink } from '@react-pdf/renderer'
-import { ChevronDown, FileDown, Minus, Plus } from 'lucide-react'
+import {
+  ChevronDown,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  FileDown,
+  ListFilterIcon,
+  Minus,
+  Plus,
+} from 'lucide-react'
 import * as XLSX from 'xlsx'
 import { payoutAPI } from '../../features/payout/payout-api'
 import type { Payout, PayoutStatus } from '../../features/payout/types'
@@ -11,6 +19,10 @@ import PayoutItem from './components/PayoutItem'
 import PayoutInvoiceDocument from './components/PayoutInvoiceDocument'
 import PayoutInvoicePreview from './components/PayoutInvoicePreview'
 import type { SignatureField } from './types'
+import FilterItem from './components/FilterItem'
+import { translateStatus } from '../../helpers/translateStatus'
+import { categoryAPI } from '../../features/category/category-api'
+import { areaAPI } from '../../features/area/area-api'
 
 const statusLabels: Record<PayoutStatus, string> = {
   PENDING: 'Pendente',
@@ -18,8 +30,80 @@ const statusLabels: Record<PayoutStatus, string> = {
   CANCELLED: 'Cancelado',
 }
 
+type PageSizeSelection = '50' | '100' | '200' | 'more'
+type MoreLimitSelection = 'all' | 'custom' | null
+type PageItem = number | { type: 'ellipsis'; key: string }
+
+const STATUS_OPTIONS = ['PAID', 'PENDING', 'CANCELLED'] as const
+
+const parseOptionalNumber = (value: string) => {
+  const trimmedValue = value.trim()
+
+  if (!trimmedValue) {
+    return undefined
+  }
+
+  const parsedValue = Number(trimmedValue)
+  return Number.isFinite(parsedValue) ? parsedValue : undefined
+}
+
+const getPageItems = (currentPage: number, totalPages: number): PageItem[] => {
+  if (totalPages <= 0) {
+    return []
+  }
+
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1)
+  }
+
+  const pages = new Set<number>([1, totalPages, currentPage])
+
+  if (currentPage > 1) {
+    pages.add(currentPage - 1)
+  }
+
+  if (currentPage < totalPages) {
+    pages.add(currentPage + 1)
+  }
+
+  if (currentPage <= 3) {
+    pages.add(2)
+    pages.add(3)
+    pages.add(4)
+  }
+
+  if (currentPage >= totalPages - 2) {
+    pages.add(totalPages - 1)
+    pages.add(totalPages - 2)
+    pages.add(totalPages - 3)
+  }
+
+  const sortedPages = Array.from(pages)
+    .filter((page) => page >= 1 && page <= totalPages)
+    .sort((left, right) => left - right)
+
+  const items: PageItem[] = []
+
+  sortedPages.forEach((page, index) => {
+    if (index > 0 && page - sortedPages[index - 1] > 1) {
+      items.push({ type: 'ellipsis', key: `ellipsis-before-${page}` })
+    }
+
+    items.push(page)
+  })
+
+  return items
+}
+
 const PayoutList: React.FC = () => {
-  const { data: payoutData, isLoading } = payoutAPI.useGetPayoutsQuery(undefined)
+  // const { data: proposalsResponse, isLoading } = proposalAPI.useGetProposalsDetailedQuery({
+  //   limit: resolvedLimit,
+  //   offset,
+  //   ...activeFilters,
+  // })
+  const { data: areasList } = areaAPI.useGetAreasQuery()
+  const { data: categoryList } = categoryAPI.useGetCategoriesQuery()
+
   const [updatePayoutStatus, { isLoading: isUpdatingStatus }] =
     payoutAPI.useUpdatePayoutStatusMutation()
   const [selectedPayoutIds, setSelectedPayoutIds] = useState<number[]>([])
@@ -44,6 +128,79 @@ const PayoutList: React.FC = () => {
   const [contentDropdownOpen, setContentDropdownOpen] = useState(true)
   const [signaturesDropdownOpen, setSignaturesDropdownOpen] = useState(true)
   const [openSignatureTooltip, setOpenSignatureTooltip] = useState<number | null>(null)
+
+  const [pageSizeSelection, setPageSizeSelection] = useState<PageSizeSelection>('50')
+  const [moreLimitSelection, setMoreLimitSelection] = useState<MoreLimitSelection>(null)
+  const [isMoreOptionsOpen, setIsMoreOptionsOpen] = useState(false)
+  const [customLimitInput, setCustomLimitInput] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [resolvedLimit, setResolvedLimit] = useState(50)
+  const [filterIdInput, setFilterIdInput] = useState('')
+  const [filterReInput, setFilterReInput] = useState('')
+  const [filterEmployeeNameInput, setFilterEmployeeNameInput] = useState('')
+  const [filterDescriptionInput, setFilterDescriptionInput] = useState('')
+  const [filterDateFromInput, setFilterDateFromInput] = useState('')
+  const [filterDateToInput, setFilterDateToInput] = useState('')
+  const [filterStatusInput, setFilterStatusInput] = useState('')
+  const [filterAreaInput, setFilterAreaInput] = useState('')
+  const [filterCategoryInput, setFilterCategoryInput] = useState('')
+  const [filterInactiveInput, setFilterInactiveInput] = useState(false)
+  const [isFilterBarVisible, setIsFilterBarVisible] = useState(false)
+
+  const presetLimit = Number(pageSizeSelection ?? '50')
+  const customLimitValue = Number(customLimitInput)
+  const customLimit =
+    Number.isInteger(customLimitValue) && customLimitValue > 0 ? customLimitValue : 50
+  const offset = (currentPage - 1) * resolvedLimit
+
+  const activeFilters = useMemo(() => {
+    const employeeName = filterEmployeeNameInput.trim()
+    const description = filterDescriptionInput.trim()
+
+    return {
+      payoutId: parseOptionalNumber(filterIdInput),
+      re: parseOptionalNumber(filterReInput),
+      employeeName: employeeName || undefined,
+      description: description || undefined,
+      dateFrom: filterDateFromInput || undefined,
+      dateTo: filterDateToInput || undefined,
+      status: filterStatusInput || undefined,
+      areaId: parseOptionalNumber(filterAreaInput),
+      categoryId: parseOptionalNumber(filterCategoryInput),
+      includeInactive: filterInactiveInput || undefined,
+    }
+  }, [
+    filterDateFromInput,
+    filterDateToInput,
+    filterDescriptionInput,
+    filterEmployeeNameInput,
+    filterIdInput,
+    filterAreaInput,
+    filterCategoryInput,
+    filterReInput,
+    filterStatusInput,
+    filterInactiveInput,
+  ])
+
+  const { data, isLoading } = payoutAPI.useGetPayoutsQuery({
+    limit: resolvedLimit,
+    offset,
+    ...activeFilters,
+  })
+
+  const payouts = data?.payouts
+
+  const hasActiveFilters =
+    activeFilters.payoutId !== undefined ||
+    activeFilters.re !== undefined ||
+    activeFilters.employeeName !== undefined ||
+    activeFilters.description !== undefined ||
+    activeFilters.dateFrom !== undefined ||
+    activeFilters.dateTo !== undefined ||
+    activeFilters.status !== undefined ||
+    activeFilters.areaId !== undefined ||
+    activeFilters.categoryId !== undefined ||
+    activeFilters.includeInactive !== undefined
 
   const contentSelected =
     exportShowId ||
@@ -78,19 +235,19 @@ const PayoutList: React.FC = () => {
   }
 
   const getSelectedOrAllPayouts = () => {
-    if (!payoutData?.length) return []
+    if (!payouts?.length) return []
     return selectedPayoutIds.length === 0
-      ? payoutData
-      : payoutData.filter((payout) => selectedPayoutIds.includes(payout.id))
+      ? payouts
+      : payouts.filter((payout) => selectedPayoutIds.includes(payout.id))
   }
 
   const handleToggleSelect = (id: number, isShiftPressed = false) => {
-    if (!payoutData?.length) return
-    const currentIndex = payoutData.findIndex((payout) => payout.id === id)
+    if (!payouts?.length) return
+    const currentIndex = payouts.findIndex((payout) => payout.id === id)
     if (currentIndex === -1) return
     const isCurrentlySelected = selectedPayoutIds.includes(id)
     if (isShiftPressed && lastSelectedIndex !== null) {
-      const rangeIds = payoutData
+      const rangeIds = payouts
         .slice(
           Math.min(lastSelectedIndex, currentIndex),
           Math.max(lastSelectedIndex, currentIndex) + 1,
@@ -112,10 +269,10 @@ const PayoutList: React.FC = () => {
   }
 
   const handleToggleSelectAll = () => {
-    if (!payoutData?.length) return
-    const allSelected = selectedPayoutIds.length === payoutData.length
-    setSelectedPayoutIds(allSelected ? [] : payoutData.map((payout) => payout.id))
-    setLastSelectedIndex(allSelected ? null : payoutData.length - 1)
+    if (!payouts?.length) return
+    const allSelected = selectedPayoutIds.length === payouts.length
+    setSelectedPayoutIds(allSelected ? [] : payouts.map((payout) => payout.id))
+    setLastSelectedIndex(allSelected ? null : payouts.length - 1)
   }
 
   const handleUpdateSelectedStatuses = async () => {
@@ -163,6 +320,103 @@ const PayoutList: React.FC = () => {
     !exportShowSignatureFields ||
     signatureFields.slice(0, signersAmount).every(({ name, role }) => name.trim() && role.trim())
 
+  useEffect(() => {
+    if (pageSizeSelection === 'more') {
+      if (moreLimitSelection === 'all') {
+        setResolvedLimit(data?.totalCount ?? 50)
+      } else if (moreLimitSelection === 'custom') {
+        setResolvedLimit(customLimit)
+      }
+      return
+    }
+
+    setResolvedLimit(presetLimit)
+  }, [customLimit, moreLimitSelection, pageSizeSelection, presetLimit, data?.totalCount])
+
+  // const proposalsData = proposalsResponse?.proposals ?? []
+  const totalCount = data?.totalCount ?? 0
+  const totalPages = resolvedLimit > 0 ? Math.ceil(totalCount / resolvedLimit) : 0
+  const hasNextPage = totalPages > 0 && currentPage < totalPages
+  const previousPage = currentPage > 1 ? currentPage - 1 : null
+  const nextPage = hasNextPage ? currentPage + 1 : null
+  const visiblePages = useMemo(
+    () => getPageItems(currentPage, totalPages),
+    [currentPage, totalPages],
+  )
+  useEffect(() => {
+    if (totalPages === 0) {
+      if (currentPage !== 1) {
+        setCurrentPage(1)
+      }
+      return
+    }
+
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages)
+    }
+  }, [currentPage, totalPages])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [pageSizeSelection, moreLimitSelection])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [
+    activeFilters.dateFrom,
+    activeFilters.dateTo,
+    activeFilters.description,
+    activeFilters.employeeName,
+    activeFilters.payoutId,
+    activeFilters.areaId,
+    activeFilters.categoryId,
+    activeFilters.re,
+    activeFilters.status,
+    activeFilters.includeInactive,
+  ])
+
+  useEffect(() => {
+    if (pageSizeSelection !== 'more') {
+      setMoreLimitSelection(null)
+      setIsMoreOptionsOpen(false)
+      setCustomLimitInput('')
+    }
+  }, [pageSizeSelection])
+
+  const handlePageSizeChange = (value: PageSizeSelection) => {
+    if (value === 'more') {
+      setPageSizeSelection('more')
+      setIsMoreOptionsOpen(true)
+      setMoreLimitSelection(null)
+      return
+    }
+
+    setPageSizeSelection(value)
+    setMoreLimitSelection(null)
+    setIsMoreOptionsOpen(false)
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  const handleCustomLimitChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setCustomLimitInput(event.target.value)
+  }
+
+  const handleClearFilters = () => {
+    setFilterIdInput('')
+    setFilterReInput('')
+    setFilterEmployeeNameInput('')
+    setFilterDescriptionInput('')
+    setFilterDateFromInput('')
+    setFilterDateToInput('')
+    setFilterStatusInput('')
+    setFilterAreaInput('')
+    setFilterCategoryInput('')
+    setFilterInactiveInput(false)
+  }
+
   const invoiceDocument = (
     <PayoutInvoiceDocument
       payouts={invoicePayouts}
@@ -201,6 +455,208 @@ const PayoutList: React.FC = () => {
           <div className="mx-4 my-3 text-left text-xl font-semibold sm:my-4 sm:text-2xl">
             Lista de Pagamentos
           </div>
+          <div className="mx-4 mb-4 flex flex-col gap-3 text-sm sm:flex-row sm:flex-wrap sm:items-center">
+            <span className="font-medium text-gray-700">Registros por página</span>
+            <div className="flex flex-wrap items-center gap-2">
+              {(['50', '100', '200'] as const).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => handlePageSizeChange(option)}
+                  className={`rounded-full px-3 py-1.5 transition-all border border-gray-200 ${
+                    pageSizeSelection === option
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-gray-700 bg-gray-100 hover:bg-gray-200 hover:shadow-sm hover:cursor-pointer hover:text-blue-700'
+                  }`}
+                  aria-pressed={pageSizeSelection === option}
+                >
+                  {option}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => handlePageSizeChange('more')}
+                className={`rounded-full px-3 py-1.5 transition-all border border-gray-200 ${
+                  isMoreOptionsOpen
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-gray-700 bg-gray-100 hover:bg-gray-200 hover:shadow-sm hover:cursor-pointer hover:text-blue-700'
+                }`}
+                aria-pressed={isMoreOptionsOpen}
+              >
+                ...
+              </button>
+            </div>
+            {isMoreOptionsOpen && (
+              <div className="flex flex-col gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 sm:flex-row sm:items-center">
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setMoreLimitSelection('all')}
+                    className={`rounded px-3 py-2 transition-all ${
+                      moreLimitSelection === 'all'
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-700 bg-gray-100 hover:bg-gray-200 hover:shadow-sm hover:cursor-pointer hover:text-blue-700'
+                    }`}
+                  >
+                    Mostrar tudo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMoreLimitSelection('custom')}
+                    className={`rounded px-3 py-2 transition-all ${
+                      moreLimitSelection === 'custom'
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-700 bg-gray-100 hover:bg-gray-200 hover:shadow-sm hover:cursor-pointer hover:text-blue-700'
+                    }`}
+                  >
+                    Escolher
+                  </button>
+                </div>
+                {moreLimitSelection === 'custom' && (
+                  <input
+                    type="number"
+                    min={1}
+                    step={1}
+                    value={customLimitInput}
+                    onChange={handleCustomLimitChange}
+                    placeholder="Digite a quantidade"
+                    className="w-full rounded border border-gray-300 px-3 py-2 text-sm sm:w-56"
+                  />
+                )}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => setIsFilterBarVisible((prev) => !prev)}
+              className={`rounded-full px-3 py-1.5 transition-all border border-gray-200 justify-content flex flex-row gap-2 items-center mr-auto sm:ml-auto sm:mr-0 ${
+                isFilterBarVisible
+                  ? 'bg-blue-600 text-white shadow-sm hover:cursor-pointer hover:bg-blue-700'
+                  : 'text-gray-700 bg-gray-100 hover:bg-gray-200 hover:shadow-sm hover:cursor-pointer hover:text-blue-700'
+              }`}
+              aria-pressed={isFilterBarVisible}
+            >
+              Filtros
+              <ListFilterIcon size={16} />
+            </button>
+          </div>
+          {isFilterBarVisible && (
+            <div className="mx-4 mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <span className="text-sm font-semibold text-gray-700">Filtros</span>
+              </div>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                <FilterItem filterName="Id de Pagamento" filterId="payoutId">
+                  <input
+                    type="number"
+                    min={1}
+                    value={filterIdInput}
+                    onChange={(event) => setFilterIdInput(event.target.value)}
+                    placeholder="Ex.: 123"
+                    className="rounded border border-gray-300 px-3 py-2 text-sm"
+                  />
+                </FilterItem>
+                <FilterItem filterId="re" filterName="RE">
+                  <input
+                    type="number"
+                    min={1}
+                    value={filterReInput}
+                    onChange={(event) => setFilterReInput(event.target.value)}
+                    placeholder="Ex.: 45678"
+                    className="rounded border border-gray-300 px-3 py-2 text-sm"
+                  />
+                </FilterItem>
+                <FilterItem filterId="employeeName" filterName="Nome do Colaborador">
+                  <input
+                    type="text"
+                    value={filterEmployeeNameInput}
+                    onChange={(event) => setFilterEmployeeNameInput(event.target.value)}
+                    placeholder="Buscar por nome"
+                    className="rounded border border-gray-300 px-3 py-2 text-sm"
+                  />
+                </FilterItem>
+                <FilterItem filterName="Descrição" filterId="description">
+                  <input
+                    type="text"
+                    value={filterDescriptionInput}
+                    onChange={(event) => setFilterDescriptionInput(event.target.value)}
+                    placeholder="Buscar na descrição"
+                    className="rounded border border-gray-300 px-3 py-2 text-sm"
+                  />
+                </FilterItem>
+                <FilterItem filterName="Data de criação (De)" filterId="dateFrom">
+                  <input
+                    type="date"
+                    value={filterDateFromInput}
+                    onChange={(event) => setFilterDateFromInput(event.target.value)}
+                    className="rounded border border-gray-300 px-3 py-2 text-sm"
+                  />
+                </FilterItem>
+                <FilterItem filterName="Data de criação (Até)" filterId="dateTo">
+                  <input
+                    type="date"
+                    value={filterDateToInput}
+                    onChange={(event) => setFilterDateToInput(event.target.value)}
+                    className="rounded border border-gray-300 px-3 py-2 text-sm"
+                  />
+                </FilterItem>
+                <FilterItem filterName="Status" filterId="status">
+                  <DropdownSelect
+                    value={filterStatusInput}
+                    onChange={setFilterStatusInput}
+                    placeholder="Todos"
+                    options={STATUS_OPTIONS.map((status) => ({
+                      label: translateStatus(status),
+                      value: status,
+                    }))}
+                    buttonClassName="rounded border border-gray-300 px-3 py-2 text-sm"
+                  />
+                </FilterItem>
+                <FilterItem filterId="area" filterName="Área">
+                  <DropdownSelect
+                    value={filterAreaInput}
+                    placeholder="Todas"
+                    onChange={setFilterAreaInput}
+                    options={
+                      areasList?.map((area) => ({
+                        label: area.name,
+                        value: String(area.id),
+                      })) ?? []
+                    }
+                  />
+                </FilterItem>
+                <FilterItem filterId="category" filterName="Categoria">
+                  <DropdownSelect
+                    value={filterCategoryInput}
+                    placeholder="Todas"
+                    onChange={setFilterCategoryInput}
+                    options={
+                      categoryList?.map((category) => ({
+                        label: category.name,
+                        value: String(category.id),
+                      })) ?? []
+                    }
+                  />
+                </FilterItem>
+              </div>
+              <div
+                className={`mt-4 flex flex-row sm:items-start gap-3 ${hasActiveFilters ? 'justify-between' : 'justify-end'} items-center`}
+              >
+                {hasActiveFilters && (
+                  <p className="sm:mt-3 text-xs text-gray-500">
+                    Os filtros são aplicados em todas as propostas que você pode visualizar.
+                  </p>
+                )}
+                <button
+                  type="button"
+                  onClick={handleClearFilters}
+                  className="rounded-full border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-white hover:text-blue-700 hover:cursor-pointer"
+                >
+                  Limpar <span className="hidden sm:inline">filtros</span>
+                </button>
+              </div>
+            </div>
+          )}
+          <p className="ml-6 mb-2 text-gray-500">{totalCount} registros encontradas</p>
           <div className="mx-4 mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
             <DropdownSelect
               id="payout-next-status"
@@ -230,7 +686,7 @@ const PayoutList: React.FC = () => {
             {/* <button
               type="button"
               onClick={handleExportExcel}
-              disabled={!payoutData?.length}
+              disabled={!payouts?.length}
               className="w-full rounded bg-emerald-600 px-3 py-2.25 text-sm text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-gray-400 sm:w-auto"
             >
               Exportar Excel
@@ -238,7 +694,7 @@ const PayoutList: React.FC = () => {
             <button
               type="button"
               onClick={handleOpenInvoice}
-              disabled={!payoutData?.length}
+              disabled={!payouts?.length}
               className="cursor-pointer flex w-full items-center justify-center gap-2 rounded bg-black px-3 py-2.25 text-sm font-semibold text-white shadow-md transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400 sm:w-auto"
             >
               <FileDown size={16} /> Exportar Documento
@@ -248,9 +704,7 @@ const PayoutList: React.FC = () => {
             <div className="hidden grid-cols-[40px_56px_2fr_2fr_1fr_1fr_1fr_1fr] bg-gray-300 px-4 py-2 font-semibold md:grid">
               <input
                 type="checkbox"
-                checked={Boolean(
-                  payoutData?.length && selectedPayoutIds.length === payoutData.length,
-                )}
+                checked={Boolean(payouts?.length && selectedPayoutIds.length === payouts.length)}
                 onChange={handleToggleSelectAll}
                 aria-label="Selecionar todos os pagamentos"
                 className="h-4 w-4 cursor-pointer"
@@ -264,7 +718,7 @@ const PayoutList: React.FC = () => {
               <p>Status</p>
             </div>
             <div className="flex flex-col gap-3 md:gap-0">
-              {payoutData?.map((payout) => (
+              {payouts?.map((payout) => (
                 <PayoutItem
                   key={payout.id}
                   payout={payout}
@@ -272,6 +726,47 @@ const PayoutList: React.FC = () => {
                   onToggleSelect={handleToggleSelect}
                 />
               ))}
+            </div>
+            <div className="mt-4 flex flex-row items-center justify-center gap-2 width-full">
+              <button
+                type="button"
+                onClick={() => previousPage && handlePageChange(previousPage)}
+                disabled={!previousPage}
+                className="flex items-center gap-1 rounded-lg px-2 py-2 text-gray-700 transition-all hover:bg-gray-100 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40 hover:cursor-pointer"
+              >
+                <ChevronLeftIcon size={20} />
+                <span className="hidden sm:block">Anterior</span>
+              </button>
+              {visiblePages.map((pageItem) =>
+                typeof pageItem !== 'number' ? (
+                  <span key={pageItem.key} className="px-1 text-gray-500">
+                    ...
+                  </span>
+                ) : (
+                  <button
+                    key={pageItem}
+                    type="button"
+                    onClick={() => handlePageChange(pageItem)}
+                    className={`flex h-9 w-9 items-center justify-center rounded-full transition-all ${
+                      pageItem === currentPage
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700 hover:cursor-pointer'
+                    }`}
+                    aria-current={pageItem === currentPage ? 'page' : undefined}
+                  >
+                    {pageItem}
+                  </button>
+                ),
+              )}
+              <button
+                type="button"
+                onClick={() => nextPage && handlePageChange(nextPage)}
+                disabled={!nextPage}
+                className="flex items-center gap-1 rounded-lg px-3 py-2 text-gray-700 transition-all hover:bg-gray-100 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40 hover:cursor-pointer"
+              >
+                <span className="hidden sm:block">Próximo</span>
+                <ChevronRightIcon size={20} />
+              </button>
             </div>
           </div>
         </div>
@@ -284,7 +779,7 @@ const PayoutList: React.FC = () => {
               <p className="mt-1 text-sm text-gray-500">Revise os campos e baixe o documento.</p>
             </div>
             <div className="space-y-2 rounded-lg border border-gray-200 bg-gray-50 p-4">
-              <div
+              <button
                 className="flex items-center justify-between cursor-pointer"
                 onClick={() => setContentDropdownOpen((prev) => !prev)}
               >
@@ -292,7 +787,7 @@ const PayoutList: React.FC = () => {
                 <ChevronDown
                   className={`h-4 w-4 text-gray-500 ${contentDropdownOpen ? 'rotate-180' : ''} transition-transform`}
                 />
-              </div>
+              </button>
               <div
                 className={`space-y-1 ${contentDropdownOpen ? 'opacity-100 max-h-full' : 'opacity-0 pointer-events-none max-h-0'} transform transition-all ease-in-out duration-300`}
               >
@@ -346,7 +841,7 @@ const PayoutList: React.FC = () => {
               </div>
               {exportShowSignatureFields && (
                 <div className="space-y-2 mt-4">
-                  <div
+                  <button
                     className="flex items-center justify-between cursor-pointer"
                     onClick={() => setSignaturesDropdownOpen((prev) => !prev)}
                   >
@@ -354,7 +849,7 @@ const PayoutList: React.FC = () => {
                     <ChevronDown
                       className={`h-4 w-4 text-gray-500 ${signaturesDropdownOpen ? 'rotate-180' : ''} transition-transform`}
                     />
-                  </div>
+                  </button>
                   <div
                     className={`space-y-2 ${signaturesDropdownOpen ? 'opacity-100 max-h-full' : 'opacity-0 pointer-events-none max-h-0'} transform transition-all ease-in-out duration-300`}
                   >
@@ -431,7 +926,7 @@ const PayoutList: React.FC = () => {
 
                               <div className="space-y-2">
                                 <label className="block text-xs font-medium text-gray-600">
-                                  Nome
+                                  <span>Nome</span>
                                   <input
                                     type="text"
                                     value={signatureField.name}
@@ -444,7 +939,7 @@ const PayoutList: React.FC = () => {
                                 </label>
 
                                 <label className="block text-xs font-medium text-gray-600">
-                                  Cargo
+                                  <span>Cargo</span>
                                   <input
                                     type="text"
                                     value={signatureField.role}
@@ -497,7 +992,7 @@ const PayoutList: React.FC = () => {
             <button
               type="button"
               onClick={handleExportExcel}
-              disabled={!payoutData?.length}
+              disabled={!payouts?.length}
               className="w-full rounded bg-emerald-600 px-3 py-2.25 text-sm text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-gray-400 sm:w-auto"
             >
               Exportar Excel

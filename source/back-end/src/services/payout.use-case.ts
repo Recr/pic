@@ -1,6 +1,9 @@
 import { PrismaPayoutRepository } from '../repositories/payout.repository'
 import { AppError } from '../errors/AppError'
 import { StatusCodes } from 'http-status-codes'
+import { Pagination } from '../utils/types/proposals.types'
+import { PayoutFilters } from '../utils/types/payouts.types'
+import { Prisma } from '../../prisma/client/client'
 
 class PayoutUseCase {
   constructor(private readonly payoutRepository: PrismaPayoutRepository) {}
@@ -9,6 +12,118 @@ class PayoutUseCase {
     const payouts = await this.payoutRepository.findAll()
     const activePayouts = payouts.filter((payout) => payout.suggestion.proposal.isActive)
     return activePayouts
+  }
+
+  public async executeFindAllFiltered(pagination: Pagination, filters: PayoutFilters) {
+    const where: Prisma.PayoutWhereInput = {}
+
+    if (filters.description) {
+      if (where.suggestion?.proposal?.description)
+        where.suggestion.proposal.description = { contains: filters.description }
+    }
+
+    if (filters.status) {
+      where.status = filters.status
+    }
+
+    const parseUtcDateOnly = (value: Date): Date =>
+      new Date(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate()))
+
+    const createdAt: { gte?: Date; lt?: Date } = {}
+
+    if (filters.dateFrom) {
+      createdAt.gte = parseUtcDateOnly(filters.dateFrom)
+    }
+
+    if (filters.dateTo) {
+      const nextDay = parseUtcDateOnly(filters.dateTo)
+      nextDay.setUTCDate(nextDay.getUTCDate() + 1)
+      createdAt.lt = nextDay
+    }
+
+    if (createdAt.gte || createdAt.lt) {
+      where.createdAt = createdAt
+    }
+
+    const suggestionFilters: Prisma.SuggestionWhereInput[] = []
+    const reFilter = filters.re === undefined ? undefined : String(filters.re)
+    const payoutIdFilter = filters.payoutId === undefined ? undefined : String(filters.payoutId)
+    const proposalIdFilter =
+      filters.proposalId === undefined ? undefined : String(filters.proposalId)
+
+    const matcher =
+      reFilter || payoutIdFilter || proposalIdFilter
+        ? (payout: {
+            id: number
+            suggestion: {
+              employeeRe: number
+              employee: { re: number | null } | null
+              proposal: { id: number }
+            }
+          }) => {
+            const matchesRe =
+              !reFilter ||
+              String(payout.suggestion.employeeRe).includes(reFilter) ||
+              String(payout.suggestion.employee?.re ?? '').includes(reFilter)
+
+            const matchesPayoutId = !payoutIdFilter || String(payout.id).includes(payoutIdFilter)
+
+            const matchesProposalId =
+              !proposalIdFilter || String(payout.suggestion.proposal.id).includes(proposalIdFilter)
+
+            return matchesRe && matchesPayoutId && matchesProposalId
+          }
+        : undefined
+
+    if (filters.employeeName) {
+      suggestionFilters.push({
+        OR: [
+          { employeeName: { contains: filters.employeeName } },
+          { employee: { name: { contains: filters.employeeName } } },
+        ],
+      })
+    }
+
+    if (filters.categoryId) {
+      suggestionFilters.push({
+        proposal: {
+          categoryId: filters.categoryId,
+        },
+      })
+    }
+
+    if (filters.areaId) {
+      suggestionFilters.push({
+        proposal: {
+          areaId: filters.areaId,
+        },
+      })
+    }
+
+    if (filters.description) {
+      suggestionFilters.push({
+        proposal: {
+          description: { contains: filters.description },
+        },
+      })
+    }
+
+    if (suggestionFilters.length > 0) {
+      where.suggestion = {
+        AND: suggestionFilters,
+      }
+    }
+    let payouts = await this.payoutRepository.findAllFiltered(where)
+    if (matcher) {
+      payouts = payouts.filter(matcher)
+    }
+    const totalCount = payouts.length
+
+    if (pagination.limit !== undefined && pagination.offset !== undefined) {
+      payouts = payouts.slice(pagination.offset, pagination.offset + pagination.limit)
+    }
+
+    return { payouts, totalCount }
   }
 
   public async executeUpdateStatusByIds(ids: number[], status: string) {

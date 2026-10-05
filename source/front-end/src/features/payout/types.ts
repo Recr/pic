@@ -49,6 +49,31 @@ export interface Payout {
   }
 }
 
+export interface Pagination {
+  limit: number
+  offset: number
+}
+
+export interface GetPayoutsQueryParams extends Pagination {
+  payoutId?: number
+  proposalId?: number
+  re?: number
+  employeeName?: string
+  managerName?: string
+  championName?: string
+  description?: string
+  dateFrom?: string
+  dateTo?: string
+  status?: string
+  categoryId?: number
+  areaId?: number
+}
+
+export interface GetPayoutsResponse {
+  payouts: Payout[]
+  totalCount: number
+}
+
 export interface UpdatePayoutStatusRequest {
   ids: number[]
   status: PayoutStatus
