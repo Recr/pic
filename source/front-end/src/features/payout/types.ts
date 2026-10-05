@@ -55,7 +55,6 @@ export interface Pagination {
 }
 
 export interface GetPayoutsQueryParams extends Pagination {
-  payoutId?: number
   proposalId?: number
   re?: number
   employeeName?: string

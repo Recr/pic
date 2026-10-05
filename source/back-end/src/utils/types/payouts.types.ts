@@ -1,6 +1,5 @@
 export interface PayoutFilters {
   proposalId?: number
-  payoutId?: number
   re?: number
   employeeName?: string
   managerName?: string

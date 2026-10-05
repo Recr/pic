@@ -37,27 +37,27 @@ const AdminDefineChampion: React.FC = () => {
   }
 
   return (
-    <div className="bg-primary-gray min-h-screen mx-4 mt-8">
+    <div className="bg-primary-gray min-h-screen mx-4 mt-4">
       <div className="py-4 px-4 bg-white shadow-md mb-4 rounded-2xl">
         <h2 className="text-2xl font-semibold mt-4">Definir Executor</h2>
         <div className="flex flex-wrap gap-4 rounded-2xl mt-4 p-4 bg-secondary-gray">
-        {!proposalsList || proposalsList.length === 0 ? (
-          <p className="px-2.5">Nada aqui por enquanto...</p>
-        ) : (
-          proposalsList
-          .filter((proposal) => proposal && proposal.id !== undefined)
-          .map((proposal) => (
-              <ProposalCard
-              key={proposal.id}
-              proposal={proposal}
-              availableChampions={championList}
-              availableAreas={areas}
-              categories={categories}
-              />
-            ))
+          {!proposalsList || proposalsList.length === 0 ? (
+            <p className="px-2.5">Nada aqui por enquanto...</p>
+          ) : (
+            proposalsList
+              .filter((proposal) => proposal && proposal.id !== undefined)
+              .map((proposal) => (
+                <ProposalCard
+                  key={proposal.id}
+                  proposal={proposal}
+                  availableChampions={championList}
+                  availableAreas={areas}
+                  categories={categories}
+                />
+              ))
           )}
+        </div>
       </div>
-          </div>
     </div>
   )
 }

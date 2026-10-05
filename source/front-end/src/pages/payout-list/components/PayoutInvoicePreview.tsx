@@ -56,10 +56,11 @@ const PayoutInvoicePreview: React.FC<PayoutInvoicePreviewProps> = ({
         <h3 className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#666]">
           Resumo da emissão
         </h3>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           {[
-            ['Pagamentos', payouts.length],
             ['Emissão', issuedAt.toLocaleDateString('pt-BR')],
+            ['Pagamentos', payouts.length],
+            ['Total', formatCurrency(totalValue)],
           ].map(([label, value]) => (
             <div key={label as string} className="rounded-md border border-[#d8d8d8] bg-white p-3">
               <p className="mb-1 text-[9px] uppercase text-[#777]">{label as string}</p>
@@ -118,15 +119,6 @@ const PayoutInvoicePreview: React.FC<PayoutInvoicePreviewProps> = ({
           </table>
         </div>
       </section>
-
-      {showPaymentValue && (
-        <div className="mt-4 flex justify-end">
-          <div className="rounded-md bg-[#e1e1e1] px-4 py-3">
-            <p className="text-[9px] font-bold uppercase text-[#666]">Valor total</p>
-            <p className="mt-1 text-lg font-bold text-[#111]">{formatCurrency(totalValue)}</p>
-          </div>
-        </div>
-      )}
 
       {showSignatureFields && (
         <section className="mt-7">

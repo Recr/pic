@@ -114,7 +114,7 @@ const Sidebar: React.FC = () => {
   return (
     <div className="z-30 mt-4 lg:mt-0 flex w-full max-w-full flex-col overflow-x-clip lg:static lg:w-fit lg:h-full lg:overflow-visible">
       <div
-        className={`${isMobileMenuOpen ? 'w-[calc(100%-2rem)]' : 'w-12'} relative z-30 mx-4 max-w-full rounded-xl bg-white shadow-md transition-[width] duration-300 ease-linear lg:static lg:mt-8 lg:mr-0 lg:ml-4 lg:h-full lg:max-w-none lg:bg-white  ${isSidebarExpanded ? 'lg:w-49' : 'lg:w-13'} lg:m-4 `}
+        className={`${isMobileMenuOpen ? 'w-[calc(100%-2rem)]' : 'w-12'} relative z-30 mx-4 max-w-full rounded-xl bg-white shadow-md transition-[width] duration-300 ease-linear lg:static lg:mr-0 lg:ml-4 lg:h-full lg:max-w-none lg:bg-white  ${isSidebarExpanded ? 'lg:w-49' : 'lg:w-13'} lg:m-4 `}
         onMouseEnter={() => setIsSidebarHovered(true)}
         onMouseLeave={() => setIsSidebarHovered(false)}
       >

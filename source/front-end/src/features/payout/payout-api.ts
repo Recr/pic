@@ -13,7 +13,6 @@ export const payoutAPI = api.injectEndpoints({
         limit,
         offset,
         proposalId,
-        payoutId,
         re,
         employeeName,
         managerName,
@@ -29,7 +28,6 @@ export const payoutAPI = api.injectEndpoints({
           url: `/payouts?${new URLSearchParams({
             limit: String(limit),
             offset: String(offset),
-            ...(payoutId !== undefined && { payoutId: String(payoutId) }),
             ...(proposalId !== undefined && { proposalId: String(proposalId) }),
             ...(re !== undefined && { re: String(re) }),
             ...(employeeName && { employeeName }),

@@ -47,12 +47,11 @@ class PayoutUseCase {
 
     const suggestionFilters: Prisma.SuggestionWhereInput[] = []
     const reFilter = filters.re === undefined ? undefined : String(filters.re)
-    const payoutIdFilter = filters.payoutId === undefined ? undefined : String(filters.payoutId)
     const proposalIdFilter =
       filters.proposalId === undefined ? undefined : String(filters.proposalId)
 
     const matcher =
-      reFilter || payoutIdFilter || proposalIdFilter
+      reFilter || proposalIdFilter
         ? (payout: {
             id: number
             suggestion: {
@@ -66,12 +65,10 @@ class PayoutUseCase {
               String(payout.suggestion.employeeRe).includes(reFilter) ||
               String(payout.suggestion.employee?.re ?? '').includes(reFilter)
 
-            const matchesPayoutId = !payoutIdFilter || String(payout.id).includes(payoutIdFilter)
-
             const matchesProposalId =
               !proposalIdFilter || String(payout.suggestion.proposal.id).includes(proposalIdFilter)
 
-            return matchesRe && matchesPayoutId && matchesProposalId
+            return matchesRe && matchesProposalId
           }
         : undefined
 

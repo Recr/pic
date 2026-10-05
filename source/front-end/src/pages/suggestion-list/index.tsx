@@ -305,7 +305,7 @@ const SuggestionList: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-primary-gray mx-4 mt-8">
+    <div className="min-h-screen bg-primary-gray mx-4 mt-4">
       <div className="mb-7.5 rounded-2xl bg-white py-4 shadow-custom sm:py-5">
         <h2 className="mx-4 my-3 text-left font-semibold sm:my-4 sm:text-2xl">
           Lista de Propostas

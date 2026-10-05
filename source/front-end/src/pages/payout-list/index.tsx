@@ -96,11 +96,6 @@ const getPageItems = (currentPage: number, totalPages: number): PageItem[] => {
 }
 
 const PayoutList: React.FC = () => {
-  // const { data: proposalsResponse, isLoading } = proposalAPI.useGetProposalsDetailedQuery({
-  //   limit: resolvedLimit,
-  //   offset,
-  //   ...activeFilters,
-  // })
   const { data: areasList } = areaAPI.useGetAreasQuery()
   const { data: categoryList } = categoryAPI.useGetCategoriesQuery()
 
@@ -135,7 +130,7 @@ const PayoutList: React.FC = () => {
   const [customLimitInput, setCustomLimitInput] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [resolvedLimit, setResolvedLimit] = useState(50)
-  const [filterIdInput, setFilterIdInput] = useState('')
+  const [filterProposalIdInput, setFilterProposalIdInput] = useState('')
   const [filterReInput, setFilterReInput] = useState('')
   const [filterEmployeeNameInput, setFilterEmployeeNameInput] = useState('')
   const [filterDescriptionInput, setFilterDescriptionInput] = useState('')
@@ -158,7 +153,7 @@ const PayoutList: React.FC = () => {
     const description = filterDescriptionInput.trim()
 
     return {
-      payoutId: parseOptionalNumber(filterIdInput),
+      proposalId: parseOptionalNumber(filterProposalIdInput),
       re: parseOptionalNumber(filterReInput),
       employeeName: employeeName || undefined,
       description: description || undefined,
@@ -174,7 +169,7 @@ const PayoutList: React.FC = () => {
     filterDateToInput,
     filterDescriptionInput,
     filterEmployeeNameInput,
-    filterIdInput,
+    filterProposalIdInput,
     filterAreaInput,
     filterCategoryInput,
     filterReInput,
@@ -191,7 +186,7 @@ const PayoutList: React.FC = () => {
   const payouts = data?.payouts
 
   const hasActiveFilters =
-    activeFilters.payoutId !== undefined ||
+    activeFilters.proposalId !== undefined ||
     activeFilters.re !== undefined ||
     activeFilters.employeeName !== undefined ||
     activeFilters.description !== undefined ||
@@ -367,7 +362,7 @@ const PayoutList: React.FC = () => {
     activeFilters.dateTo,
     activeFilters.description,
     activeFilters.employeeName,
-    activeFilters.payoutId,
+    activeFilters.proposalId,
     activeFilters.areaId,
     activeFilters.categoryId,
     activeFilters.re,
@@ -405,7 +400,7 @@ const PayoutList: React.FC = () => {
   }
 
   const handleClearFilters = () => {
-    setFilterIdInput('')
+    setFilterProposalIdInput('')
     setFilterReInput('')
     setFilterEmployeeNameInput('')
     setFilterDescriptionInput('')
@@ -450,7 +445,7 @@ const PayoutList: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-primary-gray md:px-4 md:py-8">
+      <div className="min-h-screen bg-primary-gray m-4">
         <div className="rounded-xl bg-white py-4 shadow-custom">
           <div className="mx-4 my-3 text-left text-xl font-semibold sm:my-4 sm:text-2xl">
             Lista de Pagamentos
@@ -545,12 +540,12 @@ const PayoutList: React.FC = () => {
                 <span className="text-sm font-semibold text-gray-700">Filtros</span>
               </div>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-                <FilterItem filterName="Id de Pagamento" filterId="payoutId">
+                <FilterItem filterName="Id da Proposta" filterId="proposalId">
                   <input
                     type="number"
                     min={1}
-                    value={filterIdInput}
-                    onChange={(event) => setFilterIdInput(event.target.value)}
+                    value={filterProposalIdInput}
+                    onChange={(event) => setFilterProposalIdInput(event.target.value)}
                     placeholder="Ex.: 123"
                     className="rounded border border-gray-300 px-3 py-2 text-sm"
                   />
@@ -727,47 +722,47 @@ const PayoutList: React.FC = () => {
                 />
               ))}
             </div>
-            <div className="mt-4 flex flex-row items-center justify-center gap-2 width-full">
-              <button
-                type="button"
-                onClick={() => previousPage && handlePageChange(previousPage)}
-                disabled={!previousPage}
-                className="flex items-center gap-1 rounded-lg px-2 py-2 text-gray-700 transition-all hover:bg-gray-100 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40 hover:cursor-pointer"
-              >
-                <ChevronLeftIcon size={20} />
-                <span className="hidden sm:block">Anterior</span>
-              </button>
-              {visiblePages.map((pageItem) =>
-                typeof pageItem !== 'number' ? (
-                  <span key={pageItem.key} className="px-1 text-gray-500">
-                    ...
-                  </span>
-                ) : (
-                  <button
-                    key={pageItem}
-                    type="button"
-                    onClick={() => handlePageChange(pageItem)}
-                    className={`flex h-9 w-9 items-center justify-center rounded-full transition-all ${
-                      pageItem === currentPage
-                        ? 'bg-blue-600 text-white shadow-sm'
-                        : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700 hover:cursor-pointer'
-                    }`}
-                    aria-current={pageItem === currentPage ? 'page' : undefined}
-                  >
-                    {pageItem}
-                  </button>
-                ),
-              )}
-              <button
-                type="button"
-                onClick={() => nextPage && handlePageChange(nextPage)}
-                disabled={!nextPage}
-                className="flex items-center gap-1 rounded-lg px-3 py-2 text-gray-700 transition-all hover:bg-gray-100 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40 hover:cursor-pointer"
-              >
-                <span className="hidden sm:block">Próximo</span>
-                <ChevronRightIcon size={20} />
-              </button>
-            </div>
+          </div>
+          <div className="mt-4 flex flex-row items-center justify-center gap-2 width-full">
+            <button
+              type="button"
+              onClick={() => previousPage && handlePageChange(previousPage)}
+              disabled={!previousPage}
+              className="flex items-center gap-1 rounded-lg px-2 py-2 text-gray-700 transition-all hover:bg-gray-100 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40 hover:cursor-pointer"
+            >
+              <ChevronLeftIcon size={20} />
+              <span className="hidden sm:block">Anterior</span>
+            </button>
+            {visiblePages.map((pageItem) =>
+              typeof pageItem !== 'number' ? (
+                <span key={pageItem.key} className="px-1 text-gray-500">
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={pageItem}
+                  type="button"
+                  onClick={() => handlePageChange(pageItem)}
+                  className={`flex h-9 w-9 items-center justify-center rounded-full transition-all ${
+                    pageItem === currentPage
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700 hover:cursor-pointer'
+                  }`}
+                  aria-current={pageItem === currentPage ? 'page' : undefined}
+                >
+                  {pageItem}
+                </button>
+              ),
+            )}
+            <button
+              type="button"
+              onClick={() => nextPage && handlePageChange(nextPage)}
+              disabled={!nextPage}
+              className="flex items-center gap-1 rounded-lg px-3 py-2 text-gray-700 transition-all hover:bg-gray-100 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40 hover:cursor-pointer"
+            >
+              <span className="hidden sm:block">Próximo</span>
+              <ChevronRightIcon size={20} />
+            </button>
           </div>
         </div>
       </div>
@@ -919,7 +914,7 @@ const PayoutList: React.FC = () => {
                           </button>
 
                           {isTooltipOpen && (
-                            <div className="absolute left-full top-0 z-20 ml-2 w-60 rounded-lg border border-gray-200 bg-gray-50 p-3 shadow-lg">
+                            <div className="absolute right-0 lg:left-full top-0 z-20 ml-2 w-60 rounded-lg border border-gray-200 bg-gray-50 p-3 shadow-lg">
                               <p className="mb-2 text-xs font-semibold text-gray-600">
                                 Dados da assinatura
                               </p>

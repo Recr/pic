@@ -32,12 +32,7 @@ export const PayoutController = {
 
       const filters: PayoutFilters = {}
 
-      const payoutIdFilter = parseOptionalNumber(req.query.id)
-      if (payoutIdFilter !== undefined) {
-        filters.payoutId = payoutIdFilter
-      }
-
-      const proposalIdFilter = parseOptionalNumber(req.query.id)
+      const proposalIdFilter = parseOptionalNumber(req.query.proposalId)
       if (proposalIdFilter !== undefined) {
         filters.proposalId = proposalIdFilter
       }

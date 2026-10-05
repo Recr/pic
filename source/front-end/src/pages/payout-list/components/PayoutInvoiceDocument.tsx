@@ -157,17 +157,17 @@ const PayoutInvoiceDocument: React.FC<PayoutInvoiceDocumentProps> = ({
           <Text style={styles.sectionTitle}>Resumo da emissão</Text>
           <View style={styles.summary}>
             <View style={styles.summaryItem}>
+              <Text style={styles.summaryLabel}>Data de Emissão</Text>
+              <Text style={styles.summaryValue}>{issuedAt.toLocaleDateString('pt-BR')}</Text>
+            </View>
+            <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>Pagamentos</Text>
               <Text style={styles.summaryValue}>{payouts.length}</Text>
             </View>
             <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Emissão</Text>
-              <Text style={styles.summaryValue}>{issuedAt.toLocaleDateString('pt-BR')}</Text>
+              <Text style={styles.summaryLabel}>Total</Text>
+              <Text style={styles.summaryValue}>{formatCurrency(totalValue)}</Text>
             </View>
-            {/* <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Status</Text>
-              <Text style={styles.summaryValue}>Consolidado</Text>
-            </View> */}
           </View>
         </View>
         <View style={styles.section}>
@@ -217,25 +217,21 @@ const PayoutInvoiceDocument: React.FC<PayoutInvoiceDocumentProps> = ({
             ))}
           </View>
         </View>
-        {showPaymentValue && (
-          <View style={styles.total}>
-            <View style={styles.totalBox}>
-              <Text style={styles.totalLabel}>Valor total</Text>
-              <Text style={styles.totalValue}>{formatCurrency(totalValue)}</Text>
-            </View>
-          </View>
-        )}
-        {showSignatureFields && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Assinaturas</Text>
-            <View style={styles.signatures}>
-              {signatureFields.map((field, index) => (
-                <View key={`${field.name}-${field.role}-${index}`} style={styles.signature}>
-                  <Text style={styles.signatureTitle}>{field.name || 'Assinante'}</Text>
-                  <Text style={styles.signatureSubtitle}>{field.role || 'Cargo'}</Text>
+        {(showPaymentValue || showSignatureFields) && (
+          <View wrap={false}>
+            {showSignatureFields && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Assinaturas</Text>
+                <View style={styles.signatures}>
+                  {signatureFields.map((field, index) => (
+                    <View key={`${field.name}-${field.role}-${index}`} style={styles.signature}>
+                      <Text style={styles.signatureTitle}>{field.name || 'Assinante'}</Text>
+                      <Text style={styles.signatureSubtitle}>{field.role || 'Cargo'}</Text>
+                    </View>
+                  ))}
                 </View>
-              ))}
-            </View>
+              </View>
+            )}
           </View>
         )}
         <View style={styles.footer} fixed>
