@@ -24,7 +24,7 @@ const statusLabels = {
 } as const
 
 const styles = StyleSheet.create({
-  page: { backgroundColor: '#f3f3f3', color: '#202020', fontFamily: 'Helvetica', padding: 36 },
+  page: { backgroundColor: '#f3f3f3', color: '#202020', fontFamily: 'Helvetica', padding: 16 },
   header: { backgroundColor: '#111111', borderRadius: 10, color: '#ffffff', padding: 24 },
   headerContent: { display: 'flex', flexDirection: 'column', justifyContent: 'space-between' },
   eyebrow: {
@@ -73,16 +73,23 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   tableRow: {
-    alignItems: 'center',
     borderBottomColor: '#e5e5e5',
     borderBottomWidth: 1,
-    flexDirection: 'row',
     minHeight: 36,
     paddingHorizontal: 10,
     width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   tableHeader: { backgroundColor: '#e4e4e4', borderBottomColor: '#cccccc' },
   cell: { color: '#333333', flex: 1, fontSize: 8, paddingRight: 6 },
+  idCell: { flexGrow: 0.6 },
+  nameCell: { flexGrow: 1.3 },
+  reCell: { flexGrow: 0.6 },
+  proposalCell: { flexGrow: 2.8 },
+  creationDateCell: { flexGrow: 1 },
+  statusCell: { flexGrow: 1 },
+  paymentValueCell: { flexGrow: 0.8, textAlign: 'right' },
   headerCell: { color: '#444444', fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase' },
   valueCell: { textAlign: 'right' },
   total: { alignItems: 'flex-end', marginTop: 14 },
@@ -174,42 +181,58 @@ const PayoutInvoiceDocument: React.FC<PayoutInvoiceDocumentProps> = ({
           <Text style={styles.sectionTitle}>Itens</Text>
           <View style={styles.table}>
             <View style={[styles.tableRow, styles.tableHeader]} fixed>
-              {showId && <Text style={[styles.cell, styles.headerCell]}>ID</Text>}
-              {showName && <Text style={[styles.cell, styles.headerCell]}>Colaborador</Text>}
-              {showRE && <Text style={[styles.cell, styles.headerCell]}>RE</Text>}
-              {showProposal && <Text style={[styles.cell, styles.headerCell]}>Proposta</Text>}
-              {showCreationDate && (
-                <Text style={[styles.cell, styles.headerCell]}>Data de criação</Text>
+              {showId && <Text style={[styles.cell, styles.idCell, styles.headerCell]}>ID</Text>}
+              {showName && (
+                <Text style={[styles.cell, styles.nameCell, styles.headerCell]}>Colaborador</Text>
               )}
-              {showStatus && <Text style={[styles.cell, styles.headerCell]}>Status</Text>}
+              {showRE && <Text style={[styles.cell, styles.reCell, styles.headerCell]}>RE</Text>}
+              {showProposal && (
+                <Text style={[styles.cell, styles.proposalCell, styles.headerCell]}>Proposta</Text>
+              )}
+              {showCreationDate && (
+                <Text style={[styles.cell, styles.creationDateCell, styles.headerCell]}>
+                  Data de criação
+                </Text>
+              )}
+              {showStatus && (
+                <Text style={[styles.cell, styles.statusCell, styles.headerCell]}>Status</Text>
+              )}
               {showPaymentValue && (
-                <Text style={[styles.cell, styles.headerCell, styles.valueCell]}>Valor</Text>
+                <Text style={[styles.cell, styles.paymentValueCell, styles.headerCell]}>Valor</Text>
               )}
             </View>
             {payouts.map((payout) => (
               <View key={payout.id} style={styles.tableRow} wrap={false}>
-                {showId && <Text style={styles.cell}>{payout.id}</Text>}
+                {showId && (
+                  <Text style={[styles.cell, styles.idCell]}>{payout.suggestion.proposal.id}</Text>
+                )}
                 {showName && (
-                  <Text style={styles.cell}>
+                  <Text style={[styles.cell, styles.nameCell]}>
                     {payout.suggestion.employee?.name ?? payout.suggestion.employeeName}
                   </Text>
                 )}
                 {showRE && (
-                  <Text style={styles.cell}>
+                  <Text style={[styles.cell, styles.reCell]}>
                     {payout.suggestion.employee?.re ?? payout.suggestion.employeeRe}
                   </Text>
                 )}
                 {showProposal && (
-                  <Text style={styles.cell}>{payout.suggestion.proposal.description}</Text>
+                  <Text style={[styles.cell, styles.proposalCell]}>
+                    {payout.suggestion.proposal.description}
+                  </Text>
                 )}
                 {showCreationDate && (
-                  <Text style={styles.cell}>
+                  <Text style={[styles.cell, styles.creationDateCell]}>
                     {new Date(payout.createdAt).toLocaleDateString('pt-BR')}
                   </Text>
                 )}
-                {showStatus && <Text style={styles.cell}>{statusLabels[payout.status]}</Text>}
+                {showStatus && (
+                  <Text style={[styles.cell, styles.statusCell]}>
+                    {statusLabels[payout.status]}
+                  </Text>
+                )}
                 {showPaymentValue && (
-                  <Text style={[styles.cell, styles.valueCell]}>
+                  <Text style={[styles.cell, styles.paymentValueCell, styles.valueCell]}>
                     {formatCurrency(Number(payout.value))}
                   </Text>
                 )}
