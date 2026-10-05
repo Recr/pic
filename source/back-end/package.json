@@ -37,7 +37,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "globals": "^17.0.0",
     "jiti": "^2.6.1",
-    "prisma": "7.3.0",
+    "prisma": "7.10.0",
     "tsup": "^8.5.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
