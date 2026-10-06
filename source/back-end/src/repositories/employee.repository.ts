@@ -108,6 +108,9 @@ class PrismaEmployeeRepository {
     const suggestions = await db.suggestion.findMany({
       where: {
         employeeId: null,
+        proposal: {
+          isActive: true,
+        },
       },
       distinct: ['employeeRe'],
       orderBy: {
