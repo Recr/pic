@@ -571,8 +571,8 @@ class ProposalUseCase {
 
   public async executeRestoreProposal(proposalId: number) {
     const proposal = await this.proposalRepository.findById(proposalId)
-    if (!proposal?.isActive) {
-      return null
+    if (proposal?.isActive) {
+      throw new AppError('Proposal is already active.', StatusCodes.BAD_REQUEST)
     }
     if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
 
