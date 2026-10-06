@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes'
 import { Pagination } from '../utils/types/proposals.types'
 import { PayoutFilters } from '../utils/types/payouts.types'
 import { Prisma } from '../../prisma/client/client'
+import { getUTCEndOfDay, getUTCStartOfDay } from '../utils/helpers/date-helper'
 
 class PayoutUseCase {
   constructor(private readonly payoutRepository: PrismaPayoutRepository) {}
@@ -21,23 +22,16 @@ class PayoutUseCase {
       where.status = filters.status
     }
 
-    const parseUtcDateOnly = (value: Date): Date =>
-      new Date(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate()))
-
-    const createdAt: { gte?: Date; lt?: Date } = {}
-
     if (filters.dateFrom) {
-      createdAt.gte = parseUtcDateOnly(filters.dateFrom)
+      where.createdAt = {
+        gte: getUTCStartOfDay(filters.dateFrom),
+      }
     }
 
     if (filters.dateTo) {
-      const nextDay = parseUtcDateOnly(filters.dateTo)
-      nextDay.setUTCDate(nextDay.getUTCDate() + 1)
-      createdAt.lt = nextDay
-    }
-
-    if (createdAt.gte || createdAt.lt) {
-      where.createdAt = createdAt
+      where.createdAt = {
+        lte: getUTCEndOfDay(filters.dateTo),
+      }
     }
 
     const suggestionFilters: Prisma.SuggestionWhereInput[] = []

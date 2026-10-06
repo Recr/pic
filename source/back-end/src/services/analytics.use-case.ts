@@ -1,6 +1,7 @@
 import { Proposal } from '../../prisma/client/client'
 import { PrismaPayoutRepository } from '../repositories/payout.repository'
 import { PrismaProposalRepository } from '../repositories/proposal.repository'
+import { getUTCEndOfDay, getUTCStartOfDay } from '../utils/helpers/date-helper'
 
 type TimeBucket = 'week' | 'month' | 'year'
 
@@ -149,8 +150,8 @@ class AnalyticsUseCase {
   ): Promise<ProposalAnalyticsResponse> {
     const proposals = await this.proposalsRepository.findAllFiltered(
       filters?.statuses,
-      filters?.startDate,
-      filters?.endDate,
+      ...(filters?.startDate ? [getUTCStartOfDay(filters?.startDate)] : []),
+      ...(filters?.endDate ? [getUTCEndOfDay(filters?.endDate)] : []),
       filters?.categoryId,
       filters?.areaId,
     )
@@ -209,6 +210,7 @@ class AnalyticsUseCase {
       filters.startDate,
       filters.endDate,
     )
+    console.log('proposals', filters)
     let totalDaysToCommunication = 0
     let proposalsAmount = 0
 

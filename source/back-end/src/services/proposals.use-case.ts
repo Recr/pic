@@ -118,12 +118,12 @@ class ProposalUseCase {
     const createdAt: { gte?: Date; lte?: Date } = {}
     if (filters.dateFrom) {
       const d = new Date(filters.dateFrom)
-      d.setHours(0, 0, 0, 0)
+      d.setUTCHours(0, 0, 0, 0)
       createdAt.gte = d
     }
     if (filters.dateTo) {
       const d = new Date(filters.dateTo)
-      d.setHours(23, 59, 59, 999)
+      d.setUTCHours(23, 59, 59, 999)
       createdAt.lte = d
     }
     if (createdAt.gte || createdAt.lte) where.createdAt = createdAt
