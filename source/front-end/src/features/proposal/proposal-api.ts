@@ -314,6 +314,16 @@ export const proposalAPI = api.injectEndpoints({
         { type: 'Proposal', id: 'LIST' },
       ],
     }),
+    undoUnderValidationToDefineChampion: builder.mutation<Proposal, { proposalId: string }>({
+      query: ({ proposalId }) => ({
+        url: `/proposals/${proposalId}/undo/under-validation-to-define-champion`,
+        method: 'PUT',
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
     undoRejectedToUnderValidation: builder.mutation<Proposal, { proposalId: string }>({
       query: ({ proposalId }) => ({
         url: `/proposals/${proposalId}/undo/rejected-to-under-validation`,
