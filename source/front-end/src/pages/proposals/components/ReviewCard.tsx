@@ -37,7 +37,7 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
 
   const handleUndoStatus = async () => {
     try {
-      await undo({ proposalId: proposal.id.toString() }).unwrap()
+      await undoUnderValidationToDefineChampion({ proposalId: proposal.id.toString() }).unwrap()
       setIsUndoModalOpen(false)
       toast.success('Status retornado para "A Implementar" com sucesso.')
     } catch (error) {

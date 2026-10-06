@@ -760,6 +760,28 @@ class ProposalUseCase {
     return updatedProposal
   }
 
+  public async executeUndoUnderValidationToDefineChampion(proposalId: number, userId: number) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+
+    if (proposal.status !== 'UNDER_VALIDATION') {
+      throw new AppError('Proposal is not in UNDER_VALIDATION status.', StatusCodes.BAD_REQUEST)
+    }
+
+    if (proposal.championId !== userId && proposal.managerId !== userId) {
+      throw new AppError('Unauthorized to undo this proposal.', StatusCodes.FORBIDDEN)
+    }
+
+    const updatedData: Prisma.ProposalUpdateInput = {
+      status: 'DEFINE_CHAMPION',
+      championReviewedAt: null,
+      champion: { disconnect: true },
+    }
+
+    const updatedProposal = await this.proposalRepository.updateProposal(proposalId, updatedData)
+    return updatedProposal
+  }
+
   public async executeUndoRejectedToUnderValidation(proposalId: number, userId: number) {
     const proposal = await this.proposalRepository.findById(proposalId)
     if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
