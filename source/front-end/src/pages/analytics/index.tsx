@@ -33,7 +33,7 @@ const AnalyticsPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 px-3 pt-4 sm:px-4 sm:pt-8">
+      <div className="  bg-gray-100 px-3 pt-4 sm:px-4 sm:pt-8">
         <div className="mx-auto w-full max-w-7xl rounded bg-white p-3 sm:p-4 md:p-6">
           <Skeleton className="mb-3 h-7 w-40 sm:mb-4 sm:h-8" />
           <Skeleton className="h-5 w-48" />
@@ -123,7 +123,7 @@ const AnalyticsPage: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-primary-gray m-4">
+      <div className="  bg-primary-gray m-4">
         <div className="mx-auto max-w-7xl space-y-6">
           <section className="rounded-lg bg-white p-6 shadow-sm">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">

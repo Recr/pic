@@ -68,7 +68,7 @@ const Proposals: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-primary-gray min-h-screen font-sans">
+      <div className="bg-primary-gray   font-sans">
         <div className="mb-2.5 flex items-center justify-between bg-white px-5 py-2.5 shadow-md">
           <Skeleton className="ml-8 h-7 w-56" />
         </div>
@@ -87,7 +87,7 @@ const Proposals: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-primary-gray m-4">
+    <div className="  bg-primary-gray m-4">
       <div className="rounded-2xl bg-white py-4 shadow-custom sm:py-5">
         <div className="mx-4 my-3 text-left text-3xl font-semibold sm:my-4 sm:text-2xl">
           Propostas

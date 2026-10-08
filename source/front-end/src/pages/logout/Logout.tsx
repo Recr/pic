@@ -40,7 +40,7 @@ const Logout: React.FC = () => {
   }, [dispatch, navigate, triggerLogout])
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-primary-gray px-4">
+    <div className="flex   items-center justify-center bg-primary-gray px-4">
       <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-lg">
         <h2 className="text-2xl font-bold text-gray-800">Até logo!</h2>
         <LoaderCircle className="mx-auto mt-4 h-12 w-12 animate-spin text-gray-600" />

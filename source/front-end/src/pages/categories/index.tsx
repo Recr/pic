@@ -83,7 +83,7 @@ const Categories: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-gray-100 min-h-screen py-5">
+      <div className="bg-gray-100   py-5">
         <div className="m-auto flex w-xs flex-col gap-4 rounded-xl bg-white p-8 sm:w-sm md:w-md lg:w-xl">
           <Skeleton className="h-8 w-40" />
           <div className="flex flex-col gap-3">
@@ -115,7 +115,7 @@ const Categories: React.FC = () => {
   }
 
   return (
-    <div className="bg-primary-gray min-h-screen m-4">
+    <div className="bg-primary-gray   m-4">
       <div className="flex flex-col gap-4 m-auto bg-white  sm:w-sm md:w-md lg:w-xl p-8 rounded-xl">
         <h1 className="text-2xl pt-5 pb-10">Categorias</h1>
         {categoriesList?.map((category) => (

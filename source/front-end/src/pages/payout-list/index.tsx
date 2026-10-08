@@ -430,7 +430,7 @@ const PayoutList: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen px-3 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8">
+      <div className="  px-3 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8">
         <div className="rounded-lg bg-white py-4 shadow-custom sm:py-5">
           <Skeleton className="mx-4 my-3 h-8 w-56 sm:my-4 sm:h-9" />
           <div className="space-y-3 p-4">
@@ -445,7 +445,7 @@ const PayoutList: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-primary-gray m-4">
+      <div className="  bg-primary-gray m-4">
         <div className="rounded-xl bg-white py-4 shadow-custom">
           <div className="mx-4 my-3 text-left text-xl font-semibold sm:my-4 sm:text-2xl">
             Lista de Pagamentos
