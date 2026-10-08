@@ -130,7 +130,7 @@ const Sidebar: React.FC = () => {
           </div>
         </button>
         {/* </div> */}
-        <div className="hidden justify-start p-2 lg:flex z-30 ">
+        <div className="hidden justify-start p-2 lg:flex z-30">
           <button
             type="button"
             aria-label={isSidebarLocked ? 'Desbloquear menu lateral' : 'Fixar menu lateral aberto'}

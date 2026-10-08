@@ -17,7 +17,7 @@ const DefineManager: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-primary-gray min-h-screen font-sans">
+      <div className="bg-primary-gray   font-sans">
         <div className="mb-2.5 flex items-center justify-between bg-white px-5 py-2.5 shadow-md">
           <Skeleton className="ml-8 h-7 w-56" />
         </div>
@@ -36,7 +36,7 @@ const DefineManager: React.FC = () => {
   }
 
   return (
-    <div className="bg-primary-gray min-h-screen mx-4 mt-4">
+    <div className="bg-primary-gray mx-4 mt-4">
       <div className="py-4 px-4 bg-white shadow-md mb-4 rounded-2xl">
         <h2 className="text-2xl font-semibold mt-4">Definir Gerente</h2>
         <div className="flex flex-wrap gap-4 rounded-2xl mt-4 p-4 bg-secondary-gray">

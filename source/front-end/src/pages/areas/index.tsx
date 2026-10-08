@@ -60,7 +60,7 @@ const Areas: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-gray-100 min-h-screen py-5">
+      <div className="bg-gray-100   py-5">
         <div className="m-auto mt-5 flex w-xs flex-col gap-4 rounded-xl bg-white p-8 sm:w-sm md:w-md">
           <Skeleton className="h-8 w-32" />
           <div className="flex flex-col gap-3">
@@ -87,7 +87,7 @@ const Areas: React.FC = () => {
   }
 
   return (
-    <div className="bg-primary-gray min-h-screen mt-4">
+    <div className="bg-primary-gray   mt-4">
       <div className="flex flex-col gap-4 m-auto mt-5 w-xs bg-white sm:w-sm md:w-md p-8 rounded-xl">
         <h1 className="text-2xl pt-5 pb-10">Áreas</h1>
         {data?.map((area) => (

@@ -20,6 +20,7 @@ import DefineManager from '../pages/define-manager'
 import DefineChampion from '../pages/define-champion'
 import Categories from '../pages/categories'
 import AnalyticsPage from '../pages/analytics'
+import Footer from '../components/footer/Footer'
 
 const AppShell: React.FC = () => {
   const isLoggedin = useSelector((state: RootState) => state.auth.isLoggedin)
@@ -30,113 +31,116 @@ const AppShell: React.FC = () => {
   })
 
   return (
-    <div className="relative bg-primary-gray lg:flex">
-      {isLoggedin && <Sidebar />}
-      <main className="flex-1">
-        <Routes>
-          <Route path="/" element={<SuggestionForm />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route
-            path="/profile"
-            element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/suggestion-list"
-            element={
-              <PrivateRoute>
-                <SuggestionList />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/admin/define-champion"
-            element={
-              <PrivateRoute allowedRoles={['ADMIN']}>
-                <AdminDefineChampion />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/define-champion"
-            element={
-              <PrivateRoute blockedRoles={['ADMIN']}>
-                <DefineChampion />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/admin/define-manager"
-            element={
-              <PrivateRoute allowedRoles={['ADMIN']}>
-                <DefineManager />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/employee"
-            element={
-              <PrivateRoute allowedRoles={['ADMIN']}>
-                <Employee />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/areas"
-            element={
-              <PrivateRoute allowedRoles={['ADMIN']}>
-                <Areas />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/categories"
-            element={
-              <PrivateRoute allowedRoles={['ADMIN']}>
-                <Categories />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/proposals"
-            element={
-              <PrivateRoute>
-                <Proposals />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/payouts"
-            element={
-              <PrivateRoute>
-                <PayoutList />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/change-password"
-            element={
-              <PrivateRoute>
-                <PasswordChangePage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/analytics"
-            element={
-              <PrivateRoute allowedRoles={['ADMIN', 'GENERAL_MANAGER']}>
-                <AnalyticsPage />
-              </PrivateRoute>
-            }
-          />
-          <Route path="/logout" element={<Logout />} />
-          <Route path="*" element={<div>404 Not Found</div>} />
-          <Route path="/password-reset" element={<PasswordResetPage />} />
-        </Routes>
-      </main>
+    <div className="min-h-screen flex flex-col justify-between">
+      <div className="relative bg-primary-gray lg:flex">
+        {isLoggedin && <Sidebar />}
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<SuggestionForm />} />
+            <Route path="/login" element={<LoginForm />} />
+            <Route
+              path="/profile"
+              element={
+                <PrivateRoute>
+                  <Profile />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/suggestion-list"
+              element={
+                <PrivateRoute>
+                  <SuggestionList />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/admin/define-champion"
+              element={
+                <PrivateRoute allowedRoles={['ADMIN']}>
+                  <AdminDefineChampion />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/define-champion"
+              element={
+                <PrivateRoute blockedRoles={['ADMIN']}>
+                  <DefineChampion />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/admin/define-manager"
+              element={
+                <PrivateRoute allowedRoles={['ADMIN']}>
+                  <DefineManager />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/employee"
+              element={
+                <PrivateRoute allowedRoles={['ADMIN']}>
+                  <Employee />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/areas"
+              element={
+                <PrivateRoute allowedRoles={['ADMIN']}>
+                  <Areas />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/categories"
+              element={
+                <PrivateRoute allowedRoles={['ADMIN']}>
+                  <Categories />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/proposals"
+              element={
+                <PrivateRoute>
+                  <Proposals />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/payouts"
+              element={
+                <PrivateRoute>
+                  <PayoutList />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/change-password"
+              element={
+                <PrivateRoute>
+                  <PasswordChangePage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/analytics"
+              element={
+                <PrivateRoute allowedRoles={['ADMIN', 'GENERAL_MANAGER']}>
+                  <AnalyticsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route path="/logout" element={<Logout />} />
+            <Route path="*" element={<div>404 Not Found</div>} />
+            <Route path="/password-reset" element={<PasswordResetPage />} />
+          </Routes>
+        </main>
+      </div>
+      <Footer />
     </div>
   )
 }

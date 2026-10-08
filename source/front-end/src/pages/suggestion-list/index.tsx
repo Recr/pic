@@ -277,7 +277,7 @@ const SuggestionList: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 px-3 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8">
+      <div className="  bg-gray-100 px-3 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8">
         <div className="mb-7.5 rounded-lg bg-white py-4 shadow-custom sm:py-5">
           <Skeleton className="mx-4 my-3 h-8 w-56 sm:my-4 sm:h-9" />
           <div className="mx-3 rounded-lg border border-gray-300 p-4 sm:mx-4">
@@ -305,7 +305,7 @@ const SuggestionList: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-primary-gray mx-4 mt-4">
+    <div className="  bg-primary-gray mx-4 mt-4">
       <div className="mb-7.5 rounded-2xl bg-white py-4 shadow-custom sm:py-5">
         <h2 className="mx-4 my-3 text-left font-semibold sm:my-4 sm:text-2xl">
           Lista de Propostas

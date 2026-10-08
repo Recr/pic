@@ -120,7 +120,7 @@ const Employee: React.FC = () => {
 
   if (isLoadingEmployees) {
     return (
-      <div className="min-h-screen bg-gray-100 px-3 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8">
+      <div className="  bg-gray-100 px-3 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8">
         <div className="mb-7.5 rounded-lg bg-white py-4 shadow-custom sm:py-5">
           <Skeleton className="mx-4 my-3 h-8 w-56 sm:my-4 sm:h-9" />
           <div className="mx-4 mt-5 grid gap-4 xl:grid-cols-2">
@@ -147,7 +147,7 @@ const Employee: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-primary-gray m-4">
+    <div className="  bg-primary-gray m-4">
       <div className="mb-7.5 rounded-lg bg-white py-4 shadow-custom sm:py-5">
         <div className="mx-4 my-3 text-left text-xl font-semibold sm:my-4 sm:text-2xl">
           Colaboradores
