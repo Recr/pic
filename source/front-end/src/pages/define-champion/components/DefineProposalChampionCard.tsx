@@ -8,6 +8,8 @@ import EmployeeCombobox from '../../../components/inputs/EmployeeCombobox'
 import { useState } from 'react'
 import Modal from '../../../components/modal/Modal'
 import EmployeeInformationBadge from '../../../components/badges/EmployeeInformationBadge'
+import { Undo2 } from 'lucide-react'
+import { toast } from 'react-toastify'
 
 const updateProposalSchema = z.object({
   championRe: z.coerce.number().int().positive('Selecione um RE valido para o executor.'),
@@ -75,6 +77,10 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableC
   const [isRejectionModalOpen, setIsRejectionModalOpen] = useState(false)
   const [rejectionNote, setRejectionNote] = useState('')
   const [rejectionNoteError, setRejectionNoteError] = useState<string | null>(null)
+  const [isUndoModalOpen, setIsUndoModalOpen] = useState(false)
+
+  const [undoManagerDefineChampionToAdminDefineManager, { isLoading: isUndoLoading }] =
+    proposalAPI.useUndoManagerDefineChampionToAdminDefineManagerMutation()
 
   const onSubmit = async (data: UpdateProposalFormOutput) => {
     try {
@@ -97,6 +103,19 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableC
     }
   }
 
+  const handleUndoStatus = async () => {
+    try {
+      await undoManagerDefineChampionToAdminDefineManager({
+        proposalId: proposal.id.toString(),
+      }).unwrap()
+      setIsUndoModalOpen(false)
+      toast.success('Proposta devolvida para o administrador com sucesso.')
+    } catch (error) {
+      console.log(error)
+      toast.error('Erro ao retornar status da proposta.')
+    }
+  }
+
   return (
     <>
       <form
@@ -104,10 +123,25 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableC
         onSubmit={handleSubmit(onSubmit)}
       >
         <div onClick={() => setIsModalOpen(true)}>
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg m-0">Proposta #{proposal.id}</h3>
-            <StatusBadge status={proposal.status} color={getStatusColor(proposal.status)} />
+          <div className="flex w-full items-center justify-between gap-2">
+            <h3 className="text-sm font-semibold">Proposta #{proposal.id}</h3>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation()
+                setIsUndoModalOpen(true)
+              }}
+              title="Devolver para gestor"
+              className="inline-flex h-8 w-8 items-center justify-center rounded border border-orange-200 text-orange-600 transition-colors hover:cursor-pointer hover:bg-orange-50"
+            >
+              <Undo2 size={16} />
+            </button>
           </div>
+          <StatusBadge
+            status={proposal.status}
+            color={getStatusColor(proposal.status)}
+            className="w-fit"
+          />
           <p>
             <strong>Colaboradores:</strong>
           </p>
@@ -281,6 +315,31 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, availableC
               className="py-2 px-4 cursor-pointer rounded border border-[#c0392b] bg-[#e74c3c] hover:bg-[#c0392b] text-white transition-all"
             >
               Confirmar rejeicao
+            </button>
+          </div>
+        </div>
+      </Modal>
+      <Modal isOpen={isUndoModalOpen} onClose={() => setIsUndoModalOpen(false)}>
+        <div className="w-80 max-w-[95vw] p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-center">Confirmar retorno de status</h2>
+          <p className="text-gray-700 text-center">
+            Tem <strong>certeza</strong> que deseja devolver esta proposta?
+          </p>
+          <div className="flex gap-3 justify-center">
+            <button
+              type="button"
+              onClick={() => setIsUndoModalOpen(false)}
+              className="py-2 px-4 cursor-pointer rounded border border-gray-300 bg-gray-100 hover:bg-gray-200 text-gray-800 transition-all"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={handleUndoStatus}
+              disabled={isUndoLoading}
+              className="py-2 px-4 cursor-pointer rounded border border-orange-800 bg-orange-500 hover:bg-orange-700 text-white transition-all disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isUndoLoading ? 'Retornando...' : 'Confirmar'}
             </button>
           </div>
         </div>

@@ -782,6 +782,30 @@ class ProposalUseCase {
     return updatedProposal
   }
 
+  public async executeUndoManagerDefineChampionToAdminDefineManager(
+    proposalId: number,
+    userId: number,
+  ) {
+    const proposal = await this.proposalRepository.findById(proposalId)
+    if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)
+
+    if (proposal.status !== 'DEFINE_CHAMPION') {
+      throw new AppError('Proposal is not in DEFINE_CHAMPION status.', StatusCodes.BAD_REQUEST)
+    }
+
+    if (proposal.managerId !== userId) {
+      throw new AppError('Unauthorized to undo this proposal.', StatusCodes.FORBIDDEN)
+    }
+
+    const updatedData: Prisma.ProposalUpdateInput = {
+      managerReviewedAt: null,
+      manager: { disconnect: true },
+    }
+
+    const updatedProposal = await this.proposalRepository.updateProposal(proposalId, updatedData)
+    return updatedProposal
+  }
+
   public async executeUndoRejectedToUnderValidation(proposalId: number, userId: number) {
     const proposal = await this.proposalRepository.findById(proposalId)
     if (!proposal) throw new AppError('Proposal not found.', StatusCodes.NOT_FOUND)

@@ -324,6 +324,19 @@ export const proposalAPI = api.injectEndpoints({
         { type: 'Proposal', id: 'LIST' },
       ],
     }),
+    undoManagerDefineChampionToAdminDefineManager: builder.mutation<
+      Proposal,
+      { proposalId: string }
+    >({
+      query: ({ proposalId }) => ({
+        url: `/proposals/${proposalId}/undo/manager-define-champion-to-admin-define-manager`,
+        method: 'PUT',
+      }),
+      invalidatesTags: (_result, _error, { proposalId }) => [
+        { type: 'Proposal', id: Number(proposalId) },
+        { type: 'Proposal', id: 'LIST' },
+      ],
+    }),
     undoRejectedToUnderValidation: builder.mutation<Proposal, { proposalId: string }>({
       query: ({ proposalId }) => ({
         url: `/proposals/${proposalId}/undo/rejected-to-under-validation`,

@@ -39,7 +39,7 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
     try {
       await undoUnderValidationToDefineChampion({ proposalId: proposal.id.toString() }).unwrap()
       setIsUndoModalOpen(false)
-      toast.success('Status retornado para "A Implementar" com sucesso.')
+      toast.success('Proposta devolvida para o gestor com sucesso.')
     } catch (error) {
       console.log(error)
       toast.error('Erro ao retornar status da proposta.')
@@ -68,7 +68,7 @@ const ReviewCard: React.FC<ProposalWithSuggestions> = (proposal) => {
               event.stopPropagation()
               setIsUndoModalOpen(true)
             }}
-            title="Retornar para A Implementar"
+            title="Devolver para gestor"
             className="inline-flex h-8 w-8 items-center justify-center rounded border border-orange-200 text-orange-600 transition-colors hover:cursor-pointer hover:bg-orange-50"
           >
             <Undo2 size={16} />

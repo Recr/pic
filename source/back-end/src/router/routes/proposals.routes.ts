@@ -175,6 +175,12 @@ proposalsRoutes.put(
 )
 
 proposalsRoutes.put(
+  '/:id/undo/manager-define-champion-to-admin-define-manager',
+  authMiddleware,
+  ProposalsController.handleUndoManagerDefineChampionToAdminDefineManager,
+)
+
+proposalsRoutes.put(
   '/:id/undo/rejected-to-define-champion',
   authMiddleware,
   ProposalsController.handleUndoRejectedToDefineChampion,
