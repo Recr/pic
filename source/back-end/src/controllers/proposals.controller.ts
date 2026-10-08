@@ -547,6 +547,51 @@ export const ProposalsController = {
     }
   },
 
+  async handleUndoUnderValidationToDefineChampion(req: Request, res: Response, next: NextFunction) {
+    try {
+      const proposalId = Number(req.params.id)
+      const userId = Number(req.user?.sub)
+
+      if (Number.isNaN(proposalId) || Number.isNaN(userId)) {
+        return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
+      }
+
+      const proposalUseCase = makeProposalsUseCase()
+
+      const proposal = await proposalUseCase.executeUndoUnderValidationToDefineChampion(
+        proposalId,
+        userId,
+      )
+      res.send(proposal)
+    } catch (error) {
+      next(error)
+    }
+  },
+  async handleUndoManagerDefineChampionToAdminDefineManager(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const proposalId = Number(req.params.id)
+      const userId = Number(req.user?.sub)
+
+      if (Number.isNaN(proposalId) || Number.isNaN(userId)) {
+        return next(new AppError('Invalid token payload.', StatusCodes.UNAUTHORIZED))
+      }
+
+      const proposalUseCase = makeProposalsUseCase()
+
+      const proposal = await proposalUseCase.executeUndoManagerDefineChampionToAdminDefineManager(
+        proposalId,
+        userId,
+      )
+      res.send(proposal)
+    } catch (error) {
+      next(error)
+    }
+  },
+
   async handleUndoRejectedToUnderValidation(req: Request, res: Response, next: NextFunction) {
     try {
       const proposalId = Number(req.params.id)

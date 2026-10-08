@@ -138,7 +138,7 @@ describe('EmployeeRepository', () => {
     expect(employee).toStrictEqual(mockEmployee)
   })
 
-  test('should find all unregistered employees on suggestions', async () => {
+  test('should find all unregistered employees on suggestions of active proposals', async () => {
     const mockSuggestions: Suggestion[] = [
       {
         id: 1,
@@ -173,6 +173,9 @@ describe('EmployeeRepository', () => {
     expect(prisma.suggestion.findMany).toHaveBeenCalledWith({
       where: {
         employeeId: null,
+        proposal: {
+          isActive: true,
+        },
       },
       distinct: ['employeeRe'],
       orderBy: {

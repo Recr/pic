@@ -163,9 +163,21 @@ proposalsRoutes.put(
 )
 
 proposalsRoutes.put(
+  '/:id/undo/under-validation-to-define-champion',
+  authMiddleware,
+  ProposalsController.handleUndoUnderValidationToDefineChampion,
+)
+
+proposalsRoutes.put(
   '/:id/undo/rejected-to-under-validation',
   authMiddleware,
   ProposalsController.handleUndoRejectedToUnderValidation,
+)
+
+proposalsRoutes.put(
+  '/:id/undo/manager-define-champion-to-admin-define-manager',
+  authMiddleware,
+  ProposalsController.handleUndoManagerDefineChampionToAdminDefineManager,
 )
 
 proposalsRoutes.put(
