@@ -1,7 +1,6 @@
-import { Proposal } from '../../prisma/client/client'
+import { Prisma, Proposal } from '../../prisma/client/client'
 import { PrismaPayoutRepository } from '../repositories/payout.repository'
 import { PrismaProposalRepository } from '../repositories/proposal.repository'
-import { getUTCEndOfDay, getUTCStartOfDay } from '../utils/helpers/date-helper'
 
 type TimeBucket = 'week' | 'month' | 'year'
 
@@ -148,13 +147,32 @@ class AnalyticsUseCase {
   public async executeGetProposalAnalytics(
     filters?: GetProposalAnalyticsFilters,
   ): Promise<ProposalAnalyticsResponse> {
-    const proposals = await this.proposalsRepository.findAllFiltered(
-      filters?.statuses,
-      ...(filters?.startDate ? [getUTCStartOfDay(filters?.startDate)] : []),
-      ...(filters?.endDate ? [getUTCEndOfDay(filters?.endDate)] : []),
-      filters?.categoryId,
-      filters?.areaId,
-    )
+    const where: Prisma.ProposalWhereInput = {}
+    if (filters?.statuses) {
+      where.status = { in: filters.statuses }
+    }
+
+    if (filters?.completionDate) {
+      where.completedAt = {
+        ...(filters.startDate ? { gte: filters.startDate } : {}),
+        lte: filters.completionDate,
+      }
+    } else {
+      where.createdAt = {
+        ...(filters?.startDate ? { gte: filters.startDate } : {}),
+        ...(filters?.endDate ? { lte: filters.endDate } : {}),
+      }
+    }
+    if (filters?.categoryId) {
+      where.categoryId = filters?.categoryId
+    }
+    if (filters?.areaId) {
+      where.areaId = filters?.areaId
+    }
+
+    where.isActive = true
+
+    const proposals = await this.proposalsRepository.findAllFiltered(where)
 
     const proposalDates = proposals.map((proposal) =>
       filters?.completionDate ? (proposal.completedAt ?? proposal.createdAt) : proposal.createdAt,
@@ -205,12 +223,14 @@ class AnalyticsUseCase {
   public async executeGetTimeToCommunicationAndImplementation(
     filters: GetTimeToCommunicationAndImplementationFilters,
   ): Promise<TimeToCommunicationAndImplementationResponse> {
-    const proposals = await this.proposalsRepository.findAllFiltered(
-      undefined,
-      filters.startDate,
-      filters.endDate,
-    )
-    console.log('proposals', filters)
+    const where: Prisma.ProposalWhereInput = {
+      isActive: true,
+      createdAt: {
+        ...(filters.startDate ? { gte: filters.startDate } : {}),
+        ...(filters.endDate ? { lte: filters.endDate } : {}),
+      },
+    }
+    const proposals = await this.proposalsRepository.findAllFiltered(where)
     let totalDaysToCommunication = 0
     let proposalsAmount = 0
 

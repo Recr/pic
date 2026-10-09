@@ -55,6 +55,7 @@ export const AnalyticsController = {
       const statuses = getQueryStringArray(req.query.status)
       const startDate = parseDateQuery(req.query.startDate, 'startDate')
       const endDate = parseDateQuery(req.query.endDate, 'endDate')
+      const completionDate = parseDateQuery(req.query.completionDate, 'completionDate', 'end')
       const categoryId =
         typeof req.query.categoryId === 'string' && req.query.categoryId.trim() !== ''
           ? Number(req.query.categoryId)
@@ -82,6 +83,7 @@ export const AnalyticsController = {
         ...(statuses.length > 0 ? { statuses } : {}),
         ...(startDate ? { startDate } : {}),
         ...(endDate ? { endDate } : {}),
+        ...(completionDate ? { completionDate } : {}),
         ...(categoryId !== undefined ? { categoryId } : {}),
         ...(areaId !== undefined ? { areaId } : {}),
       }

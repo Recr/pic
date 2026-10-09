@@ -86,24 +86,7 @@ class PrismaProposalRepository {
     }
   }
 
-  public async findAllFiltered(
-    statuses?: string[],
-    startDate?: Date,
-    endDate?: Date,
-    categoryId?: number,
-    areaId?: number,
-  ) {
-    const where: Prisma.ProposalWhereInput = {
-      isActive: true,
-      ...(statuses?.length && { status: { in: statuses } }),
-      ...(categoryId !== undefined && { categoryId }),
-      ...(areaId !== undefined && { areaId }),
-      createdAt: {
-        ...(startDate && { gte: startDate }),
-        ...(endDate && { lte: endDate }),
-      },
-    }
-
+  public async findAllFiltered(where: Prisma.ProposalWhereInput) {
     const proposals = await prisma.proposal.findMany({
       where,
     })
