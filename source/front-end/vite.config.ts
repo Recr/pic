@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  const gitVersion = execFileSync('git', ['describe', '--tags', '--always'], {
+  const gitVersion = execFileSync('git', ['describe', '--tag', '--abbrev=0'], {
     encoding: 'utf8',
   }).trim()
 
