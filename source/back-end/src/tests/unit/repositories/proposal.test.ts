@@ -82,17 +82,10 @@ describe('ProposalRepository', () => {
       statuses: ['DEFINE_CHAMPION'],
       startDate: new Date(new Date().setDate(new Date().getDate() - 1)),
       endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+      completionDate: new Date(new Date().setDate(new Date().getDate() + 1)),
       categoryId: 1,
       areaId: 1,
     }
-    const proposals = await proposalRepository.findAllFiltered(
-      filters.statuses,
-      filters.startDate,
-      filters.endDate,
-      filters.categoryId,
-      filters.areaId,
-    )
-
     const where: Prisma.ProposalWhereInput = {
       isActive: true,
     }
@@ -114,6 +107,8 @@ describe('ProposalRepository', () => {
         where.createdAt.lte = filters.endDate
       }
     }
+
+    const proposals = await proposalRepository.findAllFiltered(where)
 
     expect(prisma.proposal.findMany).toHaveBeenCalledWith({
       where,
