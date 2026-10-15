@@ -12,7 +12,7 @@ export const ProposalsController = {
   async handleFindAll(req: Request, res: Response, next: NextFunction) {
     try {
       const proposalUseCase = makeProposalsUseCase()
-      const proposals = await proposalUseCase.executeFindAll()
+      const proposals = await proposalUseCase.executeFindAllActive()
       res.send(proposals)
     } catch (error) {
       next(error)

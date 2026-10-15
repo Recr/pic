@@ -20,6 +20,7 @@ import { PrismaProposalAttachmentRepository } from '../repositories/proposal-att
 import { PrismaPayoutRepository } from '../repositories/payout.repository'
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { ProposalWhereInput } from '../../prisma/client/models'
 
 class ProposalUseCase {
   constructor(
@@ -31,35 +32,31 @@ class ProposalUseCase {
     private readonly payoutRepository: PrismaPayoutRepository,
   ) {}
 
-  public async executeFindAll() {
-    const proposals = await this.proposalRepository.findAll()
+  public async executeFindAllActive() {
+    const where: ProposalWhereInput = {
+      isActive: true,
+    }
+
+    const proposals = await this.proposalRepository.findAllFiltered(where)
     return proposals
   }
 
-  public async executeFindAllWithEmployees(userId?: number) {
-    const where: Prisma.ProposalWhereInput =
-      userId === undefined
-        ? {
-            isActive: true,
-            status: {
-              in: ['UNDER_VALIDATION', 'TO_IMPLEMENT', 'IMPLEMENTATION'],
-            },
-          }
-        : {
-            isActive: true,
-            OR: [
-              {
-                status: {
-                  in: ['UNDER_VALIDATION', 'TO_IMPLEMENT', 'IMPLEMENTATION'],
-                },
-                championId: userId,
-              },
-              {
-                status: 'WAITING_APPROVAL',
-                managerId: userId,
-              },
-            ],
-          }
+  public async executeFindAllWithEmployees(userId: number) {
+    const where: Prisma.ProposalWhereInput = {
+      isActive: true,
+      OR: [
+        {
+          status: {
+            in: ['UNDER_VALIDATION', 'TO_IMPLEMENT', 'IMPLEMENTATION'],
+          },
+          championId: userId,
+        },
+        {
+          status: 'WAITING_APPROVAL',
+          managerId: userId,
+        },
+      ],
+    }
     const proposals = await this.proposalRepository.findAllWithEmployees(where)
     return proposals
   }
