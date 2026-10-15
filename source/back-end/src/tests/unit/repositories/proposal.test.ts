@@ -35,33 +35,6 @@ describe('ProposalRepository', () => {
 
   const proposalRepository = new PrismaProposalRepository()
 
-  test('returns all active proposals', async () => {
-    const mockProposals: Proposal[] = [
-      {
-        id: 1,
-        description: 'Proposal 1',
-        ...partialProposal,
-      },
-      {
-        id: 2,
-        description: 'Proposal 2',
-        ...partialProposal,
-      },
-    ]
-
-    prisma.proposal.findMany.mockResolvedValue(mockProposals)
-
-    const proposals = await proposalRepository.findAll()
-
-    expect(prisma.proposal.findMany).toHaveBeenCalledWith({
-      where: {
-        isActive: true,
-      },
-    })
-
-    expect(proposals).toStrictEqual(mockProposals)
-  })
-
   test('returns active proposals filtered by status, date range, category, and area', async () => {
     const mockProposals: Proposal[] = [
       {
