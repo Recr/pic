@@ -21,6 +21,7 @@ import { PrismaPayoutRepository } from '../repositories/payout.repository'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { ProposalWhereInput } from '../../prisma/client/models'
+import { adjustDateByOffset } from '../utils/helpers/date-helper'
 
 class ProposalUseCase {
   constructor(
@@ -114,12 +115,12 @@ class ProposalUseCase {
     if (filters.dateFrom) {
       const d = new Date(filters.dateFrom)
       d.setUTCHours(0, 0, 0, 0)
-      createdAt.gte = d
+      createdAt.gte = adjustDateByOffset(d, filters.utcOffsetInMinutes ?? 0)
     }
     if (filters.dateTo) {
       const d = new Date(filters.dateTo)
       d.setUTCHours(23, 59, 59, 999)
-      createdAt.lte = d
+      createdAt.lte = adjustDateByOffset(d, filters.utcOffsetInMinutes ?? 0)
     }
     if (createdAt.gte || createdAt.lte) where.createdAt = createdAt
 
@@ -209,6 +210,11 @@ class ProposalUseCase {
         totalCount: filteredProposals.length,
       }
     }
+
+    detailedProposals.proposals = detailedProposals.proposals.map((proposal) => {
+      proposal.createdAt = adjustDateByOffset(proposal.createdAt, filters.utcOffsetInMinutes ?? 0)
+      return proposal
+    })
 
     return detailedProposals
   }

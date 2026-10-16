@@ -103,6 +103,11 @@ export const ProposalsController = {
         filters.dateTo = dateToFilter
       }
 
+      const utcOffsetInMinutes = parseOptionalNumber(req.query.utcOffsetInMinutes)
+      if (utcOffsetInMinutes !== undefined) {
+        filters.utcOffsetInMinutes = utcOffsetInMinutes
+      }
+
       const statusFilter =
         typeof req.query.status === 'string' && req.query.status.trim() !== ''
           ? req.query.status.trim()

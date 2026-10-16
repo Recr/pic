@@ -59,6 +59,7 @@ export interface DetailedProposalFilters {
   description?: string
   dateFrom?: Date
   dateTo?: Date
+  utcOffsetInMinutes?: number
   status?: string
   categoryId?: number
   areaId?: number

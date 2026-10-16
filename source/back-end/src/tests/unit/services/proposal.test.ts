@@ -201,5 +201,6 @@ describe('Proposal Use Case', () => {
         expect(proposalRepository.findAllDetailed).toHaveBeenCalledWith(where, pagination)
       },
     )
+    it.todo('should apply dateFrom and dateTo filters correctly', async () => {})
   })
 })
