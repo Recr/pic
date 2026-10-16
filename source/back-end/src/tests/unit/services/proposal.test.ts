@@ -28,6 +28,8 @@ const partialProposal: Omit<Proposal, 'id' | 'description'> = {
   requiresImplementation: false,
 }
 
+const pagination: Pagination = { limit: 50, offset: 0 }
+
 describe('Proposal Use Case', () => {
   let proposalRepository: ReturnType<typeof makeProposalRepositoryMock>
 
@@ -108,7 +110,6 @@ describe('Proposal Use Case', () => {
         championName: 'test',
         employeeName: 'test',
       }
-      const pagination: Pagination = { limit: 50, offset: 0 }
 
       await proposalUseCase.executeFindAllDetailed(Role.ADMIN, 1, pagination, filters)
 
@@ -149,6 +150,16 @@ describe('Proposal Use Case', () => {
               ],
             },
           },
+        },
+        pagination,
+      )
+    })
+    it('should omit optional filters when not provided', async () => {
+      await proposalUseCase.executeFindAllDetailed(Role.ADMIN, 1, pagination, {})
+
+      expect(proposalRepository.findAllDetailed).toHaveBeenCalledWith(
+        {
+          isActive: true,
         },
         pagination,
       )
