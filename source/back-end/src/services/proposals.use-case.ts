@@ -105,8 +105,6 @@ class ProposalUseCase {
     if (role === Role.ADMIN) {
       if (filters.includeInactive === undefined || filters.includeInactive === false) {
         where.isActive = true
-      } else if (filters.includeInactive === true) {
-        where.OR = [{ isActive: false }, { isActive: true }]
       }
     } else {
       where.isActive = true
@@ -125,7 +123,6 @@ class ProposalUseCase {
     }
     if (createdAt.gte || createdAt.lte) where.createdAt = createdAt
 
-    const suggestionFilters: Prisma.SuggestionWhereInput[] = []
     const reFilter = filters.re === undefined ? undefined : String(filters.re)
     const idFilter = filters.id === undefined ? undefined : String(filters.id)
 
@@ -162,24 +159,26 @@ class ProposalUseCase {
         : undefined
 
     if (filters.employeeName) {
-      suggestionFilters.push({
-        OR: [
-          {
-            employeeName: {
-              contains: filters.employeeName,
+      where.suggestions = {
+        some: {
+          OR: [
+            {
+              employeeName: {
+                contains: filters.employeeName,
+              },
             },
-          },
-          {
-            employee: {
-              is: {
-                name: {
-                  contains: filters.employeeName,
+            {
+              employee: {
+                is: {
+                  name: {
+                    contains: filters.employeeName,
+                  },
                 },
               },
             },
-          },
-        ],
-      })
+          ],
+        },
+      }
     }
 
     if (filters.managerName) {
@@ -198,13 +197,6 @@ class ProposalUseCase {
       }
     }
 
-    if (suggestionFilters.length > 0) {
-      where.suggestions = {
-        some: {
-          AND: suggestionFilters,
-        },
-      }
-    }
     const detailedProposals = await this.proposalRepository.findAllDetailed(
       where,
       matcher ? undefined : pagination,
