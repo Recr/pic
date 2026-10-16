@@ -164,55 +164,42 @@ describe('Proposal Use Case', () => {
         pagination,
       )
     })
-    it('should request all active proposals if user is admin', async () => {
-      const mockProposals: Proposal[] = [
-        { id: 1, description: '1', ...partialProposal },
-        { id: 2, description: '2', ...partialProposal },
-      ]
+    it.each([
+      { role: Role.ADMIN, includeInactive: undefined, expectedIsActiveFilter: true },
+      { role: Role.ADMIN, includeInactive: false, expectedIsActiveFilter: true },
+      { role: Role.ADMIN, includeInactive: true, expectedIsActiveFilter: undefined },
+      { role: Role.OPERATOR, includeInactive: false, expectedIsActiveFilter: true },
+      { role: Role.OPERATOR, includeInactive: true, expectedIsActiveFilter: true },
+    ])(
+      'should apply isActive=$expectedIsActiveFilter for role=$role and includeInactive=$includeInactive',
+      async ({ role, includeInactive, expectedIsActiveFilter }) => {
+        const filter: DetailedProposalFilters = {}
+        if (includeInactive) {
+          filter.includeInactive = includeInactive
+        }
 
-      const where: ProposalWhereInput = { isActive: true }
-      const pagination: Pagination = { limit: 50, offset: 0 }
+        const where: ProposalWhereInput = {
+          ...(expectedIsActiveFilter === undefined ? {} : { isActive: expectedIsActiveFilter }),
+          ...(role !== Role.ADMIN
+            ? {
+                OR: [
+                  {
+                    suggestions: {
+                      some: {
+                        employeeId: 1,
+                      },
+                    },
+                  },
+                  { managerId: 1 },
+                  { championId: 1 },
+                ],
+              }
+            : {}),
+        }
 
-      proposalRepository.findAllDetailed.mockResolvedValue(mockProposals)
-
-      const proposals = await proposalUseCase.executeFindAllDetailed(Role.ADMIN, 1, pagination, {})
-
-      expect(proposalRepository.findAllDetailed).toHaveBeenCalledWith(where, pagination)
-      expect(proposals).toStrictEqual(mockProposals)
-    })
-    it('should request only active proposals related to user if not admin', async () => {
-      const mockProposals: Proposal[] = [
-        { id: 1, description: '1', ...partialProposal },
-        { id: 2, description: '2', ...partialProposal },
-      ]
-
-      const where: ProposalWhereInput = {
-        isActive: true,
-        OR: [
-          {
-            suggestions: {
-              some: {
-                employeeId: 1,
-              },
-            },
-          },
-          { managerId: 1 },
-          { championId: 1 },
-        ],
-      }
-      const pagination: Pagination = { limit: 50, offset: 0 }
-
-      proposalRepository.findAllDetailed.mockResolvedValue(mockProposals)
-
-      const proposals = await proposalUseCase.executeFindAllDetailed(
-        Role.OPERATOR,
-        1,
-        pagination,
-        {},
-      )
-
-      expect(proposalRepository.findAllDetailed).toHaveBeenCalledWith(where, pagination)
-      expect(proposals).toStrictEqual(mockProposals)
-    })
+        await proposalUseCase.executeFindAllDetailed(role, 1, pagination, filter)
+        expect(proposalRepository.findAllDetailed).toHaveBeenCalledWith(where, pagination)
+      },
+    )
   })
 })
