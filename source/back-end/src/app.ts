@@ -14,7 +14,7 @@ const corsOrigin = `${process.env.CORS_ORIGIN}`
 const corsOptions: CorsOptions = {
   origin: corsOrigin,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
   credentials: true,
   optionsSuccessStatus: 200,
 }
