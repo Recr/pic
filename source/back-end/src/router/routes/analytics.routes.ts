@@ -1,15 +1,15 @@
 import { Router } from 'express'
-import { authMiddleware } from '../../middlewares/auth.middeware'
-import { checkRole } from '../../middlewares/role.middleware'
 import { Role } from '../../utils/types/employees.types'
 import { AnalyticsController } from '../../controllers/analytics.controller'
+import { apiKeyOr } from '../../middlewares/api-key.middleware'
+import { authMiddleware } from '../../middlewares/auth.middeware'
+import { checkRole } from '../../middlewares/role.middleware'
 
 const analyticsRoutes = Router()
 
 analyticsRoutes.get(
   '/proposals',
-  authMiddleware,
-  checkRole([Role.ADMIN, Role.GENERAL_MANAGER]),
+  apiKeyOr('ANALYTICS_API_KEY', authMiddleware, checkRole([Role.ADMIN, Role.GENERAL_MANAGER])),
   AnalyticsController.handleGetProposalAnalytics,
 )
 
