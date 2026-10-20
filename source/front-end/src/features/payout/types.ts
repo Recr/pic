@@ -63,6 +63,7 @@ export interface GetPayoutsQueryParams extends Pagination {
   description?: string
   dateFrom?: string
   dateTo?: string
+  utcOffsetInMinutes?: number
   status?: string
   categoryId?: number
   areaId?: number

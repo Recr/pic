@@ -7,6 +7,7 @@ export interface PayoutFilters {
   description?: string
   dateFrom?: Date
   dateTo?: Date
+  utcOffsetInMinutes?: number
   status?: string
   categoryId?: number
   areaId?: number

@@ -26,7 +26,6 @@ const startOfUtcDay = (date: Date): Date =>
 
 const endOfUtcDay = (date: Date): Date =>
   new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999))
-
 const parseDateQuery = (
   value: unknown,
   fieldName: string,
@@ -54,8 +53,9 @@ export const AnalyticsController = {
       const analyticsUseCase = makeAnalyticsUseCase()
       const statuses = getQueryStringArray(req.query.status)
       const startDate = parseDateQuery(req.query.startDate, 'startDate')
-      const endDate = parseDateQuery(req.query.endDate, 'endDate')
+      const endDate = parseDateQuery(req.query.endDate, 'endDate', 'end')
       const completionDate = parseDateQuery(req.query.completionDate, 'completionDate', 'end')
+      const utcOffsetInMinutes = Number(req.query.utcOffsetInMinutes)
       const categoryId =
         typeof req.query.categoryId === 'string' && req.query.categoryId.trim() !== ''
           ? Number(req.query.categoryId)
@@ -86,6 +86,7 @@ export const AnalyticsController = {
         ...(completionDate ? { completionDate } : {}),
         ...(categoryId !== undefined ? { categoryId } : {}),
         ...(areaId !== undefined ? { areaId } : {}),
+        ...(Number.isFinite(utcOffsetInMinutes) ? { utcOffsetInMinutes } : {}),
       }
 
       const analytics = await analyticsUseCase.executeGetProposalAnalytics(filters)
@@ -103,10 +104,22 @@ export const AnalyticsController = {
     try {
       const analyticsUseCase = makeAnalyticsUseCase()
       const startDate = parseDateQuery(req.query.startDate, 'startDate')
-      const endDate = parseDateQuery(req.query.endDate, 'endDate')
+      const endDate = parseDateQuery(req.query.endDate, 'endDate', 'end')
+      const utcOffsetInMinutes = Number(req.query.utcOffsetInMinutes)
+      if (
+        startDate === undefined ||
+        endDate === undefined ||
+        !Number.isFinite(utcOffsetInMinutes)
+      ) {
+        throw new AppError(
+          'Invalid query parameters. Ensure startDate, endDate, and utcOffsetInMinutes are provided and valid.',
+          StatusCodes.BAD_REQUEST,
+        )
+      }
       const filters = {
-        ...(startDate ? { startDate } : {}),
-        ...(endDate ? { endDate: endOfUtcDay(endDate) } : {}),
+        startDate: startDate,
+        endDate: endDate,
+        utcOffsetInMinutes: utcOffsetInMinutes,
       }
       const timeToCommunicationAndImplementation =
         await analyticsUseCase.executeGetTimeToCommunicationAndImplementation(filters)
@@ -120,10 +133,12 @@ export const AnalyticsController = {
     try {
       const analyticsUseCase = makeAnalyticsUseCase()
       const startDate = parseDateQuery(req.query.startDate, 'startDate')
-      const endDate = parseDateQuery(req.query.endDate, 'endDate')
+      const endDate = parseDateQuery(req.query.endDate, 'endDate', 'end')
+      const utcOffsetInMinutes = Number(req.query.utcOffsetInMinutes)
       const filters = {
         ...(startDate ? { startDate } : {}),
-        ...(endDate ? { endDate: endOfUtcDay(endDate) } : {}),
+        ...(endDate ? { endDate } : {}),
+        ...(Number.isFinite(utcOffsetInMinutes) ? { utcOffsetInMinutes } : {}),
       }
       const pendingAndCompletedPayments =
         await analyticsUseCase.executeGetPendingAndCompletedPayments(filters)
