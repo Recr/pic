@@ -204,7 +204,10 @@ class ProposalUseCase {
     )
 
     detailedProposals.proposals = detailedProposals.proposals.map((proposal) => {
-      proposal.createdAt = adjustDateByOffset(proposal.createdAt, filters.utcOffsetInMinutes ?? 0)
+      proposal.createdAt = adjustDateByOffset(
+        proposal.createdAt,
+        filters.utcOffsetInMinutes ? filters.utcOffsetInMinutes * -1 : 0,
+      )
       return proposal
     })
 

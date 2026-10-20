@@ -101,6 +101,10 @@ describe('Proposal Use Case', () => {
 
   describe('executeFindAllDetailed', () => {
     it('should apply all provided filters', async () => {
+      const mockProposals = {
+        proposals: [],
+        totalCount: 0,
+      }
       const filters: DetailedProposalFilters = {
         areaId: 1,
         categoryId: 1,
@@ -110,6 +114,8 @@ describe('Proposal Use Case', () => {
         championName: 'test',
         employeeName: 'test',
       }
+
+      proposalRepository.findAllDetailed.mockResolvedValue(mockProposals)
 
       await proposalUseCase.executeFindAllDetailed(Role.ADMIN, 1, pagination, filters)
 
@@ -155,6 +161,12 @@ describe('Proposal Use Case', () => {
       )
     })
     it('should omit optional filters when not provided', async () => {
+      const mockProposals = {
+        proposals: [],
+        totalCount: 0,
+      }
+      proposalRepository.findAllDetailed.mockResolvedValue(mockProposals)
+
       await proposalUseCase.executeFindAllDetailed(Role.ADMIN, 1, pagination, {})
 
       expect(proposalRepository.findAllDetailed).toHaveBeenCalledWith(
@@ -173,6 +185,11 @@ describe('Proposal Use Case', () => {
     ])(
       'should apply isActive=$expectedIsActiveFilter for role=$role and includeInactive=$includeInactive',
       async ({ role, includeInactive, expectedIsActiveFilter }) => {
+        const mockProposals = {
+          proposals: [],
+          totalCount: 0,
+        }
+        proposalRepository.findAllDetailed.mockResolvedValue(mockProposals)
         const filter: DetailedProposalFilters = {}
         if (includeInactive) {
           filter.includeInactive = includeInactive
@@ -201,6 +218,33 @@ describe('Proposal Use Case', () => {
         expect(proposalRepository.findAllDetailed).toHaveBeenCalledWith(where, pagination)
       },
     )
-    it.todo('should apply dateFrom and dateTo filters correctly', async () => {})
+    // it.todo('should apply dateFrom and dateTo filters correctly', async () => {})
+
+    it('should adjust returned proposal dates by the requested UTC offset', async () => {
+      const createdAt = new Date('2026-10-20T03:00:00.000Z')
+      proposalRepository.findAllDetailed.mockResolvedValue({
+        proposals: [{ id: 1, description: '1', ...partialProposal, createdAt }],
+        totalCount: 1,
+      })
+
+      const result = await proposalUseCase.executeFindAllDetailed(Role.ADMIN, 1, pagination, {
+        utcOffsetInMinutes: 180,
+      })
+
+      expect(result.proposals[0]?.createdAt).toEqual(new Date('2026-10-20T00:00:00.000Z'))
+    })
+    it('should adjust returned proposal dates by the requested UTC offset and change the day if needed', async () => {
+      const createdAt = new Date('2026-10-20T01:00:00.000Z')
+      proposalRepository.findAllDetailed.mockResolvedValue({
+        proposals: [{ id: 1, description: '1', ...partialProposal, createdAt }],
+        totalCount: 1,
+      })
+
+      const result = await proposalUseCase.executeFindAllDetailed(Role.ADMIN, 1, pagination, {
+        utcOffsetInMinutes: 180,
+      })
+
+      expect(result.proposals[0]?.createdAt).toEqual(new Date('2026-10-19T22:00:00.000Z'))
+    })
   })
 })
