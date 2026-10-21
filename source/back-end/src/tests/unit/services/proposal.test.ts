@@ -113,6 +113,9 @@ describe('Proposal Use Case', () => {
         managerName: 'test',
         championName: 'test',
         employeeName: 'test',
+        dateFrom: new Date('2026-10-19'),
+        dateTo: new Date('2026-10-20'),
+        utcOffsetInMinutes: 180,
       }
 
       proposalRepository.findAllDetailed.mockResolvedValue(mockProposals)
@@ -126,6 +129,10 @@ describe('Proposal Use Case', () => {
           areaId: filters.areaId,
           categoryId: filters.categoryId,
           status: filters.status,
+          createdAt: {
+            gte: new Date('2026-10-19T03:00:00.000Z'),
+            lte: new Date('2026-10-21T02:59:59.999Z'),
+          },
           manager: {
             name: {
               contains: filters.managerName,
@@ -218,33 +225,60 @@ describe('Proposal Use Case', () => {
         expect(proposalRepository.findAllDetailed).toHaveBeenCalledWith(where, pagination)
       },
     )
-    // it.todo('should apply dateFrom and dateTo filters correctly', async () => {})
-
-    it('should adjust returned proposal dates by the requested UTC offset', async () => {
-      const createdAt = new Date('2026-10-20T03:00:00.000Z')
-      proposalRepository.findAllDetailed.mockResolvedValue({
-        proposals: [{ id: 1, description: '1', ...partialProposal, createdAt }],
-        totalCount: 1,
-      })
-
-      const result = await proposalUseCase.executeFindAllDetailed(Role.ADMIN, 1, pagination, {
+    it.each([
+      {
+        dateFrom: new Date('2026-10-19'),
+        dateTo: new Date('2026-10-20'),
         utcOffsetInMinutes: 180,
-      })
+        adjustedDateFrom: new Date('2026-10-19T03:00:00.000Z'),
+        adjustedDateTo: new Date('2026-10-21T02:59:59.999Z'),
+        dateFromLabel: '2026-10-19',
+        dateToLabel: '2026-10-20',
+        offsetHoursLabel: '3',
+      },
+      {
+        dateFrom: new Date('2026-10-19'),
+        dateTo: new Date('2026-10-20'),
+        utcOffsetInMinutes: -180,
+        adjustedDateFrom: new Date('2026-10-18T21:00:00.000Z'),
+        adjustedDateTo: new Date('2026-10-20T20:59:59.999Z'),
+        dateFromLabel: '2026-10-19',
+        dateToLabel: '2026-10-20',
+        offsetHoursLabel: '-3',
+      },
+      {
+        dateFrom: new Date('2026-10-19'),
+        dateTo: new Date('2026-10-20'),
+        utcOffsetInMinutes: 600,
+        adjustedDateFrom: new Date('2026-10-19T10:00:00.000Z'),
+        adjustedDateTo: new Date('2026-10-21T09:59:59.999Z'),
+        dateFromLabel: '2026-10-19',
+        dateToLabel: '2026-10-20',
+        offsetHoursLabel: '10',
+      },
+    ])(
+      'converts dateFrom=$dateFromLabel and dateTo=$dateToLabel with offset of $offsetHoursLabel hours to match UTC',
+      async ({ dateFrom, dateTo, utcOffsetInMinutes, adjustedDateFrom, adjustedDateTo }) => {
+        const mockProposals = {
+          proposals: [],
+          totalCount: 0,
+        }
+        proposalRepository.findAllDetailed.mockResolvedValue(mockProposals)
+        await proposalUseCase.executeFindAllDetailed(Role.ADMIN, 1, pagination, {
+          dateFrom,
+          dateTo,
+          utcOffsetInMinutes,
+        })
 
-      expect(result.proposals[0]?.createdAt).toEqual(new Date('2026-10-20T00:00:00.000Z'))
-    })
-    it('should adjust returned proposal dates by the requested UTC offset and change the day if needed', async () => {
-      const createdAt = new Date('2026-10-20T01:00:00.000Z')
-      proposalRepository.findAllDetailed.mockResolvedValue({
-        proposals: [{ id: 1, description: '1', ...partialProposal, createdAt }],
-        totalCount: 1,
-      })
-
-      const result = await proposalUseCase.executeFindAllDetailed(Role.ADMIN, 1, pagination, {
-        utcOffsetInMinutes: 180,
-      })
-
-      expect(result.proposals[0]?.createdAt).toEqual(new Date('2026-10-19T22:00:00.000Z'))
-    })
+        const where: ProposalWhereInput = {
+          isActive: true,
+          createdAt: {
+            gte: adjustedDateFrom,
+            lte: adjustedDateTo,
+          },
+        }
+        expect(proposalRepository.findAllDetailed).toHaveBeenCalledWith(where, pagination)
+      },
+    )
   })
 })
