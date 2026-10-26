@@ -5,6 +5,8 @@ import { ProposalUseCase } from '../../../services/proposals.use-case'
 import { makeProposalRepositoryMock } from '../../mocks/repositories'
 import { Role } from '../../../utils/types/employees.types'
 import { DetailedProposalFilters, Pagination } from '../../../utils/types/proposals.types'
+import { StatusCodes } from 'http-status-codes'
+import { AppError } from '../../../errors/AppError'
 
 const partialProposal: Omit<Proposal, 'id' | 'description'> = {
   status: 'DEFINE_CHAMPION',
@@ -280,5 +282,118 @@ describe('Proposal Use Case', () => {
         expect(proposalRepository.findAllDetailed).toHaveBeenCalledWith(where, pagination)
       },
     )
+  })
+
+  it('should return all proposals with manager to define champion', async () => {
+    const mockProposals: Proposal[] = [
+      { id: 1, description: '1', ...partialProposal },
+      { id: 2, description: '2', ...partialProposal },
+    ]
+    const user = {
+      id: 1,
+      role: Role.OPERATOR,
+    }
+
+    const where: ProposalWhereInput = {
+      isActive: true,
+      championId: null,
+      status: 'DEFINE_CHAMPION',
+      managerId: user.id,
+    }
+
+    proposalRepository.findAllWithoutChampion.mockResolvedValue(mockProposals)
+
+    const proposalsToDefineChampion = await proposalUseCase.executeFindAllWithoutChampion(
+      user.role,
+      user.id,
+    )
+
+    expect(proposalRepository.findAllWithoutChampion).toHaveBeenCalledWith(where)
+    expect(proposalsToDefineChampion).toStrictEqual(mockProposals)
+  })
+  it('should return all proposals without manager and without champion that the admin is manager for admin', async () => {
+    const mockProposals: Proposal[] = [
+      { id: 1, description: '1', ...partialProposal },
+      { id: 2, description: '2', ...partialProposal },
+    ]
+    const user = {
+      id: 1,
+      role: Role.ADMIN,
+    }
+
+    const where: ProposalWhereInput = {
+      isActive: true,
+      championId: null,
+      status: 'DEFINE_CHAMPION',
+      OR: [
+        {
+          managerId: null,
+        },
+        {
+          managerId: user.id,
+        },
+      ],
+    }
+
+    proposalRepository.findAllWithoutChampion.mockResolvedValue(mockProposals)
+
+    const proposalsToDefineChampion = await proposalUseCase.executeFindAllWithoutChampion(
+      user.role,
+      user.id,
+    )
+
+    expect(proposalRepository.findAllWithoutChampion).toHaveBeenCalledWith(where)
+    expect(proposalsToDefineChampion).toStrictEqual(mockProposals)
+  })
+  it('should return all proposals without manager and without champion', async () => {
+    const mockProposals: Proposal[] = [
+      { id: 1, description: '1', ...partialProposal },
+      { id: 2, description: '2', ...partialProposal },
+    ]
+
+    const where: ProposalWhereInput = {
+      isActive: true,
+      managerId: null,
+      championId: null,
+      status: 'DEFINE_CHAMPION',
+    }
+
+    proposalRepository.findAllWithoutChampion.mockResolvedValue(mockProposals)
+
+    const proposalsToDefineChampion =
+      await proposalUseCase.executeFindAllWithoutManagerAndChampion()
+
+    expect(proposalRepository.findAllWithoutChampion).toHaveBeenCalledWith(where)
+    expect(proposalsToDefineChampion).toStrictEqual(mockProposals)
+  })
+  it('should find a proposal by its ID', async () => {
+    const mockProposal: Proposal = { id: 1, description: 'Test Proposal', ...partialProposal }
+
+    proposalRepository.findById.mockResolvedValue(mockProposal)
+
+    const foundProposal = await proposalUseCase.executeFindById(1)
+
+    expect(proposalRepository.findById).toHaveBeenCalledWith(1)
+    expect(foundProposal).toStrictEqual(mockProposal)
+  })
+  it('should throw an error if proposal is not found', async () => {
+    proposalRepository.findById.mockResolvedValue(undefined)
+
+    await expect(proposalUseCase.executeFindById(1)).rejects.toThrow(
+      new AppError('Proposal not found', StatusCodes.NOT_FOUND),
+    )
+  })
+  it('should return proposals by category id', async () => {
+    const mockProposals: Proposal[] = [
+      { id: 1, description: '1', ...partialProposal },
+      { id: 2, description: '2', ...partialProposal },
+    ]
+
+    proposalRepository.findByCategoryId.mockResolvedValue(mockProposals)
+
+    const foundProposals = await proposalUseCase.executeFindByCategoryId(1)
+
+    expect(proposalRepository.findByCategoryId).toHaveBeenCalledWith(1)
+    expect(foundProposals).toStrictEqual(mockProposals)
   })
 })
