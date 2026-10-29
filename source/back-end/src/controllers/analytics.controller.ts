@@ -65,6 +65,8 @@ export const AnalyticsController = {
           ? Number(req.query.areaId)
           : undefined
 
+      const removeRejected = req.query.removeRejected === 'true'
+
       if (categoryId !== undefined && Number.isNaN(categoryId)) {
         throw new AppError(
           'Invalid categoryId query parameter. Use a valid number.',
@@ -86,6 +88,7 @@ export const AnalyticsController = {
         ...(completionDate ? { completionDate } : {}),
         ...(categoryId !== undefined ? { categoryId } : {}),
         ...(areaId !== undefined ? { areaId } : {}),
+        ...(removeRejected ? { removeRejected } : {}),
       }
 
       const analytics = await analyticsUseCase.executeGetProposalAnalytics(filters)
