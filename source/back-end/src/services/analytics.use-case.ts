@@ -14,11 +14,10 @@ interface GetProposalAnalyticsFilters {
   startDate?: Date
   endDate?: Date
   completionDate?: Date
-  category?: string
   categoryId?: number
   areaId?: number
   removeRejected?: boolean
-  utcOffsetInMinutes: number
+  utcOffsetInMinutes?: number
 }
 
 interface GetTimeToCommunicationAndImplementationFilters {

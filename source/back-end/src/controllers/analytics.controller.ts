@@ -88,8 +88,8 @@ export const AnalyticsController = {
         ...(completionDate ? { completionDate } : {}),
         ...(categoryId !== undefined ? { categoryId } : {}),
         ...(areaId !== undefined ? { areaId } : {}),
-        ...(Number.isFinite(utcOffsetInMinutes) ? { utcOffsetInMinutes } : {}),
         ...(removeRejected ? { removeRejected } : {}),
+        ...(Number.isFinite(utcOffsetInMinutes) ? { utcOffsetInMinutes } : {}),
       }
 
       const analytics = await analyticsUseCase.executeGetProposalAnalytics(filters)
