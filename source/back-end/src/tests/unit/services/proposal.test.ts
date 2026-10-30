@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Proposal } from '../../../../prisma/client/client'
 import { Decimal, ProposalWhereInput } from '../../../../prisma/client/internal/prismaNamespace'
 import { ProposalUseCase } from '../../../services/proposals.use-case'
-import { makeProposalRepositoryMock } from '../../mocks/repositories'
+import { makeEmployeeRepositoryMock, makeProposalRepositoryMock } from '../../mocks/repositories'
 import { Role } from '../../../utils/types/employees.types'
 import { DetailedProposalFilters, Pagination } from '../../../utils/types/proposals.types'
 import { StatusCodes } from 'http-status-codes'
@@ -37,12 +37,15 @@ describe('Proposal Use Case', () => {
 
   let proposalUseCase: ProposalUseCase
 
+  let employeeRepository: ReturnType<typeof makeEmployeeRepositoryMock>
+
   beforeEach(() => {
     proposalRepository = makeProposalRepositoryMock()
+    employeeRepository = makeEmployeeRepositoryMock()
 
     proposalUseCase = new ProposalUseCase(
       proposalRepository as never,
-      vi.fn() as never,
+      employeeRepository as never,
       vi.fn() as never,
       vi.fn() as never,
       vi.fn() as never,
@@ -282,6 +285,218 @@ describe('Proposal Use Case', () => {
         expect(proposalRepository.findAllDetailed).toHaveBeenCalledWith(where, pagination)
       },
     )
+    it('should filter and paginate proposals by id or employee re', async () => {
+      const proposals = [
+        {
+          id: 123,
+          createdAt: new Date('2026-10-19T12:00:00Z'),
+          suggestions: [
+            {
+              employeeRe: 999,
+              employeeId: 10,
+              employee: { id: 10, re: 456 },
+            },
+          ],
+        },
+        {
+          id: 789,
+          createdAt: new Date('2026-10-19T12:00:00Z'),
+          suggestions: [
+            {
+              employeeRe: 999,
+              employeeId: 20,
+              employee: { id: 20, re: 999 },
+            },
+          ],
+        },
+      ]
+
+      proposalRepository.findAllDetailed.mockResolvedValue({
+        proposals,
+        totalCount: 2,
+      })
+
+      const result = await proposalUseCase.executeFindAllDetailed(
+        Role.ADMIN,
+        1,
+        { limit: 10, offset: 0 },
+        { re: 456 },
+      )
+
+      expect(proposalRepository.findAllDetailed).toHaveBeenCalledWith({ isActive: true }, undefined)
+
+      expect(result).toEqual({
+        proposals: [proposals[0]],
+        totalCount: 1,
+      })
+    })
+
+    it('should match proposal and employee ids when filtering by id', async () => {
+      const proposals = [
+        {
+          id: 12,
+          createdAt: new Date('2026-10-19T12:00:00Z'),
+          suggestions: [
+            {
+              employeeRe: 100,
+              employeeId: 345,
+              employee: { id: 345, re: 100 },
+            },
+          ],
+        },
+        {
+          id: 99,
+          createdAt: new Date('2026-10-19T12:00:00Z'),
+          suggestions: [
+            {
+              employeeRe: 200,
+              employeeId: null,
+              employee: null,
+            },
+          ],
+        },
+      ]
+
+      proposalRepository.findAllDetailed.mockResolvedValue({
+        proposals,
+        totalCount: proposals.length,
+      })
+
+      const result = await proposalUseCase.executeFindAllDetailed(
+        Role.ADMIN,
+        1,
+        { limit: 10, offset: 0 },
+        { id: 345 },
+      )
+
+      expect(result.proposals).toEqual([proposals[0]])
+      expect(result.totalCount).toBe(1)
+    })
+
+    it('should require both id and re filters to match the same proposal', async () => {
+      const proposals = [
+        {
+          id: 12,
+          createdAt: new Date('2026-10-19T12:00:00Z'),
+          suggestions: [
+            {
+              employeeRe: 100,
+              employeeId: 345,
+              employee: { id: 345, re: 100 },
+            },
+          ],
+        },
+        {
+          id: 34,
+          createdAt: new Date('2026-10-19T12:00:00Z'),
+          suggestions: [
+            {
+              employeeRe: 200,
+              employeeId: 678,
+              employee: { id: 678, re: 200 },
+            },
+          ],
+        },
+      ]
+
+      proposalRepository.findAllDetailed.mockResolvedValue({
+        proposals,
+        totalCount: proposals.length,
+      })
+
+      const result = await proposalUseCase.executeFindAllDetailed(
+        Role.ADMIN,
+        1,
+        { limit: 1, offset: 0 },
+        { id: 34, re: 200 },
+      )
+
+      expect(result.proposals).toEqual([proposals[1]])
+      expect(result.totalCount).toBe(1)
+    })
+
+    it('should adjust returned proposal dates by the requested offset', async () => {
+      const proposal = {
+        id: 1,
+        createdAt: new Date('2026-10-19T12:00:00Z'),
+        suggestions: [],
+      }
+      proposalRepository.findAllDetailed.mockResolvedValue({
+        proposals: [proposal],
+        totalCount: 1,
+      })
+
+      const result = await proposalUseCase.executeFindAllDetailed(
+        Role.ADMIN,
+        1,
+        pagination,
+        { utcOffsetInMinutes: 180 },
+      )
+
+      expect(result.proposals[0].createdAt).toEqual(new Date('2026-10-19T09:00:00Z'))
+    })
+
+    it('should use zero offset when utcOffsetInMinutes is not provided', async () => {
+      const proposal = {
+        id: 1,
+        createdAt: new Date('2026-10-19T12:00:00Z'),
+        suggestions: [],
+      }
+      proposalRepository.findAllDetailed.mockResolvedValue({
+        proposals: [proposal],
+        totalCount: 1,
+      })
+
+      await proposalUseCase.executeFindAllDetailed(Role.ADMIN, 1, pagination, {
+        dateFrom: new Date('2026-10-19'),
+        dateTo: new Date('2026-10-19'),
+      })
+
+      expect(proposalRepository.findAllDetailed).toHaveBeenCalledWith(
+        {
+          isActive: true,
+          createdAt: {
+            gte: new Date('2026-10-19T00:00:00.000Z'),
+            lte: new Date('2026-10-19T23:59:59.999Z'),
+          },
+        },
+        pagination,
+      )
+    })
+
+    it('should not match a proposal when neither stored employee re matches', async () => {
+      const proposals = [
+        {
+          id: 1,
+          createdAt: new Date('2026-10-19T12:00:00Z'),
+          suggestions: [
+            {
+              employeeRe: 100,
+              employeeId: 10,
+              employee: { id: 10, re: 200 },
+            },
+            {
+              employeeRe: 300,
+              employeeId: 20,
+              employee: null,
+            },
+          ],
+        },
+      ]
+      proposalRepository.findAllDetailed.mockResolvedValue({
+        proposals,
+        totalCount: 1,
+      })
+
+      const result = await proposalUseCase.executeFindAllDetailed(
+        Role.ADMIN,
+        1,
+        pagination,
+        { re: 999 },
+      )
+
+      expect(result).toEqual({ proposals: [], totalCount: 0 })
+    })
   })
 
   it('should return all proposals with manager to define champion', async () => {
@@ -396,4 +611,102 @@ describe('Proposal Use Case', () => {
     expect(proposalRepository.findByCategoryId).toHaveBeenCalledWith(1)
     expect(foundProposals).toStrictEqual(mockProposals)
   })
+  it('should create a proposals', async () => {
+    const mockProposal: Proposal = {
+      id: 1,
+      description: 'Creation Test',
+      ...partialProposal,
+      areaId: 10,
+    }
+
+    proposalRepository.createWithSuggestions.mockResolvedValue(mockProposal)
+
+    const proposalInput = {
+      description: 'Creation Test',
+      areaId: 10,
+      employees: [
+        {
+          re: 123,
+          name: 'Employee 1',
+          shift: 'Morning',
+        },
+        {
+          re: 456,
+          name: 'Employee 2',
+          shift: 'Evening',
+        },
+        {
+          re: 789,
+          name: 'Employee 3',
+          shift: 'Night',
+        },
+      ],
+    }
+
+    employeeRepository.findByRe.mockResolvedValueOnce({
+      id: 10,
+      name: 'Employee 1',
+      role: 'OPERATOR',
+      re: 123,
+      shift: 'Morning',
+      email: 'employee1@example.com',
+      mustChangePassword: false,
+    })
+
+    employeeRepository.findByRe.mockResolvedValueOnce(undefined)
+
+    employeeRepository.findByRe.mockResolvedValueOnce({
+      id: 47,
+      name: 'Employee 3',
+      role: 'OPERATOR',
+      re: 789,
+      shift: 'ADM',
+      email: 'employee3@example.com',
+      mustChangePassword: false,
+    })
+
+    const createdProposal = await proposalUseCase.executeCreate(proposalInput)
+
+    expect(employeeRepository.findByRe).toHaveBeenCalledWith(123)
+    expect(employeeRepository.findByRe).toHaveBeenCalledWith(456)
+    expect(employeeRepository.findByRe).toHaveBeenCalledWith(789)
+    expect(employeeRepository.findByRe).toHaveBeenCalledTimes(3)
+
+    expect(proposalRepository.createWithSuggestions).toHaveBeenCalledWith({
+      description: 'Creation Test',
+      areaId: 10,
+      employees: [
+        {
+          re: 123,
+          name: 'Employee 1',
+          shift: 'Morning',
+          id: 10,
+        },
+        {
+          re: 456,
+          name: 'Employee 2',
+          shift: 'Evening',
+        },
+        {
+          re: 789,
+          name: 'Employee 3',
+          shift: 'Night',
+          id: 47,
+        },
+      ],
+    })
+
+    expect(createdProposal).toStrictEqual(mockProposal)
+  })
 })
+
+// export interface EmployeeInfo {
+//   re: number
+//   name: string
+//   shift: string
+// }
+// export interface CreateProposalInput {
+//   description: string
+//   areaId: number
+//   employees: EmployeeInfo[]
+// }

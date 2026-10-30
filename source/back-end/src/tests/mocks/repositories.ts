@@ -7,6 +7,7 @@ export interface ProposalRepositoryMock {
   findAllWithoutChampion: ReturnType<typeof vi.fn>
   findById: ReturnType<typeof vi.fn>
   findByCategoryId: ReturnType<typeof vi.fn>
+  createWithSuggestions: ReturnType<typeof vi.fn>
 }
 
 export const makeProposalRepositoryMock = (): ProposalRepositoryMock => ({
@@ -16,4 +17,13 @@ export const makeProposalRepositoryMock = (): ProposalRepositoryMock => ({
   findAllWithoutChampion: vi.fn(),
   findById: vi.fn(),
   findByCategoryId: vi.fn(),
+  createWithSuggestions: vi.fn(),
+})
+
+export interface EmployeeRepositoryMock {
+  findByRe: ReturnType<typeof vi.fn>
+}
+
+export const makeEmployeeRepositoryMock = (): EmployeeRepositoryMock => ({
+  findByRe: vi.fn(),
 })
