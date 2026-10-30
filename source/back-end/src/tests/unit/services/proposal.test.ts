@@ -426,12 +426,9 @@ describe('Proposal Use Case', () => {
         totalCount: 1,
       })
 
-      const result = await proposalUseCase.executeFindAllDetailed(
-        Role.ADMIN,
-        1,
-        pagination,
-        { utcOffsetInMinutes: 180 },
-      )
+      const result = await proposalUseCase.executeFindAllDetailed(Role.ADMIN, 1, pagination, {
+        utcOffsetInMinutes: 180,
+      })
 
       expect(result.proposals[0].createdAt).toEqual(new Date('2026-10-19T09:00:00Z'))
     })
@@ -488,12 +485,9 @@ describe('Proposal Use Case', () => {
         totalCount: 1,
       })
 
-      const result = await proposalUseCase.executeFindAllDetailed(
-        Role.ADMIN,
-        1,
-        pagination,
-        { re: 999 },
-      )
+      const result = await proposalUseCase.executeFindAllDetailed(Role.ADMIN, 1, pagination, {
+        re: 999,
+      })
 
       expect(result).toEqual({ proposals: [], totalCount: 0 })
     })
@@ -699,14 +693,3 @@ describe('Proposal Use Case', () => {
     expect(createdProposal).toStrictEqual(mockProposal)
   })
 })
-
-// export interface EmployeeInfo {
-//   re: number
-//   name: string
-//   shift: string
-// }
-// export interface CreateProposalInput {
-//   description: string
-//   areaId: number
-//   employees: EmployeeInfo[]
-// }
