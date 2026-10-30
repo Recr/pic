@@ -14,6 +14,7 @@ export interface GetProposalAnalyticsFilters {
   category?: string
   categoryId?: number
   areaId?: number
+  removeRejected?: boolean
 }
 
 export interface ProposalAnalyticsResponse {
@@ -33,6 +34,10 @@ export const analyticsAPI = api.injectEndpoints({
 
         if (filters?.status) {
           params.set('status', filters.status)
+        }
+
+        if (filters?.removeRejected) {
+          params.set('removeRejected', String(filters.removeRejected))
         }
 
         if (filters?.startDate) {

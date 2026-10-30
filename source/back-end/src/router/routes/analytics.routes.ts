@@ -1,21 +1,17 @@
 import { Router } from 'express'
-import { authMiddleware } from '../../middlewares/auth.middeware'
-import { checkRole } from '../../middlewares/role.middleware'
 import { Role } from '../../utils/types/employees.types'
 import { AnalyticsController } from '../../controllers/analytics.controller'
 import { validate } from '../../middlewares/validation.middleware'
-import {
-  proposalsAnalyticsSchema,
-  timeToCommunicationAndImplementationSchema,
-} from '../../utils/schemas/analytics.schemas'
+import { timeToCommunicationAndImplementationSchema } from '../../utils/schemas/analytics.schemas'
+import { apiKeyOr } from '../../middlewares/api-key.middleware'
+import { authMiddleware } from '../../middlewares/auth.middeware'
+import { checkRole } from '../../middlewares/role.middleware'
 
 const analyticsRoutes = Router()
 
 analyticsRoutes.get(
   '/proposals',
-  authMiddleware,
-  checkRole([Role.ADMIN, Role.GENERAL_MANAGER]),
-  validate(proposalsAnalyticsSchema),
+  apiKeyOr('ANALYTICS_API_KEY', authMiddleware, checkRole([Role.ADMIN, Role.GENERAL_MANAGER])),
   AnalyticsController.handleGetProposalAnalytics,
 )
 

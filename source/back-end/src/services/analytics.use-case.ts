@@ -7,6 +7,8 @@ type TimeBucket = 'week' | 'month' | 'year'
 
 const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000
 
+const REJECTED_PROPOSALS_EXCLUDED_FROM = new Date(Date.UTC(2026, 8, 30))
+
 interface GetProposalAnalyticsFilters {
   statuses?: string[]
   startDate?: Date
@@ -15,6 +17,7 @@ interface GetProposalAnalyticsFilters {
   category?: string
   categoryId?: number
   areaId?: number
+  removeRejected?: boolean
   utcOffsetInMinutes: number
 }
 
@@ -183,6 +186,13 @@ class AnalyticsUseCase {
     }
     if (filters?.areaId) {
       where.areaId = filters?.areaId
+    }
+
+    if (filters?.removeRejected) {
+      where.NOT = {
+        status: 'REJECTED',
+        createdAt: { gt: REJECTED_PROPOSALS_EXCLUDED_FROM },
+      }
     }
 
     where.isActive = true
