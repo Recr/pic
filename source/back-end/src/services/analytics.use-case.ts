@@ -1,6 +1,7 @@
 import { Prisma, Proposal } from '../../prisma/client/client'
 import { PrismaPayoutRepository } from '../repositories/payout.repository'
 import { PrismaProposalRepository } from '../repositories/proposal.repository'
+import { getUtcEndOfLocalDay, getUtcStartOfLocalDay } from '../utils/helpers/date-helper'
 
 type TimeBucket = 'week' | 'month' | 'year'
 
@@ -13,20 +14,22 @@ interface GetProposalAnalyticsFilters {
   startDate?: Date
   endDate?: Date
   completionDate?: Date
-  category?: string
   categoryId?: number
   areaId?: number
   removeRejected?: boolean
+  utcOffsetInMinutes?: number
 }
 
 interface GetTimeToCommunicationAndImplementationFilters {
-  startDate?: Date
-  endDate?: Date
+  startDate: Date
+  endDate: Date
+  utcOffsetInMinutes: number
 }
 
 interface TimeToCommunicationAndImplementationResponse {
   averageTimeToCommunication: number
   averageTimeToImplementation: number
+  utcOffsetInMinutes?: number
 }
 
 type GetPendingAndCompletedPaymentsFilters = GetTimeToCommunicationAndImplementationFilters
@@ -157,15 +160,26 @@ class AnalyticsUseCase {
 
     if (filters?.completionDate) {
       where.completedAt = {
-        ...(filters.startDate ? { gte: filters.startDate } : {}),
-        lte: filters.completionDate,
+        lte: getUtcEndOfLocalDay(filters.completionDate, filters.utcOffsetInMinutes ?? 0),
+        ...(filters.startDate
+          ? { gte: getUtcStartOfLocalDay(filters.startDate, filters.utcOffsetInMinutes ?? 0) }
+          : {}),
       }
     } else {
       where.createdAt = {
-        ...(filters?.startDate ? { gte: filters.startDate } : {}),
-        ...(filters?.endDate ? { lte: filters.endDate } : {}),
+        ...(filters?.startDate
+          ? { gte: getUtcStartOfLocalDay(filters.startDate, filters.utcOffsetInMinutes ?? 0) }
+          : {}),
+        ...(filters?.endDate
+          ? {
+              lte: getUtcEndOfLocalDay(filters.endDate, filters.utcOffsetInMinutes ?? 0),
+            }
+          : {}),
       }
     }
+    // if (filters?.startDate) {
+    //   console.log(startOfDay(filters?.startDate))
+    // }
     if (filters?.categoryId) {
       where.categoryId = filters?.categoryId
     }
@@ -181,9 +195,7 @@ class AnalyticsUseCase {
     }
 
     where.isActive = true
-
     const proposals = await this.proposalsRepository.findAllFiltered(where)
-
     const proposalDates = proposals.map((proposal) =>
       filters?.completionDate ? (proposal.completedAt ?? proposal.createdAt) : proposal.createdAt,
     )
@@ -235,10 +247,10 @@ class AnalyticsUseCase {
   ): Promise<TimeToCommunicationAndImplementationResponse> {
     const where: Prisma.ProposalWhereInput = {
       isActive: true,
-      createdAt: {
-        ...(filters.startDate ? { gte: filters.startDate } : {}),
-        ...(filters.endDate ? { lte: filters.endDate } : {}),
-      },
+    }
+    where.createdAt = {
+      gte: getUtcStartOfLocalDay(filters.startDate, filters.utcOffsetInMinutes),
+      lte: getUtcEndOfLocalDay(filters.endDate, filters.utcOffsetInMinutes),
     }
     const proposals = await this.proposalsRepository.findAllFiltered(where)
     let totalDaysToCommunication = 0
@@ -274,7 +286,17 @@ class AnalyticsUseCase {
   public async executeGetPendingAndCompletedPayments(
     filters: GetPendingAndCompletedPaymentsFilters,
   ): Promise<GetPendingAndCompletedPaymentsResponse> {
-    const payouts = await this.payoutsRepository.findAllFiltered(filters.startDate, filters.endDate)
+    const where: Prisma.PayoutWhereInput = {
+      createdAt: {
+        ...(filters.startDate
+          ? { gte: getUtcStartOfLocalDay(filters.startDate, filters.utcOffsetInMinutes) }
+          : {}),
+        ...(filters.endDate
+          ? { lte: getUtcEndOfLocalDay(filters.endDate, filters.utcOffsetInMinutes) }
+          : {}),
+      },
+    }
+    const payouts = await this.payoutsRepository.findAllFiltered(where)
     const pendingPayments = payouts.filter((payout) => payout.status === 'PENDING')
     const completedPayments = payouts.filter((payout) => payout.status === 'PAID')
 

@@ -20,6 +20,12 @@ import { PrismaProposalAttachmentRepository } from '../repositories/proposal-att
 import { PrismaPayoutRepository } from '../repositories/payout.repository'
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { ProposalWhereInput } from '../../prisma/client/models'
+import {
+  adjustDateByOffset,
+  getUtcEndOfLocalDay,
+  getUtcStartOfLocalDay,
+} from '../utils/helpers/date-helper'
 
 class ProposalUseCase {
   constructor(
@@ -31,35 +37,31 @@ class ProposalUseCase {
     private readonly payoutRepository: PrismaPayoutRepository,
   ) {}
 
-  public async executeFindAll() {
-    const proposals = await this.proposalRepository.findAll()
+  public async executeFindAllActive() {
+    const where: ProposalWhereInput = {
+      isActive: true,
+    }
+
+    const proposals = await this.proposalRepository.findAllFiltered(where)
     return proposals
   }
 
-  public async executeFindAllWithEmployees(userId?: number) {
-    const where: Prisma.ProposalWhereInput =
-      userId === undefined
-        ? {
-            isActive: true,
-            status: {
-              in: ['UNDER_VALIDATION', 'TO_IMPLEMENT', 'IMPLEMENTATION'],
-            },
-          }
-        : {
-            isActive: true,
-            OR: [
-              {
-                status: {
-                  in: ['UNDER_VALIDATION', 'TO_IMPLEMENT', 'IMPLEMENTATION'],
-                },
-                championId: userId,
-              },
-              {
-                status: 'WAITING_APPROVAL',
-                managerId: userId,
-              },
-            ],
-          }
+  public async executeFindAllWithEmployees(userId: number) {
+    const where: Prisma.ProposalWhereInput = {
+      isActive: true,
+      OR: [
+        {
+          status: {
+            in: ['UNDER_VALIDATION', 'TO_IMPLEMENT', 'IMPLEMENTATION'],
+          },
+          championId: userId,
+        },
+        {
+          status: 'WAITING_APPROVAL',
+          managerId: userId,
+        },
+      ],
+    }
     const proposals = await this.proposalRepository.findAllWithEmployees(where)
     return proposals
   }
@@ -108,8 +110,6 @@ class ProposalUseCase {
     if (role === Role.ADMIN) {
       if (filters.includeInactive === undefined || filters.includeInactive === false) {
         where.isActive = true
-      } else if (filters.includeInactive === true) {
-        where.OR = [{ isActive: false }, { isActive: true }]
       }
     } else {
       where.isActive = true
@@ -117,18 +117,13 @@ class ProposalUseCase {
 
     const createdAt: { gte?: Date; lte?: Date } = {}
     if (filters.dateFrom) {
-      const d = new Date(filters.dateFrom)
-      d.setUTCHours(0, 0, 0, 0)
-      createdAt.gte = d
+      createdAt.gte = getUtcStartOfLocalDay(filters.dateFrom, filters.utcOffsetInMinutes ?? 0)
     }
     if (filters.dateTo) {
-      const d = new Date(filters.dateTo)
-      d.setUTCHours(23, 59, 59, 999)
-      createdAt.lte = d
+      createdAt.lte = getUtcEndOfLocalDay(filters.dateTo, filters.utcOffsetInMinutes ?? 0)
     }
     if (createdAt.gte || createdAt.lte) where.createdAt = createdAt
 
-    const suggestionFilters: Prisma.SuggestionWhereInput[] = []
     const reFilter = filters.re === undefined ? undefined : String(filters.re)
     const idFilter = filters.id === undefined ? undefined : String(filters.id)
 
@@ -165,24 +160,26 @@ class ProposalUseCase {
         : undefined
 
     if (filters.employeeName) {
-      suggestionFilters.push({
-        OR: [
-          {
-            employeeName: {
-              contains: filters.employeeName,
+      where.suggestions = {
+        some: {
+          OR: [
+            {
+              employeeName: {
+                contains: filters.employeeName,
+              },
             },
-          },
-          {
-            employee: {
-              is: {
-                name: {
-                  contains: filters.employeeName,
+            {
+              employee: {
+                is: {
+                  name: {
+                    contains: filters.employeeName,
+                  },
                 },
               },
             },
-          },
-        ],
-      })
+          ],
+        },
+      }
     }
 
     if (filters.managerName) {
@@ -201,17 +198,18 @@ class ProposalUseCase {
       }
     }
 
-    if (suggestionFilters.length > 0) {
-      where.suggestions = {
-        some: {
-          AND: suggestionFilters,
-        },
-      }
-    }
     const detailedProposals = await this.proposalRepository.findAllDetailed(
       where,
       matcher ? undefined : pagination,
     )
+
+    detailedProposals.proposals = detailedProposals.proposals.map((proposal) => {
+      proposal.createdAt = adjustDateByOffset(
+        proposal.createdAt,
+        filters.utcOffsetInMinutes ? filters.utcOffsetInMinutes * -1 : 0,
+      )
+      return proposal
+    })
 
     if (matcher) {
       const filteredProposals = detailedProposals.proposals.filter(matcher)

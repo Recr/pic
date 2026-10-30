@@ -20,6 +20,7 @@ export const payoutAPI = api.injectEndpoints({
         description,
         dateFrom,
         dateTo,
+        utcOffsetInMinutes,
         status,
         categoryId,
         areaId,
@@ -36,6 +37,11 @@ export const payoutAPI = api.injectEndpoints({
             ...(description && { description }),
             ...(dateFrom && { dateFrom }),
             ...(dateTo && { dateTo }),
+            ...(utcOffsetInMinutes !== undefined
+              ? { utcOffsetInMinutes: String(utcOffsetInMinutes) }
+              : (dateFrom || dateTo)
+                ? { utcOffsetInMinutes: String(new Date().getTimezoneOffset()) }
+              : {}),
             ...(status && { status }),
             ...(categoryId !== undefined && { categoryId: String(categoryId) }),
             ...(areaId !== undefined && { areaId: String(areaId) }),

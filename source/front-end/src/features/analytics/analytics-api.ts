@@ -52,6 +52,11 @@ export const analyticsAPI = api.injectEndpoints({
           params.set('completionDate', filters.completionDate)
         }
 
+        if (filters?.endDate || filters?.completionDate || filters?.startDate) {
+          const d = new Date()
+          params.set('utcOffsetInMinutes', d.getTimezoneOffset().toString())
+        }
+
         if (filters?.category) {
           params.set('category', filters.category)
         }
@@ -79,11 +84,11 @@ export const analyticsAPI = api.injectEndpoints({
       query: (filters) => {
         const params = new URLSearchParams()
 
-        filters?.endDate
+        filters.endDate
           ? params.set('endDate', filters.endDate)
           : params.set('endDate', new Date().toISOString().split('T')[0])
 
-        filters?.startDate
+        filters.startDate
           ? params.set('startDate', filters.startDate)
           : params.set(
               'startDate',
@@ -91,6 +96,8 @@ export const analyticsAPI = api.injectEndpoints({
                 .toISOString()
                 .split('T')[0],
             )
+
+        params.set('utcOffsetInMinutes', new Date().getTimezoneOffset().toString())
 
         const queryString = params.toString()
 

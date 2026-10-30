@@ -11,18 +11,16 @@ export const AuthController = {
       const loginUseCase = makeLoginUseCase()
       const { accessToken, refreshToken, user } = await loginUseCase.executeLogin(data)
 
-      const isProduction = process.env.NODE_ENV === 'production'
-
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
-        secure: isProduction,
+        secure: req.secure,
         sameSite: 'lax',
         maxAge: 15 * 60 * 1000,
       })
 
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: isProduction,
+        secure: req.secure,
         sameSite: 'lax',
         maxAge: 24 * 60 * 60 * 1000,
       })
@@ -62,18 +60,16 @@ export const AuthController = {
       const { accessToken, refreshToken: newRefreshToken } =
         await loginUseCase.executeRefreshToken(refreshToken)
 
-      const isProduction = process.env.NODE_ENV === 'production'
-
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
-        secure: isProduction,
+        secure: req.secure,
         sameSite: 'lax',
         maxAge: 15 * 60 * 1000,
       })
 
       res.cookie('refreshToken', newRefreshToken, {
         httpOnly: true,
-        secure: isProduction,
+        secure: req.secure,
         sameSite: 'lax',
         maxAge: 24 * 60 * 60 * 1000,
       })
@@ -93,10 +89,9 @@ export const AuthController = {
       const loginUseCase = makeLoginUseCase()
       await loginUseCase.executeLogout(refreshToken)
 
-      const isProduction = process.env.NODE_ENV === 'production'
       const cookieOptions = {
         httpOnly: true,
-        secure: isProduction,
+        secure: req.secure,
         sameSite: 'lax' as const,
       }
 

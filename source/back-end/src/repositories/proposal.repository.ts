@@ -3,15 +3,6 @@ import { prisma } from '../lib/prisma'
 import { CreateProposalWithSuggestions, Pagination } from '../utils/types/proposals.types'
 
 class PrismaProposalRepository {
-  public async findAll() {
-    const proposals = await prisma.proposal.findMany({
-      where: {
-        isActive: true,
-      },
-    })
-    return proposals
-  }
-
   private getDetailedSelect() {
     return {
       id: true,

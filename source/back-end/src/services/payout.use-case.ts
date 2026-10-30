@@ -4,7 +4,7 @@ import { StatusCodes } from 'http-status-codes'
 import { Pagination } from '../utils/types/proposals.types'
 import { PayoutFilters } from '../utils/types/payouts.types'
 import { Prisma } from '../../prisma/client/client'
-import { getUTCEndOfDay, getUTCStartOfDay } from '../utils/helpers/date-helper'
+import { getUtcEndOfLocalDay, getUtcStartOfLocalDay } from '../utils/helpers/date-helper'
 
 class PayoutUseCase {
   constructor(private readonly payoutRepository: PrismaPayoutRepository) {}
@@ -22,16 +22,17 @@ class PayoutUseCase {
       where.status = filters.status
     }
 
+    const createdAt: { gte?: Date; lte?: Date } = {}
     if (filters.dateFrom) {
-      where.createdAt = {
-        gte: getUTCStartOfDay(filters.dateFrom),
-      }
+      createdAt.gte = getUtcStartOfLocalDay(filters.dateFrom, filters.utcOffsetInMinutes ?? 0)
     }
 
     if (filters.dateTo) {
-      where.createdAt = {
-        lte: getUTCEndOfDay(filters.dateTo),
-      }
+      createdAt.lte = getUtcEndOfLocalDay(filters.dateTo, filters.utcOffsetInMinutes ?? 0)
+    }
+
+    if (createdAt.gte || createdAt.lte) {
+      where.createdAt = createdAt
     }
 
     const suggestionFilters: Prisma.SuggestionWhereInput[] = []

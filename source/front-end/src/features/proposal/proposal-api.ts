@@ -91,6 +91,10 @@ export const proposalAPI = api.injectEndpoints({
           params.set('dateTo', dateTo)
         }
 
+        if (dateFrom || dateTo) {
+          params.set('utcOffsetInMinutes', String(new Date().getTimezoneOffset()))
+        }
+
         if (status) {
           params.set('status', status)
         }
